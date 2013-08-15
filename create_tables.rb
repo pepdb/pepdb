@@ -1,4 +1,4 @@
-DB.create_table(:libraries) do
+DB.create_table?(:libraries) do
   String :library_name, :primary_key => true
   String :encoding_scheme
   String :carrier
@@ -10,7 +10,7 @@ DB.create_table(:libraries) do
   index :library_name 
 end
 
-DB.create_table(:selections) do
+DB.create_table?(:selections) do
   String :selection_name, :primary_key => true
   Date :date
   foreign_key :target_id, :targets, :on_delete => :set_null
@@ -18,7 +18,7 @@ DB.create_table(:selections) do
   index :selection_name
 end
 
-DB.create(:sequencing_datasets) do
+DB.create_table?(:sequencing_datasets) do
   String :dataset_name, :primary_key => true
   String :read_type
   String :used_indices
@@ -35,12 +35,12 @@ DB.create(:sequencing_datasets) do
   index :dataset_name
 end
 
-DB.create(:peptides) do
+DB.create_table?(:peptides) do
   String :peptide_sequence, :primary_key => true
   index :peptide_sequence
 end
 
-DB.create(:clusters) do
+DB.create_table?(:clusters) do
   primary_key :cluster_id
   String :parameters
   String :consensus_sequence
@@ -51,19 +51,19 @@ DB.create(:clusters) do
   index :cluster_id
 end
 
-DB.create(:dna_sequences) do
+DB.create_table?(:dna_sequences) do
   String :dna_sequence, :primary_key => true
   index :dna_sequence
 end
 
-DB.create(:results) do
+DB.create_table?(:results) do
   primary_key :result_id
   String :performance
   foreign_key :target_id, :targets, :on_delete => :set_null
   index :result_id
 end
 
-DB.create(:targets) do
+DB.create_table?(:targets) do
   primary_key :target_id
   String :species
   String :tissue
@@ -71,16 +71,16 @@ DB.create(:targets) do
   index :target_id
 end
 
-DB.create(:clusters_peptides) do
-  Integer :cluster_id
-  String :peptide_sequence
+DB.create_table?(:clusters_peptides) do
+  foreign_key :cluster_id, :clusters, :on_delete => :cascade
+  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade
   primary_key [:cluster_id, :peptide_sequence]
-  index :cluster_id
+  index [:cluster_id, :peptide_sequence]
 end
 
-DB.create(:peptides_sequencing_datasets) do
-  String :dataset_name
-  String :peptide_sequence
+DB.create_table?(:peptides_sequencing_datasets) do
+  foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade
+  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade
   Integer :rank
   Integer :reads
   Float :dominance
@@ -88,10 +88,10 @@ DB.create(:peptides_sequencing_datasets) do
   index [:dataset_name, :peptide_sequence]
 end
 
-DB.create(:dna_sequences_peptides_sequencing_datasets) do
-  String :dna_sequence
-  String :peptide_sequence
-  String :dataset_name
+DB.create_table?(:dna_sequences_peptides_sequencing_datasets) do
+  foreign_key :dna_sequence, :dna_sequences, :on_delete => :cascade
+  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade
+  foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade
   Integer :reads
   foreign_key :result_id, :results, :on_delete => :set_null
   primary_key [:dna_sequence, :peptide_sequence, :dataset_name]
