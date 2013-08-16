@@ -2,6 +2,14 @@ require 'sequel'
 DB = Sequel.sqlite('pep.db')
 load 'create_tables.rb'
 
+
+
+trigger_count = DB.fetch("SELECT name FROM sqlite_master WHERE name = 'pep_div_up'")
+# trigger updating librariy column "distinct_peptides" for every newly inserted peptide
+if trigger_count.count == 0
+  DB.run("CREATE TRIGGER main.pep_div_up AFTER INSERT ON peptides_sequencing_datasets BEGIN UPDATE libraries SET distinct_peptides = distinct_peptides+1 WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = new.dataset_name); END"
+  )
+end
 class Library < Sequel::Model
   one_to_many :selections, :key => :selection_name
   one_to_many :sequencing_datasets, :key => :dataset_name
@@ -76,3 +84,5 @@ class Observation < Sequel::Model(:peptides_sequencing_datasets)
   many_to_one :sequencing_dataset, :key => :dataset_name
   many_to_one :result
 end
+
+load 'fill_db.rb'

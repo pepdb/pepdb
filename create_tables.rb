@@ -14,7 +14,7 @@ DB.create_table?(:selections) do
   String :selection_name, :primary_key => true
   Date :date
   foreign_key :target_id, :targets, :on_delete => :set_null
-  foreign_key :library_name, :libraries, :on_delete => :cascade 
+  foreign_key :library_name, :libraries, :on_delete => :cascade, :type=>'varchar(255)' 
   index :selection_name
 end
 
@@ -84,6 +84,7 @@ DB.create_table?(:peptides_sequencing_datasets) do
   Integer :rank
   Integer :reads
   Float :dominance
+  foreign_key :result_id, :results, :on_delete => :set_null
   primary_key [:dataset_name, :peptide_sequence]
   index [:dataset_name, :peptide_sequence]
 end
@@ -93,7 +94,7 @@ DB.create_table?(:dna_sequences_peptides_sequencing_datasets) do
   foreign_key :peptide_sequence, :peptides, :on_delete => :cascade
   foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade
   Integer :reads
-  foreign_key :result_id, :results, :on_delete => :set_null
   primary_key [:dna_sequence, :peptide_sequence, :dataset_name]
   index [:dna_sequence, :peptide_sequence, :dataset_name]
 end
+

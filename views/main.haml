@@ -1,0 +1,35 @@
+%html
+  %head
+    %link{ :rel => "stylesheet", :href => "style.css"}
+    %title pepDB main
+  %body
+    #topbar
+    #content
+      #left 
+        %ul
+          %li 
+            %a{:href =>"/libraries"} Library
+          %li 
+            %a{:href =>"/selections"} Selection
+          %li 
+            %a{:href =>"/datasets"} Sequencing Dataset
+          %li Peptides 
+          %ul
+            %li 
+              %a{:href =>"/sys_search"} Systemic Search
+            %li 
+              %a{:href =>"/prop_search"} Property Search
+            %li 
+              %a{:href =>"/comp_search"} Comparative Search 
+            %li
+              %a{:href =>"/mot_search"} Motive Search
+          %li 
+            %a{:href =>"/clusters"} Clusters
+          %ul
+            %li
+            %a{:href =>"/datasets"} Cluster Search
+            %li
+            %a{:href =>"/datasets"} Sequencing Dataset
+      #right
+        = libraries = Library.all 
+
