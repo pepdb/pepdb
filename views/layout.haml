@@ -1,3 +1,4 @@
+!!!
 %html
   %head
     %link{ :rel => "stylesheet", :href => "style.css"}
@@ -30,6 +31,4 @@
             %a{:href =>"/datasets"} Cluster Search
             %li
             %a{:href =>"/datasets"} Sequencing Dataset
-      #right
-        = libraries = Library.all 
-
+      #right= yield
