@@ -30,8 +30,8 @@ DB.create_table?(:sequencing_datasets) do
   Integer :sequence_length
   File :statistics
   foreign_key :target_id, :targets, :on_delete => :set_null
-  foreign_key :library_name, :libraries, :on_delete => :cascade
-  foreign_key :selection_name, :selections, :on_delete => :cascade
+  foreign_key :library_name, :libraries, :on_delete => :cascade, :type=>'varchar(255)'
+  foreign_key :selection_name, :selections, :on_delete => :cascade, :type=>'varchar(255)'
   index :dataset_name
 end
 
@@ -45,9 +45,9 @@ DB.create_table?(:clusters) do
   String :parameters
   String :consensus_sequence
   Float :dominance_sum
-  foreign_key :library_name, :libraries, :on_delete => :cascade
-  foreign_key :selection_name, :selections, :on_delete => :cascade
-  foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade
+  foreign_key :library_name, :libraries, :on_delete => :cascade, :type=>'varchar(255)'
+  foreign_key :selection_name, :selections, :on_delete => :cascade, :type=>'varchar(255)'
+  foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade, :type=>'varchar(255)'
   index :cluster_id
 end
 
@@ -73,14 +73,14 @@ end
 
 DB.create_table?(:clusters_peptides) do
   foreign_key :cluster_id, :clusters, :on_delete => :cascade
-  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade
+  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade, :type=>'varchar(255)'
   primary_key [:cluster_id, :peptide_sequence]
   index [:cluster_id, :peptide_sequence]
 end
 
 DB.create_table?(:peptides_sequencing_datasets) do
-  foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade
-  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade
+  foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade, :type=>'varchar(255)'
+  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade, :type=>'varchar(255)'
   Integer :rank
   Integer :reads
   Float :dominance
@@ -90,9 +90,9 @@ DB.create_table?(:peptides_sequencing_datasets) do
 end
 
 DB.create_table?(:dna_sequences_peptides_sequencing_datasets) do
-  foreign_key :dna_sequence, :dna_sequences, :on_delete => :cascade
-  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade
-  foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade
+  foreign_key :dna_sequence, :dna_sequences, :on_delete => :cascade, :type=>'varchar(255)'
+  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade, :type=>'varchar(255)'
+  foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade, :type=>'varchar(255)'
   Integer :reads
   primary_key [:dna_sequence, :peptide_sequence, :dataset_name]
   index [:dna_sequence, :peptide_sequence, :dataset_name]
