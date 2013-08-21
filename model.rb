@@ -5,6 +5,7 @@ load 'create_tables.rb'
 
 
 trigger_count = DB.fetch("SELECT name FROM sqlite_master WHERE name = 'pep_div_up'")
+
 # trigger updating librariy column "distinct_peptides" for every newly inserted peptide
 if trigger_count.count == 0
   DB.run("CREATE TRIGGER main.pep_div_up AFTER INSERT ON peptides_sequencing_datasets BEGIN UPDATE libraries SET distinct_peptides = distinct_peptides+1 WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = new.dataset_name); END"
