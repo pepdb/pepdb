@@ -1,0 +1,23 @@
+%table{:border => 1, :id => "select_table"}
+  %tr 
+  - @selections.first.each do |name|
+    %th= name[0].to_s.tr('_', ' ')
+  %tr
+  - @selections.each do |selection|
+    - selection.each do |column|
+      %td= column[1]
+    %tr       
+
+- if params.size != 0
+  %p 
+    sequencing datasets in selection 
+    = params[:sel_name]
+  %table{:border => 1}
+    %tr 
+    - @datasets.first.each do |name|
+      %th= name[0].to_s.tr('_', ' ')
+    %tr    
+    - @datasets.where(:selection_name => "#{params[:sel_name]}").each do |dataset|
+      - dataset.each do |column|
+        %td= column[1]
+      %tr

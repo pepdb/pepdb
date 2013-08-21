@@ -1,10 +1,17 @@
-
+// variables
+$sidebar-color: #A0A0A0;
 
 
 html, body {
   height: 100%;
   margin: 0;
 }
+
+.highlight td{
+  background-color: green;
+  cursor: pointer;
+}
+
 
 ul {
   list-style-type: none;
@@ -15,23 +22,23 @@ ul {
 }
 
 #left {
- # width: 200px;
+ // width: 200px;
   height: 300px;
   float: left;
-  background-color: red;
+  background-color: $sidebar-color;
   border-stlye:solid;
-#    margin-left: 0;
+//   margin-left: 0;
   width: 20%;
-  # -moz-border-radius: 10px;
-  # -webkit-border-radius: 10px;
-  # -o-border-radius: 10px;
-  # -ms-border-radius: 10px;
-  # -khtml-border-radius: 10px;
-  # border-radius: 10px;
-#  font-size: 0.9em;
-#  line-height: 1.3em;
-#  text-align: left;
-  # overflow: auto;
+ /*  -moz-border-radius: 10px;
+   -webkit-border-radius: 10px;
+   -o-border-radius: 10px;
+   -ms-border-radius: 10px;
+   -khtml-border-radius: 10px;
+   border-radius: 10px;
+  font-size: 0.9em;
+  line-height: 1.3em;
+  text-align: left;
+   overflow: auto; */
 }
 
 #topbar {

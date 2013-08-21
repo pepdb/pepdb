@@ -1,0 +1,23 @@
+%table{:border => 1, :id => "select_table"}
+  %tr 
+  - @datasets.first.each do |name|
+    %th= name[0].to_s.tr('_', ' ')
+  %tr
+  - @datasets.each do |dataset|
+    - dataset.each do |column|
+      %td= column[1]
+    %tr       
+
+- if params.size != 0
+  %p 
+    peptides in selected sequencing dataset 
+    = params[:set_name]
+  %table{:border => 1}
+    %tr 
+    - @peptides.first.each do |name|
+      %th= name[0].to_s.tr('_', ' ')
+    %tr    
+    - @peptides.where(:dataset_name => "#{params[:set_name]}").each do |peptide|
+      - peptide.each do |column|
+        %td= column[1]
+      %tr

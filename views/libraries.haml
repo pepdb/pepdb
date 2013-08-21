@@ -1,0 +1,23 @@
+%table{:border => 1, :id=>"select_table" }
+  %tr 
+  - @libraries.first.each do |name|
+    %th= name[0].to_s.tr('_', ' ')
+  %tr.notfirst
+  - @libraries.each do |library|
+    - library.each do |column|
+      %td= column[1]
+    %tr.notfirst     
+
+- if params.size != 0
+  %p 
+    selections in Library 
+    = params[:lib_name] 
+  %table{:border => 1, :id=>'sel_table'}
+    %tr 
+    - @selections.first.each do |name|
+      %th= name[0].to_s.tr('_', ' ')
+    %tr    
+    - @selections.where(:library_name => "#{params[:lib_name]}").each do |selection|
+      - selection.each do |column|
+        %td= column[1]
+      %tr  
