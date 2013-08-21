@@ -1,4 +1,4 @@
-%table{:border => 1, :id => "select_table"}
+%table{:border => 1, :id => "select_table", :data=>{:first_choice => "#{params[:set_name]}"}}
   %tr 
   - @datasets.first.each do |name|
     %th= name[0].to_s.tr('_', ' ')
@@ -12,7 +12,7 @@
   %p 
     peptides in selected sequencing dataset 
     = params[:set_name]
-  %table{:border => 1}
+  %table{:border => 1, :id=>'show_table', :data=>{:second_choice=>"#{params[:pep_seq]}"}}
     %tr 
     - @peptides.first.each do |name|
       %th= name[0].to_s.tr('_', ' ')
@@ -21,3 +21,31 @@
       - peptide.each do |column|
         %td= column[1]
       %tr
+
+  - if params.size > 3  
+    %p
+      all data on peptide
+      = params[:pep_seq]
+    %table{:border => 1}
+      %tr
+        - @peptide_info.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :sequencing_datasets__dataset_name => "#{params[:set_name]}").each do |info|
+          - info.each do |column|
+            %td= column[0].to_s.tr('_', ' ')
+            %td= column[1]
+            %tr 
+
+  - if params.size > 3  
+    %p
+      dna sequences encoding 
+      = params[:pep_seq]
+      in sequencing dataset
+      = params[:set_name]
+    %table{:border => 1}
+      %tr
+      - @peptide_dna.first.each do |name|
+        %th= name[0].to_s.tr('_', ' ')
+      %tr
+      - @peptide_dna.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :sequencing_datasets__dataset_name => "#{params[:set_name]}").each do |info|
+        - info.each do |column|
+          %td= column[1]
+        %tr

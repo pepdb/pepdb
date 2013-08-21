@@ -1,18 +1,17 @@
-%table{:border => 1, :id=>"select_table" }
+%table{:border => 1, :id=>"select_table", :data=>{:first_choice => "#{params[:lib_name]}"}}
   %tr 
   - @libraries.first.each do |name|
     %th= name[0].to_s.tr('_', ' ')
-  %tr.notfirst
+  %tr
   - @libraries.each do |library|
     - library.each do |column|
       %td= column[1]
-    %tr.notfirst     
-
+    %tr     
 - if params.size != 0
   %p 
-    selections in Library 
+    selections in Library
     = params[:lib_name] 
-  %table{:border => 1, :id=>'sel_table'}
+  %table{:border => 1, :id=>'show_table', :data=>{:second_choice=>"#{params[:sel_name]}"}}
     %tr 
     - @selections.first.each do |name|
       %th= name[0].to_s.tr('_', ' ')
@@ -20,4 +19,17 @@
     - @selections.where(:library_name => "#{params[:lib_name]}").each do |selection|
       - selection.each do |column|
         %td= column[1]
-      %tr  
+      %tr 
+
+  - if params.size > 3 
+    %p
+      all data on selection
+      = params[:sel_name]
+    %table{:border => 1}
+      %tr
+        - @selection_info.where(:selection_name => "#{params[:sel_name]}").each do |info|
+          - info.each do |column|
+            %td= column[0].to_s.tr('_', ' ')
+            %td= column[1]
+            %tr 
+ 
