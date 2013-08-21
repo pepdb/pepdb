@@ -1,0 +1,8 @@
+%ul
+  - @clusters.distinct.select(:library_name).each do |lib|
+    %li= lib[:library_name]
+    %ul
+      - @clusters.distinct.select(:selection_name).where(:library_name => "#{lib[:library_name]}").each do |sel| 
+        %li= sel[:selection_name]
+        - @clusters.distinct.select(:dataset_name).where(:library_name => "#{lib[:library_name]}", :selection_name => "#{sel[:selection_name]}").each do |ds|
+          %li= ds[:dataset_name]
