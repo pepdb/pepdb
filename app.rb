@@ -14,6 +14,7 @@ set :root, File.dirname(__FILE__)
 
 selection_columns = [:selection_name, :library_name, :date, :species, :tissue, :cell]
 dataset_columns = [:dataset_name, :library_name, :selection_name, :date, :selection_round]
+peptide_columns = [:peptides__peptide_sequence ]
 
 #before %r{.+\.js} do
 #  content_type 'text/javascript'
@@ -56,6 +57,6 @@ end
 
 get '/datasets/:set_name' do
   @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
-  @peptides = Peptide.join(Observation, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name=>:dataset_name)
+  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
   haml :datasets
 end
