@@ -1,4 +1,13 @@
 $(document).ready(function(){
+  $('#select_table').dataTable({
+    "bPaginate": false,
+    "bInfo": false,
+  })
+    .columnFilter();
+} );
+
+/*
+$(document).ready(function(){
   $('#select_table tr').hover(function(){
     $(this).toggleClass('highlight');
   });
@@ -21,3 +30,4 @@ $(document).ready(function(){
   });
   
 });
+*/
