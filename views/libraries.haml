@@ -1,37 +1,13 @@
-%table{:border => 1, :id=>"select_table", :class => "display",:data=>{:first_choice => "#{params[:lib_name]}"}}
-  %thead
-    %tr 
-      - @libraries.first.each do |name|
-        %th= name[0].to_s.tr('_', ' ')
-  %tbody
-    - @libraries.each do |library|
-      %tr      
-        - library.each do |column|
-          %td= column[1]
+= partial :tables, locals: {table_id:"select_table", choice:"#{params[:lib_name]}", first_data_to_display:@libraries, second_data_to_display:@libraries}
 
 - if params.size != 0
   %p 
     selections in Library
     = params[:lib_name] 
-  %table{:border => 1, :id=>'show_table', :data=>{:second_choice=>"#{params[:sel_name]}"}}
-    %tr 
-    - @selections.first.each do |name|
-      %th= name[0].to_s.tr('_', ' ')
-    %tr    
-    - @selections.where(:library_name => "#{params[:lib_name]}").each do |selection|
-      - selection.each do |column|
-        %td= column[1]
-      %tr 
+    = partial :tables, locals: {table_id:"show_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections.where(:library_name => "#{params[:lib_name]}")}    
 
-  - if params.size > 3 
+  - if params.size 
     %p
       all data on selection
       = params[:sel_name]
-    %table{:border => 1}
-      %tr
-        - @selection_info.where(:selection_name => "#{params[:sel_name]}").each do |info|
-          - info.each do |column|
-            %td= column[0].to_s.tr('_', ' ')
-            %td= column[1]
-            %tr 
- 
+      = partial :info_tables, locals: {data_to_display:@selection_info.where(:selection_name => "#{params[:sel_name]}")}

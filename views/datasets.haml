@@ -1,38 +1,16 @@
-%table{:border => 1, :id => "select_table", :data=>{:first_choice => "#{params[:set_name]}"}}
-  %tr 
-  - @datasets.first.each do |name|
-    %th= name[0].to_s.tr('_', ' ')
-  %tr
-  - @datasets.each do |dataset|
-    - dataset.each do |column|
-      %td= column[1]
-    %tr       
+= partial :tables, locals: {table_id:"select_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets}
 
 - if params.size != 0
   %p 
     peptides in selected sequencing dataset 
     = params[:set_name]
-  %table{:border => 1, :id=>'show_table', :data=>{:second_choice=>"#{params[:pep_seq]}"}}
-    %tr 
-    - @peptides.first.each do |name|
-      %th= name[0].to_s.tr('_', ' ')
-    %tr    
-    - @peptides.where(:sequencing_datasets__dataset_name => "#{params[:set_name]}").each do |peptide|
-      - peptide.each do |column|
-        %td= column[1]
-      %tr
+    = partial :tables, locals: {table_id:"show_table", choice:"#{params[:pep_seq]}", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => "#{params[:set_name]}")}
 
   - if params.size > 3  
     %p
       all data on peptide
       = params[:pep_seq]
-    %table{:border => 1}
-      %tr
-        - @peptide_info.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :sequencing_datasets__dataset_name => "#{params[:set_name]}").each do |info|
-          - info.each do |column|
-            %td= column[0].to_s.tr('_', ' ')
-            %td= column[1]
-            %tr 
+      = partial :info_tables, locals: {data_to_display:@peptide_info.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :sequencing_datasets__dataset_name => "#{params[:set_name]}")}
 
   - if params.size > 3  
     %p
@@ -41,11 +19,12 @@
       in sequencing dataset
       = params[:set_name]
     %table{:border => 1}
-      %tr
-      - @peptide_dna.first.each do |name|
-        %th= name[0].to_s.tr('_', ' ')
-      %tr
-      - @peptide_dna.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :sequencing_datasets__dataset_name => "#{params[:set_name]}").each do |info|
-        - info.each do |column|
-          %td= column[1]
+      %thead
         %tr
+          - @peptide_dna.first.each do |name|
+            %th= name[0].to_s.tr('_', ' ')
+      %tbody
+        - @peptide_dna.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :sequencing_datasets__dataset_name => "#{params[:set_name]}").each do |info|
+          %tr
+            - info.each do |column|
+              %td= column[1]

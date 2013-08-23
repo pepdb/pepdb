@@ -1,5 +1,6 @@
 #pepdb.rb
 require 'sinatra'
+require 'sinatra/partial'
 require 'date'
 require 'sass'
 require 'haml'

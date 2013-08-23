@@ -1,0 +1,9 @@
+%table{:border => 1}
+  %thead
+  %tbody
+    - data_to_display.each do |info|
+      - info.each do |column|
+        %tr
+          %td= column[0].to_s.tr('_', ' ')
+          %td= column[1]
+

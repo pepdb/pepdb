@@ -1,0 +1,11 @@
+%table{:id=>"#{table_id}", :class => "display",:data=>{:first_choice => "#{choice}"}}
+  %thead
+    %tr
+      - first_data_to_display.first.each do |column_name|
+        %th= column_name[0].to_s.tr('_', ' ')
+  %tbody
+    - second_data_to_display.each do |data_element|
+      %tr
+        - data_element.each do |cell_data|
+          %td= cell_data[1]
+
