@@ -1,4 +1,4 @@
+*.swp
 pep.db
 pep.db-journal
-.app.rb.swp
 .sass-cache

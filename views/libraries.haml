@@ -1,12 +1,14 @@
-%table{:border => 1, :id=>"select_table", :data=>{:first_choice => "#{params[:lib_name]}"}}
-  %tr 
-  - @libraries.first.each do |name|
-    %th= name[0].to_s.tr('_', ' ')
-  %tr
-  - @libraries.each do |library|
-    - library.each do |column|
-      %td= column[1]
-    %tr     
+%table{:border => 1, :id=>"select_table", :class => "display",:data=>{:first_choice => "#{params[:lib_name]}"}}
+  %thead
+    %tr 
+      - @libraries.first.each do |name|
+        %th= name[0].to_s.tr('_', ' ')
+  %tbody
+    - @libraries.each do |library|
+      %tr      
+        - library.each do |column|
+          %td= column[1]
+
 - if params.size != 0
   %p 
     selections in Library

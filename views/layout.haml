@@ -1,8 +1,16 @@
 !!! 5
+
 %html
   %head
+    %meta{:charset=>'UTF-8'}
     %script{:src => "/script/jquery-1.10.2.min.js"}
     %script{:type=>"text/javascript", :src => "/script/main.js"}
+    %script{:src => "/script/jquery.dataTables.js"}
+    %script{:src => "/script/jquery.dataTables.columnFilter.js"}
+    // %link{:rel=>"stylesheet", :href=> "/demo_table.css" }
+    // %link{:rel=>"stylesheet", :href=> "/demo_page.css" }
+    :css
+      @import 'demo_table.css'
     %link{ :rel => "stylesheet", :href => "/style.css"}
     %title pepDB main
   %body
@@ -16,21 +24,22 @@
             %a{:href =>"/selections"} Selection
           %li 
             %a{:href =>"/datasets"} Sequencing Dataset
-          %li Peptides 
-          %ul
-            %li 
-              %a{:href =>"/sys_search"} Systemic Search
-            %li 
-              %a{:href =>"/prop_search"} Property Search
-            %li 
-              %a{:href =>"/comp_search"} Comparative Search 
-            %li
-              %a{:href =>"/mot_search"} Motive Search
+          %li 
+            Peptides 
+            %ul
+              %li 
+                %a{:href =>"/sys_search"} Systemic Search
+              %li 
+                %a{:href =>"/prop_search"} Property Search
+              %li 
+                %a{:href =>"/comp_search"} Comparative Search 
+              %li
+                %a{:href =>"/mot_search"} Motif Search
           %li 
             %a{:href =>"/clusters"} Clusters
-          %ul
-            %li
-            %a{:href =>"/datasets"} Cluster Search
-            %li
-            %a{:href =>"/datasets"} Sequencing Dataset
+            %ul
+              %li
+                %a{:href =>"/datasets"} Cluster Search
+              %li
+                %a{:href =>"/datasets"} Sequencing Dataset
       #right= yield
