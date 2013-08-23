@@ -4,3 +4,4 @@ gem install sass
 zypper in ruby19-devel sqlite3 sqlite3-devel rubygem-sqlite3
 gem install sequel
 gem install shotgun
+gem install sinatra-partial
