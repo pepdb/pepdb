@@ -1,0 +1,14 @@
+LoadModule passenger_module /usr/lib64/ruby/gems/1.9.1/gems/passenger-4.0.14/buildout/apache2/mod_passenger.so
+
+PassengerRoot /usr/lib64/ruby/gems/1.9.1/gems/passenger-4.0.14
+PassengerDefaultRuby /usr/bin/ruby1.9
+
+
+<VirtualHost *:80>
+    ServerName localhost
+    DocumentRoot /home/christian/bachelor/pepdb/public
+    <Directory /home/christian/bachelor/pepdb/public>
+        Allow from all
+        Options -MultiViews
+    </Directory>
+</VirtualHost>

@@ -5,3 +5,11 @@ zypper in ruby19-devel sqlite3 sqlite3-devel rubygem-sqlite3
 gem install sequel
 gem install shotgun
 gem install sinatra-partial
+zypper in apache2
+gem install passenger
+passenger-install-apache2-module1.9
+zypper in gcc-c++
+zypper in libcurl-devel
+zypper in libopenssl-devel
+zypper in apache2-devel
+vi /etc/apache2/httpd.conf.pepdb
