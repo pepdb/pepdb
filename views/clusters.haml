@@ -1,8 +1,6 @@
-%ul
-  - @clusters.distinct.select(:library_name).each do |lib|
-    %li= lib[:library_name]
-    %ul
-      - @clusters.distinct.select(:selection_name).where(:library_name => "#{lib[:library_name]}").each do |sel| 
-        %li= sel[:selection_name]
-        - @clusters.distinct.select(:dataset_name).where(:library_name => "#{lib[:library_name]}", :selection_name => "#{sel[:selection_name]}").each do |ds|
-          %li= ds[:dataset_name]
+#clusterlist  
+  = partial :clusterlist, locals: {clusters:@clusters}
+- if params.size != 0
+  %p 
+    all data on selected cluster
+    = partial :info_tables, locals: {data_to_display:@cluster_info.where(:cluster_id => "#{params[:sel_cluster]}")}   

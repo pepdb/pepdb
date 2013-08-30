@@ -1,0 +1,21 @@
+%ul
+  - clusters.distinct.select(:library_name).each do |lib|
+    %li
+      %a{:href=>"#"}
+        = lib[:library_name]
+      %ul
+        - clusters.distinct.select(:selection_name).where(:library_name => "#{lib[:library_name]}").each do |sel|
+          %li
+            %a{:href=>"#"}
+              = sel[:selection_name]
+            %ul
+              - clusters.distinct.select(:dataset_name).where(:library_name => "#{lib[:library_name]}", :selection_name => "#{sel[:selection_name]}").each do |ds|
+                %li
+                  %a{:href=>"#"}
+                    = ds[:dataset_name]
+                  %ul
+                    - clusters.distinct.select(:cluster_id, :consensus_sequence).where(:library_name => "#{lib[:library_name]}", :selection_name => "#{sel[:selection_name]}", :dataset_name => "#{ds[:dataset_name]}").each do |cluster|
+                      %li{:id=>"#{cluster[:cluster_id]}"}
+                        %a{:href=>"/clusters/"+"#{cluster[:cluster_id]}"}
+                          = cluster[:consensus_sequence]
+

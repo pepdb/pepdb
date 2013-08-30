@@ -89,4 +89,9 @@ get '/clusters' do
   haml :clusters
 end
 
+get '/clusters/:sel_cluster' do
+  @clusters = Cluster
+  @cluster_info = Cluster.join(Peptide, :cluster_id => :cluster_id)
+  haml :clusters
+end
 
