@@ -60,6 +60,7 @@ peptides.insert(:peptide_sequence => 'WERWERG')
 peptides.insert(:peptide_sequence => 'NRTZHWE')
 
 clusters.insert(:parameters => 'para1', :consensus_sequence => 'SDAFA', :library_name => 'lib1', :selection_name => 'sel1', :dataset_name => 'ds1')
+clusters.insert(:parameters => 'para1', :consensus_sequence => 'SDAFA', :library_name => 'lib2', :selection_name => 'sel3', :dataset_name => 'ds6')
 clusters.insert(:parameters => 'para2', :consensus_sequence => 'EWFDF', :library_name => 'lib1', :selection_name => 'sel2', :dataset_name => 'ds3')
 clusters.insert(:parameters => 'para5', :consensus_sequence => 'SEFEF', :library_name => 'lib1', :selection_name => 'sel2', :dataset_name => 'ds4')
 clusters.insert(:parameters => 'para2', :consensus_sequence => 'FWEFW', :library_name => 'lib2', :selection_name => 'sel3', :dataset_name => 'ds6')

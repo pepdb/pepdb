@@ -58,7 +58,7 @@ end
 
 DB.create_table?(:results) do
   primary_key :result_id
-  String :performance
+  Text :performance
   foreign_key :target_id, :targets, :on_delete => :set_null
   index :result_id
 end
