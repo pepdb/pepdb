@@ -21,16 +21,21 @@ $(document).ready(function(){
     var route = window.location.pathname;
     $('body').load(route + "/" + selected_id); 
   });
+
   
   $('#show_table tr').hover(function(){
     $(this).toggleClass('highlight');
   });
   
   $('#show_table tr:has(td)').click(function(){
-    var first_choice =  $('#select_table').data('first-choice');
     var selected_id = $(this).find("td:first").html();
     var route = window.location.pathname;
-    $('body').load(route+ "/" + first_choice + "/" + selected_id); 
+    var first_choice =  $('#select_table').data('first-choice');
+    if(first_choice != null ){
+      $('body').load(route + "/" + first_choice + "/" + selected_id); 
+    } else {
+      $('body').load(route + "/" + selected_id);
+    }
   });
  
   $('#clusterlist').bind("loaded.jstree", function(){

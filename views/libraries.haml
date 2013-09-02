@@ -6,7 +6,7 @@
     = params[:lib_name] 
     = partial :tables, locals: {table_id:"show_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections.where(:library_name => "#{params[:lib_name]}")}    
 
-  - if params.size 
+  - if params.size > 3 
     %p
       all data on selection
       = params[:sel_name]

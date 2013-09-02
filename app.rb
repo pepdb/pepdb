@@ -17,7 +17,8 @@ selection_all_columns = [:selection_name, :library_name, :date, :species, :tissu
 dataset_columns = [:dataset_name ]
 dataset_info_columns = [:dataset_name, :library_name, :selection_name, :date]
 dataset_all_columns = [:dataset_name, :library_name, :selection_name, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
-peptide_columns = [:peptides__peptide_sequence ]
+peptide_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance]
+cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
 dna_columns = [:dna_sequences__dna_sequence, :reads]
 
@@ -91,7 +92,19 @@ end
 
 get '/clusters/:sel_cluster' do
   @clusters = Cluster
-  @cluster_info = Cluster.join(Peptide, :cluster_id => :cluster_id)
+  @cluster_info = Cluster.select(:consensus_sequence, :dominance, :parameters)
+ @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
   haml :clusters
 end
 
+get '/clusters/:sel_cluster/:pep_seq' do
+  @clusters = Cluster
+  @cluster_info = Cluster.select(:consensus_sequence, :dominance, :parameters)
+ @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
+  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
+  haml :clusters
+end
+
+get '/sys-search' do
+  haml :sys_search
+end
