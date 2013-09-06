@@ -1,4 +1,49 @@
+$(window).unload(function(){
+  alert("uload");
+  $(':checkbox').each(function(){
+    $.cookie($(this).attr("id"),null);
+  });
+});
+
+
 $(document).ready(function(){
+  var formAll = ["#all_lib", "#all_sel", "#all_ds" ];
+  var formIDs = ["#libform", "#selform", "#dsform" ];
+  $(window).unload(function(){
+    alert("uload");
+    $(':checkbox').each(function(){
+      $.cookie($(this).attr("id"),null);
+    });
+  });
+  $(':checkbox').each(function(){
+    var yolo2 = $.cookie($(this).attr("id"));
+    if (yolo2 == "true"){
+      $(this).attr('checked', true);
+    } else {
+      $(this).attr('checked', false);
+    }
+  });
+ 
+  $.each(formAll, function(index, value){
+    $(value).click(function(){
+      var marked = this.checked;
+      $(this).closest('fieldset').find(':checkbox').each(function(){
+        $.cookie($(this).attr("id"), marked); 
+        $(this).prop('checked', marked);
+      });
+  });  
+    
+  }); 
+  
+  $.each(formIDs, function(index, selector){
+    $(selector + ' input:checkbox').click(function(){
+      $.cookie($(this).attr("id"), this.checked); 
+      $(selector).submit();
+    });
+  });
+
+
+
   $('#select_table').dataTable({
     "bPaginate": false,
     "bInfo": false,

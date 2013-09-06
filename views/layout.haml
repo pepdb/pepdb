@@ -7,35 +7,37 @@
     %script{:src => "/script/jquery.dataTables.min.js"}
     %script{:src => "/script/jquery.dataTables.columnFilter.js"}
     %script{:src => "/script/jquery.jstree.js"}
+    %script{:src => "/script/jquery.cookie.js"}
     %link{:rel=>"stylesheet", :href=> "/demo_table.css" }
     %link{ :rel => "stylesheet", :href => "/style.css"}
     %title pepDB main
   %body
     #topbar
     #content
-      %ul{:id=>'navigation'}
-        %li 
-          %a{:href =>"/libraries"} Library
-        %li 
-          %a{:href =>"/selections"} Selection
-        %li 
-          %a{:href =>"/datasets"} Sequencing Dataset
-        %li 
-          Peptide 
-          %ul
-            %li 
-              %a{:href =>"/sys-search"} Systemic Search
-            %li 
-              %a{:href =>"/prop-search"} Property Search
-            %li 
-              %a{:href =>"/comp-search"} Comparative Search 
-            %li
-              %a{:href =>"/mot-search"} Motif Search
-        %li 
-          %a{:href =>"/clusters"} Cluster
-          %ul
-            %li
-              %a{:href =>"/clus-search"} Cluster Search
-            %li
-              %a{:href =>"/comp-clus-search"} Comparative Cluster Search
+      #left
+        %ul{:id=>'navigation'}
+          %li 
+            %a{:href =>"/libraries"} Library
+          %li 
+            %a{:href =>"/selections"} Selection
+          %li 
+            %a{:href =>"/datasets"} Sequencing Dataset
+          %li 
+            Peptide 
+            %ul
+              %li 
+                %a{:href =>"/sys-search"} Systemic Search
+              %li 
+                %a{:href =>"/prop-search"} Property Search
+              %li 
+                %a{:href =>"/comp-search"} Comparative Search 
+              %li
+                %a{:href =>"/mot-search"} Motif Search
+          %li 
+            %a{:href =>"/clusters"} Cluster
+            %ul
+              %li
+                %a{:href =>"/clus-search"} Cluster Search
+              %li
+                %a{:href =>"/comp-clus-search"} Comparative Cluster Search
       #right= yield

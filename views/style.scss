@@ -11,6 +11,39 @@ body {
 
 }
 
+fieldset {
+  border: 0;
+  padding: 0;
+}
+
+div#checkboxes {
+  position: relative;
+  width: 100%;
+}
+div.check-select {
+  position: relative;
+  border: 1px solid #ccc;
+  width: 8em;
+  height: 4em;
+  overflow-y: scroll;
+}
+#check-library {
+  width: 33%;
+  position: relative;
+  float: left;
+}
+
+#check-selection {
+  width: 33%;
+  float: left;
+  position: relative;
+}
+#check-dataset {
+  width: 33%;
+  position: relative;
+  float: left;
+}
+
 .highlight td{
   background-color: green;
   cursor: pointer;
@@ -20,7 +53,7 @@ body {
 ul#navigation {
   list-style-type: none;
   font-size: 0.91em;
-  float: left;
+  //float: left;
   width: 15em;
   margin: 0;
   padding: 0em;
@@ -38,18 +71,23 @@ ul#navigation {
   }
 }
 
+#left {
+  float:left;
+  width:20%;
+}
 #right {
-  margin-left: 15em;
-  margin-right: 0.4em;
-  width: 100%;
-  min-width: 10em;
-  overflow:scroll;
+  float: left;
+  //margin-left: 15em;
+  //margin-right: 0.4em;
+  width: 80%;
+  //min-width: 10em;
+  overflow-y:auto;
 
 
 }
 
 #content {
-  width: 80%;
+  width: 100%;
   height: 100%;
 }
 

@@ -18,6 +18,7 @@ dataset_columns = [:dataset_name ]
 dataset_info_columns = [:dataset_name, :library_name, :selection_name, :date]
 dataset_all_columns = [:dataset_name, :library_name, :selection_name, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
 peptide_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance]
+sys_peptide_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name,:rank, :reads , :dominance]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
 dna_columns = [:dna_sequences__dna_sequence, :reads]
@@ -106,5 +107,17 @@ get '/clusters/:sel_cluster/:pep_seq' do
 end
 
 get '/sys-search' do
+  @libraries = Library.all
+  @datasets = SequencingDataset.all
+  @selections = Selection.all
+  haml :sys_search
+end
+
+post '/sys-search' do
+  @libraries = Library.all
+  @datasets = SequencingDataset
+  @selections = Selection
+  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*sys_peptide_columns)
+  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :sys_search
 end
