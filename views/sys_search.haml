@@ -13,7 +13,7 @@
     .check-select#check-selection
       - if !params['checked_lib'].nil?
         %fieldset
-          %input{:type => "checkbox", :name => "check_sel[]", :id=> "all_sel",:value => "all_sel"} 
+          %input{:type => "checkbox", :name => "checked_sel[]", :id=> "all_sel",:value => "all_sel"} 
             all
             %br 
           - @selections.select(:selection_name).where(:library_name => params['checked_lib']).each do |elem|
@@ -31,7 +31,7 @@
             %input{:type => "checkbox", :name => "checked_ds[]", :id => "#{elem[:dataset_name]}",:value => "#{elem[:dataset_name]}"}
               = elem[:dataset_name]
               %br
-
+    %input{:type => "button", :id => "clear-button",:value => "clear selection"}
 - if !params['checked_ds'].nil? #&& params['checked_ds'].include?("all_ds")
   %p 
     peptides in all selected datasets

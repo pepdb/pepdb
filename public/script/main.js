@@ -1,22 +1,14 @@
-$(window).unload(function(){
-  alert("uload");
-  $(':checkbox').each(function(){
-    $.cookie($(this).attr("id"),null);
-  });
-});
-
-
 $(document).ready(function(){
   var formAll = ["#all_lib", "#all_sel", "#all_ds" ];
-  var formIDs = ["#libform", "#selform", "#dsform" ];
-  $(window).unload(function(){
-    alert("uload");
-    $(':checkbox').each(function(){
-      $.cookie($(this).attr("id"),null);
-    });
+  
+  $('#clear-button').click(function(){
+    localStorage.clear();
+    $('body').load(window.location.pathname);
+    //$('#libform').submit();
   });
+   
   $(':checkbox').each(function(){
-    var yolo2 = $.cookie($(this).attr("id"));
+    var yolo2 = localStorage[$(this).attr("id")];
     if (yolo2 == "true"){
       $(this).attr('checked', true);
     } else {
@@ -28,18 +20,30 @@ $(document).ready(function(){
     $(value).click(function(){
       var marked = this.checked;
       $(this).closest('fieldset').find(':checkbox').each(function(){
-        $.cookie($(this).attr("id"), marked); 
+        localStorage[$(this).attr("id")] = marked;
+        //$.cookie($(this).attr("id"), marked); 
         $(this).prop('checked', marked);
       });
-  });  
-    
+    });  
   }); 
   
-  $.each(formIDs, function(index, selector){
-    $(selector + ' input:checkbox').click(function(){
-      $.cookie($(this).attr("id"), this.checked); 
-      $(selector).submit();
-    });
+  $('#libform input:checkbox').click(function(){
+    if($(this).attr("name") == "checked_lib[]"){
+      if(!localStorage["libs"]){
+        var content = [];
+        localStorage["libs"] = JSON.stringify(content);
+      }
+      var selectedLibs = JSON.parse(localStorage["libs"]);
+        
+      localStorage["sels"] = null; 
+      localStorage["datasets"] = null; 
+    } else if ($(this).attr("name") == "checked_sel[]"){
+      localStorage["datasets"] = null; 
+    } else if ($(this).attr("name") == "checked_sel[]"){
+    } else {
+    }
+    localStorage[$(this).attr("id")] = this.checked;
+    $('#libform').submit();
   });
 
 
