@@ -1,53 +1,81 @@
 $(document).ready(function(){
   var formAll = ["#all_lib", "#all_sel", "#all_ds" ];
+
+  /* retrieve checkbox state from localStorage  */
+  function checkCheckbox(storageName, itemID){
+      if(localStorage[storageName]){
+        var checkedItems = JSON.parse(localStorage[storageName]);
+        var marked = false;
+        checkedItems.forEach(function(element){
+          if(element == itemID){
+            marked = true;
+            return false;
+          }
+        });
+        return marked
+      } 
+  }
   
+  /* save checkbox state to localStorage */
+  function saveCheckbox(storageName, itemID, checkStatus){
+    if(!localStorage[storageName]){
+      var content = [];
+      localStorage[storageName] = JSON.stringify(content);
+    }
+    var selectedItems = JSON.parse(localStorage[storageName]);
+    if(checkStatus){
+      selectedItems.push(itemID);
+    } else {
+      for (var elementCounter = 0; elementCounter < selectedItems.length; elementCounter = elementCounter +1){
+        if(selectedItems[elementCounter] == itemID){
+          selectedItems.splice(elementCounter, 1);
+          break;
+        }
+      }
+    }      
+    localStorage[storageName] = JSON.stringify(selectedItems);
+  } 
+
+
   $('#clear-button').click(function(){
     localStorage.clear();
     $('body').load(window.location.pathname);
-    //$('#libform').submit();
   });
    
   $(':checkbox').each(function(){
-    var yolo2 = localStorage[$(this).attr("id")];
-    if (yolo2 == "true"){
-      $(this).attr('checked', true);
-    } else {
-      $(this).attr('checked', false);
-    }
+    storage = $(this).attr("name").slice(0,-2);
+    itemID = $(this).attr("id");
+    $(this).prop('checked', checkCheckbox(storage, itemID));
   });
- 
+  
+  /*(un)check all checkboxes on checking "all" */ 
   $.each(formAll, function(index, value){
     $(value).click(function(){
       var marked = this.checked;
       $(this).closest('fieldset').find(':checkbox').each(function(){
-        localStorage[$(this).attr("id")] = marked;
-        //$.cookie($(this).attr("id"), marked); 
+        storage = $(this).attr("name");
+        saveCheckbox(storage.slice(0,-2), $(this).attr("id"), marked); 
         $(this).prop('checked', marked);
       });
     });  
   }); 
   
   $('#libform input:checkbox').click(function(){
-    if($(this).attr("name") == "checked_lib[]"){
-      if(!localStorage["libs"]){
-        var content = [];
-        localStorage["libs"] = JSON.stringify(content);
-      }
-      var selectedLibs = JSON.parse(localStorage["libs"]);
-        
-      localStorage["sels"] = null; 
-      localStorage["datasets"] = null; 
-    } else if ($(this).attr("name") == "checked_sel[]"){
-      localStorage["datasets"] = null; 
-    } else if ($(this).attr("name") == "checked_sel[]"){
-    } else {
+    storage = $(this).attr("name");
+    saveCheckbox(storage.slice(0,-2), $(this).attr("id"), this.checked); 
+
+    if(storage == "checked_lib[]"){
+      localStorage.removeItem("checked_sel"); 
+      localStorage.removeItem("checked_ds");
+
+    } else if (storage == "checked_sel[]"){
+      localStorage.removeItem("checked_ds");
     }
-    localStorage[$(this).attr("id")] = this.checked;
     $('#libform').submit();
   });
 
 
-
+  /* --------------DataTables configuration----------------  */
   $('#select_table').dataTable({
     "bPaginate": false,
     "bInfo": false,
@@ -87,6 +115,8 @@ $(document).ready(function(){
     }
   });
  
+
+  /* -----------jsTree configuration------------------- */  
   $('#clusterlist').bind("loaded.jstree", function(){
    var opennode = document.location.pathname.split("/").pop(); 
    $('#' + opennode).parents(".jstree-closed").each(function(){
@@ -107,19 +137,8 @@ $(document).ready(function(){
   }) 
     .jstree( {"plugins" : ["themes", "html_data"] })
     .delegate("a", "click", function(event, data){
-     // event.preventDefault();
-     // var select = data.rslt.obj.attr("id"); 
-     // $('body').load(select);
-     // alert(select);
-
    } );
 
 
-/*
-   .bind("select_node.jstree", function(event, data){
-    var leafpath = data.rslt.obj.attr('id');
-    document.location = "/clusters/" + leafpath;
-  });
-*/
 } );
 
