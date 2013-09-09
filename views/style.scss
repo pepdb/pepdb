@@ -1,6 +1,7 @@
 // variables
 $sidebar-color: #A0A0A0;
 
+// general
 body {
   color: black;
   background-color: white;
@@ -14,6 +15,56 @@ body {
 fieldset {
   border: 0;
   padding: 0;
+}
+
+// prop-search
+#properties {
+  border:1px;
+  float:left;
+  width: 33%;
+}
+
+#disp-res {
+  border: 1px;
+  float:left;
+  width:66%;
+}
+
+fieldset#first{
+  float:left;
+  width: 24%;
+}
+fieldset#second{
+  float:left;
+  width: 24%;
+}
+fieldset#third{
+  float:left;
+  width: 24%;
+}
+fieldset#fourth{
+  float:left;
+  width: 24%;
+}
+fieldset#fifth{
+  clear:both;
+  float:left;
+}
+fieldset#sixth{
+  float:left;
+}
+fieldset#seventh{
+  float:left;
+}
+
+#bottom {
+  clear:both;
+}
+
+fieldset p {
+  clear:both;
+  padding: 1px;
+  margin: 1px;
 }
 
 div#checkboxes {

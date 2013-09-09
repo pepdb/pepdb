@@ -1,5 +1,14 @@
 $(document).ready(function(){
   var formAll = ["#all_lib", "#all_sel", "#all_ds" ];
+  var propSelect = ['#l', '#s', '#ds', '#c', '#ts', '#tt', '#tc', '#ss', '#st', '#sc'];
+  var propInput = ['#seq', '#blos', '#pl', '#sr', '#ralt', '#ragt', '#relt', '#regt', '#dlt', '#dgt'];
+
+  /* get url parameter "name" or return "" if does not exist */
+  function urlParam(name){
+    var result = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    return result && unescape(result[1]) || ""; 
+  }
+
 
   /* retrieve checkbox state from localStorage  */
   function checkCheckbox(storageName, itemID){
@@ -42,7 +51,7 @@ $(document).ready(function(){
     $('body').load(window.location.pathname);
   });
    
-  $(':checkbox').each(function(){
+  $('#checkboxes :checkbox').each(function(){
     storage = $(this).attr("name").slice(0,-2);
     itemID = $(this).attr("id");
     $(this).prop('checked', checkCheckbox(storage, itemID));
@@ -73,6 +82,49 @@ $(document).ready(function(){
     }
     $('#libform').submit();
   });
+ 
+  $('#check-library input:checkbox').click(function(){
+    $('#check-selection').load('/checklist',{checkname: 'test', all_elem: 'test2' }, function(){
+      $.getScript("/script/main.js");
+      } );
+  });
+
+  $('#check-selection input:checkbox').click(function(){
+    $('#check-dataset').load('/checklist',{checkname: 'test', all_elem: 'test2' } )
+  });
+
+
+ 
+  $.each(propSelect, function(index, value){
+    var paramName = $(value).attr('name');
+    if(urlParam(paramName) == ""){
+      $(value).prop('selectedIndex', -1);
+    }
+    $(value).on('beforeunload', function(){
+      if ($(this).attr('selectedIndex') == -1)
+        $(this).prop('name', '');
+      });
+    });
+
+  $('#propsearch').submit(function(){
+    $.each(propInput, function(index,value){
+      if($(value).val() == ""){
+        if(value == '#seq'){
+          $('#type').attr('name', '');
+        }
+        $(value).attr('name', '');
+      }
+    });
+  }); 
+    
+    
+  $('#seq-select').change(function(){
+    
+    $('#blossum').toggle();
+  });
+
+
+
 
 
   /* --------------DataTables configuration----------------  */
@@ -125,6 +177,28 @@ $(document).ready(function(){
   });  
  
   $('#clusterlist').bind('before.jstree', function(event,data){
+    switch(data.plugin){
+      case 'ui':
+        if(!data.inst.is_leaf(data.args[0])){
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+  }) 
+    .jstree( {"plugins" : ["themes", "html_data"] })
+    .delegate("a", "click", function(event, data){
+   } );
+  
+  $('#disp-res').bind("loaded.jstree", function(){
+   var opennode = document.location.pathname.split("/").pop(); 
+   $('#' + opennode).parents(".jstree-closed").each(function(){
+      $('#disp-res').jstree("open_node", this, false, true);
+    }); 
+  });  
+ 
+  $('#disp-res').bind('before.jstree', function(event,data){
     switch(data.plugin){
       case 'ui':
         if(!data.inst.is_leaf(data.args[0])){

@@ -32,8 +32,14 @@
               = elem[:dataset_name]
               %br
     %input{:type => "button", :id => "clear-button",:value => "clear selection"}
-- if !params['checked_ds'].nil? #&& params['checked_ds'].include?("all_ds")
+- if !params['checked_ds'].nil? 
   %p 
     peptides in all selected datasets
     = partial :tables, locals: {table_id:"show_table", choice:"all_ds", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => params['checked_ds'])} 
+
+- if !params[:pep_seq].nil?
+  all data on peptide
+  = params[:pep_seq]
+  = partial :info_tables, locals: {data_to_display:@peptide_info.where(:peptides__peptide_sequence => "#{params[:pep_seq]}")}#, :sequencing_datasets__dataset_name => "#{params[:set_name]}")}
+
 

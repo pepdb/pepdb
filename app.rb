@@ -113,6 +113,15 @@ get '/sys-search' do
   haml :sys_search
 end
 
+get '/sys-search/:pep_seq' do
+  @libraries = Library.all
+  @datasets = SequencingDataset
+  @selections = Selection
+  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*sys_peptide_columns)
+  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
+  haml :sys_search
+end
+
 post '/sys-search' do
   @libraries = Library.all
   @datasets = SequencingDataset
@@ -120,4 +129,33 @@ post '/sys-search' do
   @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*sys_peptide_columns)
   @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :sys_search
+end
+
+get '/prop-search' do
+  @libraries = Library
+  @datasets = SequencingDataset
+  @selections = Selection
+  @targets = Target
+  @results = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).join(Target, :selections__target_id___target => :targets__target_id___target)
+  @querystring, @placeholders = build_property_array(params)
+  puts params['type']
+  puts @querystring
+  puts @placeholders
+  haml :prop_search
+end
+
+get '/comp-search' do
+  @libraries = Library.all
+  @datasets = SequencingDataset
+  @selections = Selection
+  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*sys_peptide_columns)
+  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
+  haml :comp_search
+
+end
+
+post '/checklist' do
+  @data_to_display = Selection.all
+  @column = :selection_name
+  haml :checklist, :layout => false
 end

@@ -1,0 +1,69 @@
+#searchbox{:class => "div-table"}
+  %form{:id => "propsearch", :action => "/prop-search", :method => "get"}
+    #top
+      %select{:id => "type", :name => "type", :value => "#{params['type']}"}
+        %option exact sequence
+        %option partial sequence
+      %input{:type => "text", :id => "seq", :size => 7, :name => "seq", :value => "#{params['seq']}"}
+      #blossum
+        %label blossum62 value
+        %input{:type => "text", :id => "blos", :size => 5, :name => "blos", :value => "#{params['blos']}"}
+    %fieldset#first 
+      = partial :dropdown, locals: {labelname: "library", values:@libraries, column: :library_name, para:"l"}
+      = partial :dropdown, locals: {labelname: "selection", values:@selections, column: :selection_name, para:"s"}
+      = partial :dropdown, locals: {labelname: "sequencing dataset", values:@datasets, column: :dataset_name, para:"ds"}
+    %fieldset#second
+      = partial :dropdown, locals: {labelname: "carrier", values:@libraries.distinct.select(:carrier), column: :carrier, para:"c"}
+      %p
+        %label peptide length:
+        %input{:type => "text", :id => "pl", :size => 1, :name => "pl", :value => "#{params['pl']}"}
+      %p
+        %label selection round:
+        %input{:type => "text", :id => "sr", :size => 1, :name => "sr", :value => "#{params['sr']}"}
+    %fieldset#third
+      %legend target
+      = partial :dropdown, locals: {labelname: "species", values:@targets.distinct.select(:species), column: :species, para:"ts"}
+      = partial :dropdown, locals: {labelname: "tissue", values:@targets.distinct.select(:tissue), column: :tissue, para:"tt"}
+      = partial :dropdown, locals: {labelname: "cell", values:@targets.distinct.select(:cell), column: :cell, para:"tc"}
+    %fieldset#fourth
+      %legend sequenced 
+      = partial :dropdown, locals: {labelname: "species", values:@targets.distinct.select(:species), column: :species, para:"ss"}
+      = partial :dropdown, locals: {labelname: "tissue", values:@targets.distinct.select(:tissue), column: :tissue, para:"st"}
+      = partial :dropdown, locals: {labelname: "cell", values:@targets.distinct.select(:cell), column: :cell, para:"sc"}
+    %fieldset#fifth
+      %legend rank
+      %p
+        %label less than
+        %input{:type => "text", :id => "ralt", :size => 5, :name => "ralt", :value => params['ralt']}
+        %label greater than
+        %input{:type => "text", :id => "ragt", :size => 5, :name => "ragt", :value => "#{params['ragt']}"}
+
+    %fieldset#sixth
+      %legend reads
+      %p
+        %label less than
+        %input{:type => "text", :size => 5, :id => "relt",:name => "relt", :value => "#{params['relt']}"}
+        %label greater than
+        %input{:type => "text", :size => 5, :id => "regt",:name => "regt", :value => "#{params['regt']}"}
+    
+    %fieldset#seventh
+      %legend dominance
+      %p
+        %label less than
+        %input{:type => "text", :size => 5, :id=> "dlt",:name => "dlt", :value => "#{params['dlt']}"}
+        %label greater than
+        %input{:type => "text", :size => 5, :id => "dgt",:name => "dgt", :value => "#{params['dgt']}"}
+    #bottom
+      %input{:type => "checkbox", :id => "tp",:name => "tp", :checked => params['tp']}
+      %label only tested peptides
+      %input{:type => "submit", :value => "search"}
+
+
+- if !params.nil?
+  #results
+    #properties
+
+    #disp-res
+      //= partial :peptidelist, locals: {peptides:@results.where(build_property_hash(params))}
+      //= partial :peptidelist, locals: {peptides:@results.where(Sequel.~(:results__result_id => nil))}
+      = partial :peptidelist, locals: {peptides:@results.where(Sequel.lit(@querystring, *@placeholders ))}

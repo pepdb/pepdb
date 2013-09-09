@@ -1,0 +1,21 @@
+%ul
+  - peptides.distinct.select(:libraries__library_name___libname).each do |lib|
+    %li
+      %a{:href=>"#"}
+        = lib[:libname]
+      %ul
+        - peptides.distinct.select(:selections__selection_name___selname).where(:libraries__library_name => "#{lib[:libname]}").each do |sel|
+          %li
+            %a{:href=>"#"}
+              = sel[:selname]
+            %ul
+              - peptides.distinct.select(:sequencing_datasets__dataset_name___dsname).where(:libraries__library_name => "#{lib[:libname]}", :selections__selection_name => "#{sel[:selname]}").each do |ds|
+                %li
+                  %a{:href=>"#"}
+                    = ds[:dsname]
+                  %ul
+                    - peptides.select(:peptides__peptide_sequence___pepseq).where(:libraries__library_name => "#{lib[:libname]}", :selections__selection_name => "#{sel[:selname]}", :sequencing_datasets__dataset_name => "#{ds[:dsname]}").each do |peptide|
+                      %li{:id=>"#{peptide[:pepseq]}"}
+                        %a{:href=>"/prop-search/"+"#{peptide[:pepseq]}"}
+                          = peptide[:pepseq]
+
