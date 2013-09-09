@@ -118,7 +118,7 @@ $(document).ready(function(){
   }); 
     
     
-  $('#seq-select').change(function(){
+  $('#type').change(function(){
     
     $('#blossum').toggle();
   });
