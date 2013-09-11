@@ -1,8 +1,9 @@
 %fieldset
-  %input{:type => "checkbox", :name => params['checkname'], :id => params['all_elem'],:value => params['all_elem']}/
-  all
-  %br
-  - @data_to_display.each do |elem|
-    %input{:type => "checkbox", :name => params['checkname'], :id => "#{elem[@column]}",:value => "#{elem[@column]}"}/
-    = elem[@column]
+  - if !params['checkedElem'].nil?
+    %input{:type => "checkbox", :id => params['all_elem'],:value => params['all_elem_val']}/
+    all
     %br
+    - @data_to_display.each do |elem|
+      %input{:type => "checkbox", :id => "#{elem[@column]}",:value => "#{elem[@column]}"}/
+      = elem[@column]
+      %br

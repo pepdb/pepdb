@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  var formAll = ["#all_lib", "#all_sel", "#all_ds" ];
+  var formAll = ["#all_lib", "#all_sel", "#all_ds", "#c_all_lib", "#r_all_lib" ];
   var propSelect = ['#l', '#s', '#ds', '#c', '#ts', '#tt', '#tc', '#ss', '#st', '#sc'];
   var propInput = ['#seq', '#blos', '#pl', '#sr', '#ralt', '#ragt', '#relt', '#regt', '#dlt', '#dgt'];
 
@@ -57,13 +57,11 @@ $(document).ready(function(){
     $(this).prop('checked', checkCheckbox(storage, itemID));
   });
   
-  /*(un)check all checkboxes on checking "all" */ 
+  /*(un)check all checkboxes on checking "all"*/  
   $.each(formAll, function(index, value){
     $(value).click(function(){
       var marked = this.checked;
       $(this).closest('fieldset').find(':checkbox').each(function(){
-        storage = $(this).attr("name");
-        saveCheckbox(storage.slice(0,-2), $(this).attr("id"), marked); 
         $(this).prop('checked', marked);
       });
     });  
@@ -72,7 +70,7 @@ $(document).ready(function(){
   $('#libform input:checkbox').click(function(){
     storage = $(this).attr("name");
     saveCheckbox(storage.slice(0,-2), $(this).attr("id"), this.checked); 
-
+    alert("clicked");
     if(storage == "checked_lib[]"){
       localStorage.removeItem("checked_sel"); 
       localStorage.removeItem("checked_ds");
@@ -83,18 +81,35 @@ $(document).ready(function(){
     $('#libform').submit();
   });
  
-  $('#check-library input:checkbox').click(function(){
-    $('#check-selection').load('/checklist',{checkname: 'test', all_elem: 'test2' }, function(){
-      $.getScript("/script/main.js");
+  $('#comp-library input:checkbox').click(function(){
+    var checkedLibs = [];
+    $(this).closest('fieldset').find(':checkbox').each(function(){
+      var elemVal = $(this).attr('value');
+      if(this.checked && elemVal != "all_lib"){
+        checkedLibs.push(elemVal);
+      }
+    });
+    $('#comp-selection').load('/checklist',{checkedElem: checkedLibs, all_elem: 'c_all_sel', all_elem_val: 'all_sel', selector: 'sel', sec: 'c_' }, function(){
+        $.getScript("/script/checkbox.js");
+      } );
+  });
+  
+  $('#ref-library input:checkbox').click(function(){
+    var checkedLibs = [];
+    $(this).closest('fieldset').find(':checkbox').each(function(){
+      var elemVal = $(this).attr('value');
+      if(this.checked && elemVal != "all_lib"){
+        checkedLibs.push(elemVal);
+      }
+    });
+    $('#ref-selection').load('/checklist',{checkedElem: checkedLibs, all_elem: 'r_all_sel', all_elem_val: 'all_sel', selector: 'sel', sec: 'r_' }, function(){
+        $.getScript("/script/checkbox.js");
       } );
   });
 
-  $('#check-selection input:checkbox').click(function(){
-    $('#check-dataset').load('/checklist',{checkname: 'test', all_elem: 'test2' } )
-  });
+  
 
 
- 
   $.each(propSelect, function(index, value){
     var paramName = $(value).attr('name');
     if(urlParam(paramName) == ""){

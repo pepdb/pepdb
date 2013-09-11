@@ -138,9 +138,6 @@ get '/prop-search' do
   @targets = Target
   @results = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).join(Target, :selections__target_id___target => :targets__target_id___target)
   @querystring, @placeholders = build_property_array(params)
-  puts params['type']
-  puts @querystring
-  puts @placeholders
   haml :prop_search
 end
 
@@ -155,7 +152,19 @@ get '/comp-search' do
 end
 
 post '/checklist' do
-  @data_to_display = Selection.all
-  @column = :selection_name
+  @data_to_display, @column, @section = choose_data(params)
+  @section = params['sec']
   haml :checklist, :layout => false
+end
+
+post '/radiolist' do
+  @data_to_display = SequencingDataset.select(:dataset_name).where(:selection_name => params['checkedElem'])
+  @column = :dataset_name
+  haml :radiolist, :layout => false
+end
+
+post 'peptide_results' do
+  
+
+  haml :peptide_results, :layout => false
 end

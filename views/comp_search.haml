@@ -1,28 +1,52 @@
-#comp-dataset
-  %form{:id => "complib", :action => "/comp-search", :method => 'post'}
-    .check-select#check-library
+#comp-data
+  %p dataset
+  %form{:id => "compdata", :action => "/comp-search", :method => 'post'}
+    .comp-select#comp-library
       %fieldset
-        %input{:type => "checkbox", :name => "checked_lib_comp[]", :id => "all_lib",:value => "all_lib"}/ 
+        %input{:type => "checkbox", :id => "c_all_lib",:value => "all_lib"}/ 
         all
         %br 
         - @libraries.each do |elem|
-          %input{:type => "checkbox", :name => "checked_lib_comp[]", :id => "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+          %input{:type => "checkbox", :id => "c_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
           = elem[:library_name]
           %br
 
-    .check-select#check-selection
+    .comp-select#comp-selection
 
-    .check-select#check-dataset
+    .comp-select#comp-dataset
+
+  %legend dominance
+  %label max.
+  %input{:type => "text", :size => 5, :name => "comp_dom_max",:id => "comp_dom_max"}
+  %label min.
+  %input{:type => "text", :size => 5, :name => "comp_dom_min", :id => "comp_dom_min"}
+
+
+#ref-data
+  %p reference dataset
+  %form{:id => "refdata", :action => "/comp-search", :method => 'post'}
+    .ref-select#ref-library
+      %fieldset
+        %input{:type => "checkbox", :id => "r_all_lib",:value => "all_lib"}/ 
+        all
+        %br 
+        - @libraries.each do |elem|
+          %input{:type => "checkbox", :id => "r_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+          = elem[:library_name]
+          %br
+
+    .ref-select#ref-selection
+
+    .ref-select#ref-dataset
+  %legend dominance
+  %label max.
+  %input{:type => "text", :size => 5,:name => "ref_dom_max", :id => "ref_dom_max"}
+  %label min.
+  %input{:type => "text", :size => 5,:name => "ref_dom_min", :id => "ref_dom_min"}
+    
+  #comp-buttons
     %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+    %input{:type => "button", :id => "compare", :value => "compare selected"}
 
-- if !params['checked_ds'].nil? 
-  %p 
-    peptides in all selected datasets
-    = partial :tables, locals: {table_id:"show_table", choice:"all_ds", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => params['checked_ds'])} 
-
-- if !params[:pep_seq].nil?
-  all data on peptide
-  = params[:pep_seq]
-  = partial :info_tables, locals: {data_to_display:@peptide_info.where(:peptides__peptide_sequence => "#{params[:pep_seq]}")}#, :sequencing_datasets__dataset_name => "#{params[:set_name]}")}
-
+#results
 

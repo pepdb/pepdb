@@ -71,29 +71,65 @@ div#checkboxes {
   position: relative;
   width: 100%;
 }
-div.check-select {
+div.comp-select {
   position: relative;
   border: 1px solid #ccc;
-  width: 8em;
+  width: 6em;
   height: 4em;
   overflow-y: scroll;
 }
-#check-library {
-  width: 33%;
+
+div.ref-select {
+  position: relative;
+  border: 1px solid #ccc;
+  width: 6em;
+  height: 4em;
+  overflow-y: scroll;
+}
+
+#ref-data {
+  clear:both;
+
+}
+
+#comp-buttons {
+  clear:both;
+}
+
+#comp-library {
+  width: 25%;
   position: relative;
   float: left;
 }
 
-#check-selection {
-  width: 33%;
+#comp-selection {
+  width: 25%;
   float: left;
   position: relative;
 }
-#check-dataset {
-  width: 33%;
+
+#comp-dataset {
+  width: 25%;
   position: relative;
   float: left;
 }
+#ref-library {
+  width: 25%;
+  position: relative;
+  float: left;
+}
+
+#ref-selection {
+  width: 25%;
+  float: left;
+  position: relative;
+}
+#ref-dataset {
+  width: 25%;
+  position: relative;
+  float: left;
+}
+
 
 .highlight td{
   background-color: green;
