@@ -1,3 +1,5 @@
+pepdb.checkbox = pepdb.checkbox || {};
+
 $(document).ready(function(){
   var formAll = ["#c_all_sel", "#r_all_sel", "#r_all_ds"]
 
@@ -34,10 +36,13 @@ $(document).ready(function(){
         checkedSels.push(elemVal);
       }
     });
-     
     $('#ref-dataset').load('/checklist',{checkedElem: checkedSels, all_elem: 'r_all_ds', all_elem_val: 'all_ds', selector: 'ds', sec: 'r_' }, function(){
-      $.getScript("/script/checkbox.js");
-      $.getScript("/script/initbutton.js");
+        if (!isFirstLoad(pepdb.checkbox, "checkbox.js")){
+          return;
+        }
+      $.getScript("/script/checkbox.js", function(){
+        $.getScript("/script/initbutton.js");
+      });
     });
   });
   

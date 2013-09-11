@@ -1,3 +1,21 @@
+// define namespace to prevent loading js files multiple times
+var pepdb = pepdb || {};
+$.ajaxSetup({
+  cache: true
+});
+var isFirstLoad = function(namesp, jsFile) {
+  var isFirst = namesp.firstLoad === undefined;
+  namesp.firstLoad = false;
+/*
+  if(!isFirst) {
+    console.log("Warning: JS file included twice: " + jsFile);
+  }
+  */
+  return isFirst;
+};
+
+
+
 $(document).ready(function(){
   var formAll = ["#all_lib", "#all_sel", "#all_ds", "#c_all_lib", "#r_all_lib" ];
   var propSelect = ['#l', '#s', '#ds', '#c', '#ts', '#tt', '#tc', '#ss', '#st', '#sc'];

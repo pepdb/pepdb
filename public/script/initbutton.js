@@ -1,20 +1,25 @@
+pepdb.initbutton = pepdb.initbutton || {};
+
 $(document).ready(function(){
+  if(!isFirstLoad(pepdb.initbutton, "initbutton.js")){
+    return;
+  }
+  
   $('#compare').click(function(){
-    var checked_ref = [];
+    var checkedRef = [];
     var comMaxDom = $('#comp_dom_max').val();
     var comMinDom = $('#comp_dom_min').val();
     var reMaxDom = $('#ref_dom_max').val();
     var reMinDom = $('#ref_dom_min').val();
-    var checked_radio = $('#comp-dataset input:radio:checked').attr('value');
-    alert(cMaxDom); 
+    var checkedDS = $('#comp-dataset input:radio:checked').attr('value');
+    var compRadio = $('#comp-buttons input:radio:checked').attr('id');
     $('#ref-dataset input:checkbox:checked').each(function(){
       var elemVal = this.value;
       if(elemVal != "all_ds"){
-        checked_ref.push(elemVal);
+        checkedRef.push(elemVal);
       }
     });
      //getScript für geladene table
-    $('#results').load('/peptide_result', {checkRef: checked_ref, checkCom: checked_radio, cMaxDom: comMaxDom, cMinDom: comMinDom, rMaxDom: reMaxDom, rMinDom; reMinDom})
+    $('#results').load('/peptide_results', {compRef: checkedRef , compDS: checkedDS, compType: compRadio, dsMaxDom: comMaxDom, dsMinDom: comMinDom, rMaxDom: reMaxDom, rMinDom: reMinDom});
   });
-
 });
