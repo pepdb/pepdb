@@ -8,11 +8,15 @@
     %script{:src => "/script/jquery.dataTables.columnFilter.js"}
     %script{:src => "/script/jquery.jstree.js"}
     %script{:src => "/script/jquery.cookie.js"}
+    %script{:src => "/script/tableinit.js"}
     %link{:rel=>"stylesheet", :href=> "/demo_table.css" }
     %link{ :rel => "stylesheet", :href => "/style.css"}
     %title pepDB main
   %body
     #topbar
+      #datalinks
+        %a{:href => "/add-data", :id => "addlink"} add data
+        %a{:href => "/edit-data", :id => "editlink"} edit/delete data
     #content
       #left
         %ul{:id=>'navigation'}
@@ -26,18 +30,18 @@
             Peptide 
             %ul
               %li 
-                %a{:href =>"/sys-search"} Systemic Search
+                %a{:href =>"/systemic-search"} Systemic Search
               %li 
-                %a{:href =>"/prop-search"} Property Search
+                %a{:href =>"/property-search"} Property Search
               %li 
-                %a{:href =>"/comp-search"} Comparative Search 
+                %a{:href =>"/comparative-search"} Comparative Search 
               %li
-                %a{:href =>"/mot-search"} Motif Search
+                %a{:href =>"/motif-search"} Motif Search
           %li 
             %a{:href =>"/clusters"} Cluster
             %ul
               %li
-                %a{:href =>"/clus-search"} Cluster Search
+                %a{:href =>"/cluster-search"} Cluster Search
               %li
-                %a{:href =>"/comp-clus-search"} Comparative Cluster Search
+                %a{:href =>"/comparative-cluster-search"} Comparative Cluster Search
       #right= yield

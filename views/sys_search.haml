@@ -1,7 +1,8 @@
+%h3 systemic peptide search
 #checkboxes
   %form{:id => "libform", :action => "/sys-search", :method => 'post'}
-    .check-select#check-library
-      %fieldset
+    .check-select#ref-library
+      %fieldset.checklist
         %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
         all
         %br 
@@ -10,36 +11,14 @@
           = elem[:library_name]
           %br
 
-    .check-select#check-selection
-      - if !params['checked_lib'].nil?
-        %fieldset
-          %input{:type => "checkbox", :name => "checked_sel[]", :id=> "all_sel",:value => "all_sel"} 
-            all
-            %br 
-          - @selections.select(:selection_name).where(:library_name => params['checked_lib']).each do |elem|
-            %input{:type => "checkbox", :name => "checked_sel[]", :id => "#{elem[:selection_name]}",:value => "#{elem[:selection_name]}"}
-              = elem[:selection_name]
-              %br
+    .check-select#ref-selection
 
-    .check-select#check-dataset
-      - if !params['checked_sel'].nil?
-        %fieldset
-          %input{:type => "checkbox", :name => "checked_ds[]", :id => "all_ds",:value => "all_ds"} 
-            all
-            %br 
-          - @datasets.select(:dataset_name).where(:selection_name => params['checked_sel']).each do |elem|
-            %input{:type => "checkbox", :name => "checked_ds[]", :id => "#{elem[:dataset_name]}",:value => "#{elem[:dataset_name]}"}
-              = elem[:dataset_name]
-              %br
-    %input{:type => "button", :id => "clear-button",:value => "clear selection"}
-- if !params['checked_ds'].nil? 
-  %p 
-    peptides in all selected datasets
-    = partial :tables, locals: {table_id:"show_table", choice:"all_ds", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => params['checked_ds'])} 
+    .check-select#ref-dataset
 
-- if !params[:pep_seq].nil?
-  all data on peptide
-  = params[:pep_seq]
-  = partial :info_tables, locals: {data_to_display:@peptide_info.where(:peptides__peptide_sequence => "#{params[:pep_seq]}")}#, :sequencing_datasets__dataset_name => "#{params[:set_name]}")}
+#comp-buttons    
+  %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+  %input{:type => "button", :id => "search", :value => "search"}
 
+#results
 
+#infos

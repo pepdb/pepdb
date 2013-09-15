@@ -1,0 +1,36 @@
+%h3 motif search
+#checkboxes
+  %p sequencing datasets
+  %form{:id => "libform", :action => "/sys-search", :method => 'post'}
+    .check-select#ref-library
+      %fieldset.checklist
+        %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
+        all
+        %br 
+        - @libraries.each do |elem|
+          %input{:type => "checkbox", :name => "checked_lib[]", :id => "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+          = elem[:library_name]
+          %br
+
+    .check-select#ref-selection
+
+    .check-select#ref-dataset
+
+    #motif-select
+      %p motifs
+      .check-select#motif-list
+      .check-select#motifs
+
+    #comp-buttons
+      %fieldset.checklist  
+        %label show hits
+        %input{:type => "radio", :name => "hits-sel", :id => "hits-sel"} 
+        %label show non-hits 
+        %input{:type => "radio", :name => "hits-sel", :id => "hits-sel"} 
+      %fieldset.checklist
+        %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+        %input{:type => "submit", :id => "search", :value => "search"}
+
+#results
+
+#infos
