@@ -87,4 +87,12 @@ class Observation < Sequel::Model(:peptides_sequencing_datasets)
   many_to_one :result
 end
 
+class Motif < Sequel::Model
+  many_to_many :motif_lists, :key => :list_name
+end
+
+class MotifList < Sequel::Model
+  many_to_many :motifs, :key => :motif_sequence
+end
+
 load 'fill_db.rb'

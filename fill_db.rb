@@ -15,7 +15,7 @@ dnapepseqs = DB[:dna_sequences_peptides_sequencing_datasets]
 
 
 targets.insert(:species => 'mouse', :tissue => 'lung', :cell => 'A')
-targets.insert(:species => 'horse', :tissue => 'heart', :cell => 'B')
+targets.insert(:species => 'horse', :tissue => 'liver', :cell => 'B')
 targets.insert(:species => 'mouse', :tissue => 'liver', :cell => 'D')
 targets.insert(:species => 'mouse', :tissue => 'brain', :cell => 'C')
 

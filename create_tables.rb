@@ -98,3 +98,19 @@ DB.create_table?(:dna_sequences_peptides_sequencing_datasets) do
   index [:dna_sequence, :peptide_sequence, :dataset_name]
 end
 
+DB.create_table?(:motifs) do
+  String :motif_sequence, :primary_key => true
+  index :motif_sequence
+end
+
+DB.create_table?(:motif_lists) do
+  String :list_name, :primary_key => true
+  index :list_name
+end
+
+DB.create_table?(:motifs_motif_lists) do
+  foreign_key :list_name
+  foreign_key :motif_sequence
+  primary_key [:list_name, :motif_sequence]
+  index [:list_name, :motif_sequence]
+end
