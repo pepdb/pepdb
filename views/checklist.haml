@@ -1,9 +1,9 @@
-%fieldset
+%fieldset.checklist
   - if !params['checkedElem'].nil?
-    %input{:type => "checkbox", :id => params['all_elem'],:value => params['all_elem_val']}/
+    %input{:type => "checkbox", :id => params['allElem'], :value => params['allElemVal']}/
     all
     %br
     - @data_to_display.each do |elem|
-      %input{:type => "checkbox", :id => "#{elem[@column]}",:value => "#{elem[@column]}"}/
+      %input{:type => "checkbox", :id => "#{params['sec']}" << "#{elem[@column]}",:value => "#{elem[@column]}", :name => "#{params['checkName']}"}/
       = elem[@column]
       %br

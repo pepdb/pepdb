@@ -1,0 +1,8 @@
+#clinfos
+  %p infos on selected cluster
+  = partial :info_tables, locals: {data_to_display:@cluster_infos }
+
+#clpeps
+  %p all peptides in this cluster
+  = partial :tables, locals: {table_class: "display", table_id:"select_table", choice:"", first_data_to_display:@cluster_peps, second_data_to_display:@cluster_peps }
+

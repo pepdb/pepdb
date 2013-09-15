@@ -1,0 +1,15 @@
+#test
+  %h3 cluster search
+  #clinput
+    %form{:id => "cl-search", :action => '/cluster-results', :method => 'post'}
+      %label{:for=>"pep-seq"} peptide sequence
+      %input{:type => "text", :name => "pep-seq", :id => "pep-seq", :size => 8}
+      %input{:type => "submit", :id => "pep-search",:value => "search"}
+  #results{:hidden => true}
+
+#clsearch{:hidden => true}
+  #clprop
+
+
+
+  #pepprop
