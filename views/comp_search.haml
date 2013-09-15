@@ -1,8 +1,10 @@
+%h3 comparative peptide search
 #comp-data
   %p dataset
-  %form{:id => "compdata", :action => "/comp-search", :method => 'post'}
+  %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+  %form{:id => "compdata", :action => "/comparative-results", :method => 'post'}
     .comp-select#comp-library
-      %fieldset
+      %fieldset.checklist
         %input{:type => "checkbox", :id => "c_all_lib",:value => "all_lib"}/ 
         all
         %br 
@@ -14,39 +16,48 @@
     .comp-select#comp-selection
 
     .comp-select#comp-dataset
+    %fieldset
+      %legend dominance
+      %label max.
+      %input{:type => "text", :size => 5, :name => "ds_dom_max",:id => "ds_dom_max"}
+      %label min.
+      %input{:type => "text", :size => 5, :name => "ds_dom_min", :id => "ds_dom_min"}
 
-  %legend dominance
-  %label max.
-  %input{:type => "text", :size => 5, :name => "comp_dom_max",:id => "comp_dom_max"}
-  %label min.
-  %input{:type => "text", :size => 5, :name => "comp_dom_min", :id => "comp_dom_min"}
 
+    #ref-data
+      %p reference dataset
+      .ref-select#ref-library
+        %fieldset.checklist
+          %input{:type => "checkbox", :id => "r_all_lib",:value => "all_lib"}/ 
+          all
+          %br 
+          - @libraries.each do |elem|
+            %input{:type => "checkbox", :id => "r_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+            = elem[:library_name]
+            %br
 
-#ref-data
-  %p reference dataset
-  %form{:id => "refdata", :action => "/comp-search", :method => 'post'}
-    .ref-select#ref-library
+      .ref-select#ref-selection
+
+      .ref-select#ref-dataset
       %fieldset
-        %input{:type => "checkbox", :id => "r_all_lib",:value => "all_lib"}/ 
-        all
-        %br 
-        - @libraries.each do |elem|
-          %input{:type => "checkbox", :id => "r_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
-          = elem[:library_name]
-          %br
-
-    .ref-select#ref-selection
-
-    .ref-select#ref-dataset
-  %legend dominance
-  %label max.
-  %input{:type => "text", :size => 5,:name => "ref_dom_max", :id => "ref_dom_max"}
-  %label min.
-  %input{:type => "text", :size => 5,:name => "ref_dom_min", :id => "ref_dom_min"}
+        %legend dominance
+        %label{:for => "ref_dom_max"} max.
+        %input{:type => "text", :size => 5,:name => "ref_dom_max", :id => "ref_dom_max"}
+        %label min.
+        %input{:type => "text", :size => 5,:name => "ref_dom_min", :id => "ref_dom_min"}
     
-  #comp-buttons
-    %input{:type => "button", :id => "clear-button",:value => "clear selection"}
-    %input{:type => "button", :id => "compare", :value => "compare selected"}
+    #comp-buttons
+      %fieldset
+        %legend 
+          search options:
+        %ul
+          %li
+            %input{:type => "radio", :name => "comp_type",:id=>"ds_only", :value => "ds_only"}
+            %label{:for => "ds_only"} show peptides included only in dataset 
+          %li
+            %input{:type => "radio", :name => "comp_type",:id=>"ref_and_ds", :value => "ref_and_ds"}
+            %label{:for => "ref_and_ds"} show peptides included in both selections 
+      %input{:type => "submit", :id => "compare", :value => "compare selected"}
 
-#results
-
+#results{:hidden => true}
+#infos

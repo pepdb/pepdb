@@ -13,6 +13,16 @@ body {
 }
 
 fieldset {
+  &.selform, &.libform, &.mlform, &.dsform, &.resform, &.tarform, &.clform{
+    width:75%;
+  }
+}
+
+.formfield * {
+  vertical-align:middle;
+}
+
+fieldset.checklist {
   border: 0;
   padding: 0;
 }
@@ -71,73 +81,43 @@ div#checkboxes {
   position: relative;
   width: 100%;
 }
-div.comp-select {
-  position: relative;
-  border: 1px solid #ccc;
-  width: 6em;
-  height: 4em;
-  overflow-y: scroll;
-}
 
-div.ref-select {
-  position: relative;
-  border: 1px solid #ccc;
-  width: 6em;
-  height: 4em;
-  overflow-y: scroll;
+div {
+  &.ref-select, &.comp-select, &.check-select{
+    position: relative;
+    border: 1px solid #ccc;
+    width: 6em;
+    height: 4em;
+    overflow-y: scroll;
+  }
 }
 
 #ref-data {
   clear:both;
-
 }
 
 #comp-buttons {
   clear:both;
+  width: 45%;
 }
 
-#comp-library {
+#comp-library, #comp-selection, #comp-dataset, #ref-library, #ref-selection, #ref-dataset, #check-library, #check-selection, #check-dataset {
   width: 25%;
   position: relative;
   float: left;
 }
-
-#comp-selection {
-  width: 25%;
-  float: left;
-  position: relative;
-}
-
-#comp-dataset {
-  width: 25%;
-  position: relative;
-  float: left;
-}
-#ref-library {
-  width: 25%;
-  position: relative;
-  float: left;
-}
-
-#ref-selection {
-  width: 25%;
-  float: left;
-  position: relative;
-}
-#ref-dataset {
-  width: 25%;
-  position: relative;
-  float: left;
-}
-
 
 .highlight td{
   background-color: green;
   cursor: pointer;
 }
 
+ul {
+  list-style-type:none;
+}
 
 ul#navigation {
+  overflow:hidden;
   list-style-type: none;
   font-size: 0.91em;
   //float: left;
@@ -160,6 +140,7 @@ ul#navigation {
 
 #left {
   float:left;
+  overflow:hidden;
   width:20%;
 }
 #right {
@@ -168,18 +149,95 @@ ul#navigation {
   //margin-right: 0.4em;
   width: 80%;
   //min-width: 10em;
-  overflow-y:auto;
+  overflow:hidden;
 
 
+}
+div#results{
+  float:left;
+  width: 50%;
+}
+div#clinput {
+  float:left;
+  width:15%;
+  #pep-search{
+    float:left;
+  }
+  #pep-seq, label{
+    display:block;
+  }
+
+}
+
+#dataselection {
+  float:left;
+  width: 30%;
+}
+
+#dataform {
+  float:left;
+  width: 70%;
 }
 
 #content {
   width: 100%;
   height: 100%;
+  overflow:hidden;
+}
+
+.text_filter {
+  width:100%;
+}
+
+#clsearch{
+  clear:both;
+}
+
+#clinfos{
+  float:left;
+  width: 30%;
+}
+ 
+#clpeps {
+  float:left;
+  width: 40%;
+}
+
+#motif-select {
+  clear:left;
+} 
+
+div#motif-list {
+  float:left;
+  width: 10em;
+}
+div#motifs {
+  float:left;
+  width: 10em;
+}
+
+#datalinks {
+  position:absolute;
+  right:0;
+  bottom:0;
 }
 
 #topbar {
+  position:relative;
   height: 100px;
   width: 100%;
   background-color: grey;
 }
+
+
+// add forms
+label span {
+  display: inline-block;
+  width: 10em;
+  text-align: right;
+}
+
+p.reqfield {
+  font-size:small;
+}
+

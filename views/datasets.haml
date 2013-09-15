@@ -1,10 +1,11 @@
-= partial :tables, locals: {table_id:"select_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets}
+%h3 Browse by Sequencing Dataset
+= partial :tables, locals: {table_class: "display", table_id:"select_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets}
 
 - if params.size != 0
   %p 
     peptides in selected sequencing dataset 
     = params[:set_name]
-    = partial :tables, locals: {table_id:"show_table", choice:"#{params[:pep_seq]}", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => "#{params[:set_name]}")}
+    = partial :tables, locals: {table_class:"display", table_id:"show_table", choice:"#{params[:pep_seq]}", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => "#{params[:set_name]}")}
 
   - if params.size > 3  
     %p

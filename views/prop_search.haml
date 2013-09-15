@@ -1,3 +1,4 @@
+%h3 peptide property search
 #searchbox{:class => "div-table"}
   %form{:id => "propsearch", :action => "/prop-search", :method => "get"}
     #top
@@ -64,6 +65,4 @@
     #properties
 
     #disp-res
-      //= partial :peptidelist, locals: {peptides:@results.where(build_property_hash(params))}
-      //= partial :peptidelist, locals: {peptides:@results.where(Sequel.~(:results__result_id => nil))}
       = partial :peptidelist, locals: {peptides:@results.where(Sequel.lit(@querystring, *@placeholders ))}
