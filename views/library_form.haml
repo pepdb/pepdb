@@ -1,0 +1,33 @@
+%h3 Add Library
+%form{:id => "addlib", :action => "/add-data", :method => "post"}
+  %fieldset.libform
+    %legend 
+      library information:
+    %p
+      %label{:for => "libname"}
+        %span name:
+        %input{:type => "text", :name => "libname", :id => "libname", :required => true} 
+        %strong
+          %abbr{:title => "required"}*
+    %p
+      = partial :datalist, locals: {req: false, label:"encodings", fieldname:"encoding scheme:", listname:"encodinglist", listlabel:"schemes", dbdata:@schemes, columnname: :encoding_scheme} 
+    %p
+      = partial :datalist, locals: {req: false, label:"carrier", fieldname:"carrier:", listname:"carrierlist", listlabel:"carriers", dbdata:@carriers, columnname: :carrier} 
+    %p
+      = partial :datalist, locals: {req: false, label:"prod", fieldname:"produced by:", listname:"prodlist", listlabel:"producers", dbdata:@producers, columnname: :produced_by} 
+    %p
+      %label{:for => "insert"}
+        %span insert length:
+        %input{:type => "text", :name => "insert", :id => "insert"} 
+    %p
+      %label{:for => "diversity"}
+        %span peptide diversity:
+        %input{:type => "text", :name => "diversity", :id => "diversity"} 
+    %p
+      %label{:for => "date"}
+        %span date:
+        %input{:type => "text", :name => "date", :id => "date", :value => "yyyy-mm-dd"} 
+          
+        
+  %input{:type => "submit", :value => "add library"}
+  %input{:type => "reset", :value => "reset fields"}

@@ -1,19 +1,22 @@
 #pepdb.rb
 require 'sinatra'
 require 'sinatra/partial'
+require './modules/querystringbuilder'
+require './modules/utilities'
+require './modules/comparativesearch'
 require 'date'
 require 'sass'
 require 'haml'
 load 'model.rb'
-load 'helpers.rb'
+#load 'helpers.rb'
 
 Haml::Options.defaults[:format] = :xhtml
 
 set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 
-selection_columns = [:selection_name]
-selection_all_columns = [:selection_name, :library_name, :date, :species, :tissue, :cell]
+selection_columns = [:selection_name___selection]
+selection_all_columns = [:selection_name___selection, :library_name___library, :date, :species, :tissue, :cell]
 dataset_columns = [:dataset_name ]
 dataset_info_columns = [:dataset_name, :library_name, :selection_name, :date]
 dataset_all_columns = [:dataset_name, :library_name, :selection_name, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
@@ -106,14 +109,14 @@ get '/clusters/:sel_cluster/:pep_seq' do
   haml :clusters
 end
 
-get '/sys-search' do
+get '/systemic-search' do
   @libraries = Library.all
   @datasets = SequencingDataset.all
   @selections = Selection.all
   haml :sys_search
 end
 
-get '/sys-search/:pep_seq' do
+get '/systemic-search/:pep_seq' do
   @libraries = Library.all
   @datasets = SequencingDataset
   @selections = Selection
@@ -131,7 +134,7 @@ post '/sys-search' do
   haml :sys_search
 end
 
-get '/prop-search' do
+get '/property-search' do
   @libraries = Library
   @datasets = SequencingDataset
   @selections = Selection
@@ -141,7 +144,7 @@ get '/prop-search' do
   haml :prop_search
 end
 
-get '/comp-search' do
+get '/comparative-search' do
   @libraries = Library.all
   @datasets = SequencingDataset
   @selections = Selection
@@ -163,8 +166,113 @@ post '/radiolist' do
   haml :radiolist, :layout => false
 end
 
-post 'peptide_results' do
+post '/comparative-results' do
+  @ref_qry, @ref_placeh = build_rdom_string(params)
+  @ds_qry, @ds_placeh = build_cdom_string(params)
+  @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
   
-
   haml :peptide_results, :layout => false
 end
+
+post '/systemic-results' do
+  @peptides = Observation.select(:peptide_sequence,:dataset_name,:rank, :reads, :dominance).where(:dataset_name => params['sysDS'])
+  haml :peptide_results, :layout => false
+end
+
+post '/peptide-infos' do
+  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
+  haml :peptide_infos, :layout => false
+end
+
+get '/cluster-search' do
+  @peptides = Peptide.select(:peptide_sequence)
+  haml :cluster_search
+end
+
+post '/cluster-results' do
+  @cluster = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(:clusters__cluster_id___id ,:consensus_sequence___consensus, :library_name___library, :selection_name___selection, :dataset_name___dataset )
+  haml :peptide_results, :layout => false
+end
+
+post '/cluster-infos' do
+  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}")
+  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}")
+  haml :cluster_infos, :layout => false
+end
+
+get '/motif-search' do
+  @libraries = Library
+  haml :motif_search
+end
+
+post '/motif-search' do
+  @libraries = Library.all
+  @datasets = SequencingDataset
+  @selections = Selection
+  haml :motif_search
+end
+
+get '/comparative-cluster-search' do
+  @libraries = Library
+  haml :comparative_cluster_search
+end
+
+get '/add-data' do
+  haml :add_data
+end
+
+get '/addlibrary' do
+  @schemes = Library.distinct.select(:encoding_scheme)
+  @carriers = Library.distinct.select(:carrier)
+  @producers = Library.distinct.select(:produced_by)
+  haml :library_form, :layout => false
+end
+get '/addselection' do
+  @libraries = Library.distinct.select(:library_name)
+  @species = Target.distinct.select(:species)
+  haml :selection_form, :layout => false
+end
+get '/adddataset' do
+  @libraries = Library
+  @selections = Selection
+  @species = Target.distinct.select(:species)
+  haml :dataset_form, :layout => false
+end
+get '/addresult' do
+  @datasets = SequencingDataset
+  @species = Target.distinct.select(:species)
+  @peptides
+  haml :result_form, :layout => false
+end
+get '/addtarget' do
+  @species = Target.distinct.select(:species)
+  @tissues = Target.distinct.select(:tissue)
+  @cells = Target.distinct.select(:cell)
+  haml :target_form, :layout => false
+end
+
+get '/addcluster' do
+  @libraries = Library
+  @selection = Selection
+  @datasets = SequencingDataset
+  haml :cluster_form, :layout => false
+end
+
+get '/addmotif' do
+  haml :motif_form, :layout => false
+end
+
+get '/formdrop' do
+  @querystring, @placeholders = build_formdrop_string(params)
+  req = !params[:required].nil? ? true : false
+  @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
+  haml :formdrop, :layout => false, locals:{values:@data, column:params[:columnname].to_sym, para:params['boxID'].to_sym, required:req }
+end
+
+get '/datalist' do
+  @querystring, @placeholders = build_formdrop_string(params)
+  val = !params[:required].nil? ? true : false
+  @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
+  haml :datalist, :layout => false, locals:{req: val,label: params[:label].to_s, fieldname: params[:fieldname].to_s,listname: params[:listname].to_s , listlabel:params[:listlabel].to_s, dbdata:@data, columnname:params[:columnname].to_sym  }
+end
+

@@ -1,0 +1,12 @@
+%h3 Add Motif list 
+%form{:id => "addml", :action => "/add-data", :method => "post"}
+  %fieldset.mlform
+    %legend motif list information:
+    %p
+      %label{:for => "mlname"}
+        %span name:
+        %input{:type => "text", :name => "mlname", :id => "mlname", :required => true} 
+        %strong 
+          %abbr{:title => "required"}*
+  %input{:type => "submit", :value => "add motif list"}
+  %input{:type => "reset"}

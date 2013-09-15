@@ -1,0 +1,50 @@
+%h3 Add Sequencing Dataset
+%form{:id => "addds", :action => "/add-data", :method => "post"}
+  %fieldset.dsform
+    %legend sequencing dataset information:
+    %p
+      %label{:for => "dsname"}
+        %span name:
+        %input{:type => "text", :name => "dsname", :id => "dsname", :required => true} 
+        %strong
+          %abbr{:title => "required"}*
+    %p
+      %label{:for => "date"}
+        %span date:
+        %input{:type => "text", :name => "date", :id => "date", :value => "yyyy-mm-dd"} 
+  %fieldset.dsform
+    %legend sequencing target:
+    %p
+      %label{:for => "dspecies"}
+        %span species:
+        = partial :formdrop, locals:{para: "dspecies", values:@species, column: :species, required: false}
+    %p
+      %label{:for => "dtissue"}
+        %span tissue:
+        %select{:name => "dtissue", :id => "dtissue"}
+    %p
+      %label{:for => "dcell"}
+        %span cell:
+        %select{:name => "dcell", :id => "dcell"}
+  %fieldset.dsform
+    %legend 
+      related entities:
+      %strong 
+        %abbr{:title => "required"}*
+    %p
+      %label{:for => "dselname"}
+        %span selection:
+        = partial :formdrop, locals:{para: "dselname", values:@selections, column: :selection_name, required: true}
+  %fieldset.dsform
+    %legend data files:
+    %p
+      %label{:for => "pepfile"}
+        %span peptide sequence file:
+        %input{:type => "file", :name => "pepfile", :id => "pepfile"}
+    %p
+      %label{:for => "dnafile"}
+        %span dna sequenc file:
+        %input{:type => "file", :name => "dnafile", :id => "dnafile"}
+      
+  %input{:type => "submit", :value => "add sequencing dataset"}
+  %input{:type => "reset"}

@@ -1,0 +1,27 @@
+%h3 Add Cluster 
+%form{:id => "addds", :action => "/add-data", :method => "post"}
+  %fieldset.clform
+    %legend clustering information:
+    %p
+      %label{:for => "paras"}
+        %span parameters:
+        %input{:type => "text", :name => "paras", :id => "paras", :value => "text area?"} 
+  %fieldset.clform
+    %legend 
+      related entities:
+      %strong 
+        %abbr{:title => "required"}*
+    %p
+      %label{:for => "ddsname"}
+        %span sequencing dataset:
+        = partial :formdrop, locals:{para: "ddsname", values:@datasets, column: :dataset_name, required: true}
+
+  %fieldset.dsform
+    %legend data files:
+    %p
+      %label{:for => "clfile"}
+        %span clustering file:
+        %input{:type => "file", :name => "clfile", :id => "clfile"}
+      
+  %input{:type => "submit", :value => "add cluster"}
+  %input{:type => "reset"}

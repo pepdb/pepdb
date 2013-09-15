@@ -1,0 +1,33 @@
+%h3 Add Peptide Result 
+%form{:id => "addres", :action => "/add-data", :method => "post"}
+  %fieldset.resform
+    %legend result information:
+    %p.formfield
+      %label{:for => "perf"}
+        %span performance:
+        %textarea{:form => "addres", :name =>"perf", :id => "perf"}
+  %fieldset.resform
+    %legend target
+    %p
+      %label{:for => "dspecies"}
+        %span species:
+        = partial :formdrop, locals:{para: "dspecies", values:@species, column: :species, required: false}
+    %p
+      %label{:for => "dtissue"}
+        %span tissue:
+        %select{:name => "dtissue", :id => "dtissue"}
+    %p
+      %label{:for => "dcells"}
+        %span cell:
+        %select{:name => "dcell", :id => "dcell"}
+  %fieldset.resform
+    %legend
+      related entities:
+      %strong 
+        %abbr{:title => "required"}*
+    %label{:for => "ddsname"}
+      %span sequencing dataset:
+      = partial :formdrop, locals:{para: "ddsname", values:@datasets, column: :dataset_name, required: true}
+    %p#formpeps
+  %input{:type => "submit", :value => "add result"}
+  %input{:type => "reset"}

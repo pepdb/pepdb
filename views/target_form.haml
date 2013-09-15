@@ -1,0 +1,14 @@
+%h3 Add Target 
+%form{:id => "addtar", :action => "/add-data", :method => "post"}
+  %fieldset.tarform
+    %legend 
+      target information:
+    %p
+      = partial :datalist, locals: {req: false, label:"species", fieldname:"species:", listname:"specieslist", listlabel:"speciess", dbdata:@species, columnname: :species} 
+    %p
+      = partial :datalist, locals: {req: false, label:"tissue", fieldname:"tissue:", listname:"tissuelist", listlabel:"tissues", dbdata:@tissues, columnname: :tissue} 
+    %p
+      = partial :datalist, locals: {req: false, label:"cell", fieldname:"cell:", listname:"celllist", listlabel:"cells", dbdata:@cells, columnname: :cell} 
+        
+  %input{:type => "submit", :value => "add target"}
+  %input{:type => "reset", :value => "reset fields"}
