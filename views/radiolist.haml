@@ -1,6 +1,6 @@
 %fieldset
   - if !params['checkedElem'].nil?
     - @data_to_display.each do |elem|
-      %input{:type => "radio", :name => "datasets",:id => "c_" << "#{elem[@column]}",:value => "#{elem[@column]}"}/
+      %input{:type => "radio", :name => params['radioName'],:id => "c_" << "#{elem[@column]}",:value => "#{elem[@column]}"}/
       = elem[@column]
       %br

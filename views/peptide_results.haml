@@ -1,1 +1,22 @@
-= partial :tables, locals: {table_id: "show_table", choice:"", first_data_to_display:@peptides, second_data_to_display:@peptides}
+- if request.path_info == "/systemic-results"
+  = partial :tables, locals: {table_class:"display", table_id: "show_table", choice:"", first_data_to_display:@peptides, second_data_to_display:@peptides}
+
+- elsif request.path_info == "/comparative-results"
+  - if params[:radio_ds].nil? || params[:ref_ds].nil?
+    %p at least one dataset selection per section needed
+
+  - elsif (params[:ref_dom_max].empty? && params[:ref_dom_min].empty?) || (params[:ds_dom_max].empty? && params[:ds_dom_min].empty?)
+    %p at least one dominance limit needs to be selected per section
+
+  - elsif params[:comp_type].nil?
+    %p choose search method!
+  - else 
+    %p
+      results
+      - if @peptides.count > 0
+        = partial :tables, locals: {table_class: "display", table_id: "show_table", choice:"", first_data_to_display:@peptides, second_data_to_display:@peptides}
+      - else
+        %p no matches found
+- else
+  = partial :tables, locals: {table_class: "cldisplay", table_id: "show_table", choice:"", first_data_to_display:@cluster, second_data_to_display:@cluster.where(:peptide_sequence => "#{params['pep-seq']}")}
+  

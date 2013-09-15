@@ -1,0 +1,39 @@
+%h3 comparative cluster search
+#checkboxes
+  %p select sequencing datasets to compare
+  %form{:id => "compclform", :action => "/comparative-cluster-search", :method => 'get'}
+    .check-select#ref-library
+      %fieldset.checklist
+        %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
+        all
+        %br 
+        - @libraries.each do |elem|
+          %input{:type => "checkbox", :name => "checked_lib[]", :id => "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+          = elem[:library_name]
+          %br
+
+    .check-select#ref-selection
+
+    .check-select#ref-dataset
+
+    #comp-buttons
+      %fieldset
+        %legend
+          search options:   
+        %ul
+          %li
+            %input{:type => "radio", :name => "comptype", :id => "hits-sel", :value => "unique"} 
+            %label show unique clusters per sequencing dataset 
+          %li
+            %input{:type => "radio", :name => "comptype", :id => "hits-sel", :value => "threshold"} 
+            %label show clusters within dominance threshold
+          %li
+            %input{:type => "text", :name => "domthr", :id=> "domthr", :size => 5 }
+            %label cluster dominance threshold 
+      %fieldset.checklist
+        %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+        %input{:type => "submit", :id => "search", :value => "compare"}
+
+#results
+
+#infos

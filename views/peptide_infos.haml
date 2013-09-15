@@ -1,0 +1,5 @@
+%p
+  all data on peptide
+  = params['selSeq']
+  = partial :info_tables, locals: {data_to_display:@peptide_info.where(:peptides__peptide_sequence => "#{params['selSeq']}", :sequencing_datasets__dataset_name => "#{params['selDS']}")}
+
