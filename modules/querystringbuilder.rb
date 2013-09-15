@@ -126,32 +126,21 @@ module Sinatra
         querystring << 'results.result_id NOT NULL' if querystring.length == 0
       end
 
-      if !params['cMaxDom'].nil? && !params['cMinDom'].nil?
-            querystring << 'dominance BETWEEN ? AND ?'
-        placeholders.insert(-1, params['cMinDom'], params['cMaxDom'])
-      elsif !params['cMaxDom'].nil?
-        querystring << 'dominance < ?'
-        placeholders.insert(-1, params['cMaxDom'])
-      elsif !params['cMinDom'].nil?
-        querystring << 'dominance > ?'
-        placeholders.insert(-1, params['cMinDom'])
-      end
-
       return querystring, placeholders
     end
 
     def build_cdom_string(params)
       querystring = ''
       placeholders = Array.new
-      if !params['dsMaxDom'].empty? && !params['dsMinDom'].empty?
+      if !params[:ds_dom_max].empty? && !params[:ds_dom_min].empty?
         querystring << 'dominance BETWEEN ? AND ?'
-        placeholders.insert(-1, params['dsMinDom'].to_f, params['dsMaxDom'].to_f)
-      elsif !params['dsMaxDom'].empty?
+        placeholders.insert(-1, params[:ds_dom_min].to_f, params[:ds_dom_max].to_f)
+      elsif !params[:ds_dom_max].empty?
         querystring << 'dominance < ?'
-        placeholders.insert(-1, params['dsMaxDom'].to_f)
-      elsif !params['dsMinDom'].empty?
+        placeholders.insert(-1, params[:ds_dom_max].to_f)
+      elsif !params[:ds_dom_min].empty?
         querystring << 'dominance > ?'
-        placeholders.insert(-1, params['dsMinDom'].to_f)
+        placeholders.insert(-1, params[:ds_dom_min].to_f)
       end
 
       return querystring, placeholders
@@ -160,21 +149,36 @@ module Sinatra
     def build_rdom_string(params)
       querystring = ''
       placeholders = Array.new
-      if !params['rMaxDom'].empty? && !params['rMinDom'].empty?
+      if !params[:ref_dom_max].empty? && !params[:ref_dom_min].empty?
         querystring << 'dominance BETWEEN ? AND ?'
-        placeholders.insert(-1, params['rMinDom'].to_f, params['rMaxDom'].to_f)
-      elsif !params['rMaxDom'].empty?
+        placeholders.insert(-1, params[:ref_dom_min].to_f, params[:ref_dom_max].to_f)
+      elsif !params[:ref_dom_max].empty?
         querystring << 'dominance < ?'
-        placeholders.insert(-1, params['rMaxDom'].to_f)
-      elsif !params['rMinDom'].empty?
+        placeholders.insert(-1, params[:ref_dom_max].to_f)
+      elsif !params[:ref_dom_min].empty?
         querystring << 'dominance > ?'
-        placeholders.insert(-1, params['rMinDom'].to_f)
+        placeholders.insert(-1, params[:ref_dom_min].to_f)
       end
       
       return querystring, placeholders
     end
-                                                                                          
-  
+    
+    def build_formdrop_string(params)
+      querystring = ''
+      placeholders = Array.new
+      if !params[:selected1].nil? && !params[:selected2].nil?
+        querystring << '? = ? AND ? = ?'                                                                                         
+        placeholders.insert(-1, params[:where1].to_sym, params[:selected1].to_s, params[:where2].to_sym, params[:selected2].to_s)
+      elsif !params[:selected1].nil?
+        querystring << '? = ?'                                                                                         
+        placeholders.insert(-1, params[:where1].to_sym, params[:selected1].to_s)
+      elsif !params[:selected2].nil?
+        querystring << '? = ?'                                                                                         
+        placeholders.insert(-1, params[:where2].to_sym, params[:selected2].to_s)
+     end       
+      return querystring, placeholders
+    end
+
   end
 
   helpers QueryStringBuilder
