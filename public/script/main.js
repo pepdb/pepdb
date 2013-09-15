@@ -1,81 +1,34 @@
 // define namespace to prevent loading js files multiple times
 var pepdb = pepdb || {};
+/*
 $.ajaxSetup({
   cache: true
 });
+*/
 var isFirstLoad = function(namesp, jsFile) {
   var isFirst = namesp.firstLoad === undefined;
   namesp.firstLoad = false;
-/*
-  if(!isFirst) {
-    console.log("Warning: JS file included twice: " + jsFile);
-  }
-  */
+  
   return isFirst;
 };
 
-
+/* get url parameter "name" or return "" if does not exist */
+function urlParam(name){
+  var result = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+  return result && unescape(result[1]) || ""; 
+}
 
 $(document).ready(function(){
   var formAll = ["#all_lib", "#all_sel", "#all_ds", "#c_all_lib", "#r_all_lib" ];
   var propSelect = ['#l', '#s', '#ds', '#c', '#ts', '#tt', '#tc', '#ss', '#st', '#sc'];
   var propInput = ['#seq', '#blos', '#pl', '#sr', '#ralt', '#ragt', '#relt', '#regt', '#dlt', '#dgt'];
 
-  /* get url parameter "name" or return "" if does not exist */
-  function urlParam(name){
-    var result = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
-    return result && unescape(result[1]) || ""; 
-  }
-
-
-  /* retrieve checkbox state from localStorage  */
-  function checkCheckbox(storageName, itemID){
-      if(localStorage[storageName]){
-        var checkedItems = JSON.parse(localStorage[storageName]);
-        var marked = false;
-        checkedItems.forEach(function(element){
-          if(element == itemID){
-            marked = true;
-            return false;
-          }
-        });
-        return marked
-      } 
-  }
-  
-  /* save checkbox state to localStorage */
-  function saveCheckbox(storageName, itemID, checkStatus){
-    if(!localStorage[storageName]){
-      var content = [];
-      localStorage[storageName] = JSON.stringify(content);
-    }
-    var selectedItems = JSON.parse(localStorage[storageName]);
-    if(checkStatus){
-      selectedItems.push(itemID);
-    } else {
-      for (var elementCounter = 0; elementCounter < selectedItems.length; elementCounter = elementCounter +1){
-        if(selectedItems[elementCounter] == itemID){
-          selectedItems.splice(elementCounter, 1);
-          break;
-        }
-      }
-    }      
-    localStorage[storageName] = JSON.stringify(selectedItems);
-  } 
-
 
   $('#clear-button').click(function(){
-    localStorage.clear();
     $('body').load(window.location.pathname);
   });
    
-  $('#checkboxes :checkbox').each(function(){
-    storage = $(this).attr("name").slice(0,-2);
-    itemID = $(this).attr("id");
-    $(this).prop('checked', checkCheckbox(storage, itemID));
-  });
-  
-  /*(un)check all checkboxes on checking "all"*/  
+
   $.each(formAll, function(index, value){
     $(value).click(function(){
       var marked = this.checked;
@@ -85,20 +38,6 @@ $(document).ready(function(){
     });  
   }); 
   
-  $('#libform input:checkbox').click(function(){
-    storage = $(this).attr("name");
-    saveCheckbox(storage.slice(0,-2), $(this).attr("id"), this.checked); 
-    alert("clicked");
-    if(storage == "checked_lib[]"){
-      localStorage.removeItem("checked_sel"); 
-      localStorage.removeItem("checked_ds");
-
-    } else if (storage == "checked_sel[]"){
-      localStorage.removeItem("checked_ds");
-    }
-    $('#libform').submit();
-  });
- 
   $('#comp-library input:checkbox').click(function(){
     var checkedLibs = [];
     $(this).closest('fieldset').find(':checkbox').each(function(){
@@ -107,11 +46,12 @@ $(document).ready(function(){
         checkedLibs.push(elemVal);
       }
     });
-    $('#comp-selection').load('/checklist',{checkedElem: checkedLibs, all_elem: 'c_all_sel', all_elem_val: 'all_sel', selector: 'sel', sec: 'c_' }, function(){
+    $('#comp-selection').load('/checklist',{checkedElem: checkedLibs, allElem: 'c_all_sel', allElemVal: 'all_sel', selector: 'sel', sec: 'c_', elemName: 'sels[]' }, function(){
         $.getScript("/script/checkbox.js");
       } );
   });
   
+
   $('#ref-library input:checkbox').click(function(){
     var checkedLibs = [];
     $(this).closest('fieldset').find(':checkbox').each(function(){
@@ -120,14 +60,107 @@ $(document).ready(function(){
         checkedLibs.push(elemVal);
       }
     });
-    $('#ref-selection').load('/checklist',{checkedElem: checkedLibs, all_elem: 'r_all_sel', all_elem_val: 'all_sel', selector: 'sel', sec: 'r_' }, function(){
+    $('#ref-selection').load('/checklist',{checkedElem: checkedLibs, allElem: 'r_all_sel', allElemVal: 'all_sel', selector: 'sel', sec: 'r_', elemName: 'sels[]' }, function(){
         $.getScript("/script/checkbox.js");
       } );
   });
 
+   $('#compdata').submit(function(){
+    if($('#results').is(':visible')){
+      $('#results').toggle();
+    }
+    $.ajax({
+      data: $(this).serialize(),
+      type: $(this).attr('method'),
+      url: $(this).attr('action'),
+      success: function(response){
+        $('#results').html(response);
+        $.getScript('/script/tableinit.js', function(){
+          $('#results').toggle();
+        });
+      }
+    });
+    return false;
+  });
+   
+  $('#cl-search').submit(function(){
+    if($('#results').is(':visible')){
+      $('#results').toggle();
+    }
+    if($('#clsearch').is(':visible')){
+      $('#clsearch').toggle();
+    }
+    $.ajax({
+      data: $(this).serialize(),
+      type: $(this).attr('method'),
+      url: $(this).attr('action'),
+      success: function(response){
+        $('#results').html(response);
+        $.getScript('/script/tableinit.js', function(){
+          $('#results').toggle();
+        });
+      }
+    });
+    return false;
+  });
+
+  $('#datatype').ready(function(){
+    $("#dataform").load('/addlibrary');
+  });
+
+  $('#datatype').change(function(){
+    var selected = $(this).children("option:selected").text();
+    if(selected == "sequencing dataset"){
+      selected = "dataset";
+    }
+    if(selected == "motif list"){
+      selected = "motif";
+    }
+    $("#dataform").load('/add'+ selected, function(){
+      $('#dlibname').prop('selectedIndex', -1);
+      $('#dselname').prop('selectedIndex', -1);
+      $('#ddsname').prop('selectedIndex', -1);
+      $('#dspecies').prop('selectedIndex', -1);
+      $('#dspecies').change(function(){
+        var valSel = $(this).children("option:selected").text();
+        $.get('/formdrop', {columnname: "tissue", selected1: valSel, table:"targets", where1:"species", boxID:"dtissue"}, function(data){
+          $('#dtissue').html(data);
+          $('#dtissue').prop('selectedIndex', -1);
+          $('#dcell').html('');
+        });
+      });
+      $('#dtissue').change(function(){
+        var valSel1 = $('#dspecies').children("option:selected").text();
+        var valSel2 = $(this).children("option:selected").text();
+        $.get('/formdrop', {columnname: "cell", selected1: valSel1, selected2: valSel2,table:"targets", where2:"tissue", where1:"species",boxID:"dcell"}, function(data){
+          $('#dcell').html(data);
+        });
+      });
+      $('#dlibname').change(function(){
+        var valSel = $(this).children("option:selected").text();
+        $.get('/formdrop', {columnname: "selection_name", selected1: valSel, table:"selections", where1:"library_name", boxID:"dselname"}, function(data){
+          $('#dselname').html(data);
+          $('#dselname').prop('selectedIndex', -1);
+          $('#ddsname').prop('selectedIndex', -1);
+        });
+      });
+      $('#dselname').change(function(){
+        var valSel1 = $('#dlibname').children("option:selected").text();
+        var valSel2 = $(this).children("option:selected").text();
+        $.get('/formdrop', {columnname: "dataset_name", selected1: valSel1, selected2: valSel2, table:"sequencing_datasets", where1:"library_name", where2:"selection_name",boxID:"dselname"}, function(data){
+          $('#ddsname').html(data);
+          $('#ddsname').prop('selectedIndex', -1);
+        });
+      });
+      $('#ddsname').change(function(){
+        var valSel = $(this).children("option:selected").text();
+        $.get('/datalist', {required: "true", selected1: valSel, where1:"dataset_name", columnname: "peptide_sequence", label:"peptide", fieldname:"peptide", listname:"peptidelist", listlabel: "peptides", table:"peptides_sequencing_datasets"}, function(data){
+          $('#formpeps').html(data);
+        }); 
+      });
+    });
+  });
   
-
-
   $.each(propSelect, function(index, value){
     var paramName = $(value).attr('name');
     if(urlParam(paramName) == ""){
@@ -157,49 +190,6 @@ $(document).ready(function(){
   });
 
 
-
-
-
-  /* --------------DataTables configuration----------------  */
-  $('#select_table').dataTable({
-    "bPaginate": false,
-    "bInfo": false,
-  })
-    .columnFilter();
-  
-  $('#show_table').dataTable({
-    "bPaginate": false,
-    "bInfo": false,
-  })
-    .columnFilter();
-
-
-  $('#select_table tr').hover(function(){
-    $(this).toggleClass('highlight');
-  });
-  
-  $('#select_table tr:has(td)').click(function(){
-    var selected_id = $(this).find("td:first").html();
-    var route = window.location.pathname;
-    $('body').load(route + "/" + selected_id); 
-  });
-
-  
-  $('#show_table tr').hover(function(){
-    $(this).toggleClass('highlight');
-  });
-  
-  $('#show_table tr:has(td)').click(function(){
-    var selected_id = $(this).find("td:first").html();
-    var route = window.location.pathname;
-    var first_choice =  $('#select_table').data('first-choice');
-    if(first_choice != null ){
-      $('body').load(route + "/" + first_choice + "/" + selected_id); 
-    } else {
-      $('body').load(route + "/" + selected_id);
-    }
-  });
- 
 
   /* -----------jsTree configuration------------------- */  
   $('#clusterlist').bind("loaded.jstree", function(){
