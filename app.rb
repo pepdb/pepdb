@@ -2,13 +2,13 @@
 require 'sinatra'
 require 'sinatra/partial'
 require './modules/querystringbuilder'
+require './modules/formvalidation'
 require './modules/utilities'
 require './modules/comparativesearch'
 require 'date'
 require 'sass'
 require 'haml'
 load 'model.rb'
-#load 'helpers.rb'
 
 Haml::Options.defaults[:format] = :xhtml
 
@@ -45,11 +45,83 @@ get '/libraries/:lib_name' do
   haml :libraries
 end
 
-get '/libraries/:lib_name/:sel_name' do
-  @libraries = Library.all
-  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_columns)
+get '/show_sn_table' do
+  if params['ref'] == "Library" 
+    @column = :library_name
+    @eletype = "Selections"
+    @data = Selection.join(Target, :target_id=>:target_id).select(*selection_columns)
+  elsif params['ref'] == "Selection" 
+    @column = :selection_name
+    @eletype = "Sequencing Datasets"
+    @data = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
+  elsif params['ref'] == "Sequencing Dataset" 
+    @column = :sequencing_datasets__dataset_name
+    @eletype = "Peptides"
+    @data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
+  end
+  haml :show_sn_table, :layout => false
+end
+
+get '/show-info' do
+  if params['ref'] == "Library"
+    @info_data = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
+    @eletype = "Selection"
+    @next = "selections"
+    @column = :selection_name
+  elsif params['ref'] == "Selection"
+    @info_data = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_all_columns)
+    @eletype = "Sequencing Dataset"
+    @next = "datasets"
+    @column = :dataset_name
+  elsif params['ref'] == "Sequencing Dataset"
+    @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
+    @peptide_dna = Peptide.join(DNAFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DNASequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
+    @eletype = "Peptide"
+    @column1 = :peptides__peptide_sequence
+    @column2 = :sequencing_datasets__dataset_name
+  end
+  puts params['ele_name2'] 
+  haml :show_info, :layout => false
+end
+
+get '/selections' do
+  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
+  haml :selections
+end
+
+get '/selections/:sel_name' do
+  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
+  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
+  haml :selections
+end
+=begin
+get '/selections/:sel_name/:set_name' do
+  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
+  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
+  @dataset_info = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_all_columns)
+  haml :selections
+end
+=end
+get '/datasets' do
+  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_info_columns)
+  haml :datasets
+end
+
+get '/datasets/:set_name' do
+  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_info_columns)
+  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
+  haml :datasets
+end
+
+=begin  
+get '/datasets/:set_name/:pep_seq' do
+  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_info_columns)
+  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
+end
+
+get '/selection-info' do
   @selection_info = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
-  haml :libraries
+  haml :selection_info, :layout => false
 end
 
 get '/selections' do
@@ -88,7 +160,7 @@ get '/datasets/:set_name/:pep_seq' do
   @peptide_dna = Peptide.join(DNAFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DNASequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
   haml :datasets
 end
-
+=end
 get '/clusters' do
   @clusters = Cluster
   haml :clusters
@@ -233,6 +305,7 @@ get '/addselection' do
   haml :selection_form, :layout => false
 end
 get '/adddataset' do
+  @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
   @libraries = Library
   @selections = Selection
   @species = Target.distinct.select(:species)
@@ -274,5 +347,16 @@ get '/datalist' do
   val = !params[:required].nil? ? true : false
   @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
   haml :datalist, :layout => false, locals:{req: val,label: params[:label].to_s, fieldname: params[:fieldname].to_s,listname: params[:listname].to_s , listlabel:params[:listlabel].to_s, dbdata:@data, columnname:params[:columnname].to_sym  }
+end
+
+post '/validate-data' do
+  @errors = validate_form(params)
+  @value = params
+  if @error.empty?
+    haml :insert_data
+  else
+    haml :valid_errors
+  end
+    
 end
 
