@@ -117,10 +117,27 @@ $(document).ready(function(){
       selected = "motif";
     }
     $("#dataform").load('/add'+ selected, function(){
-      $('#dlibname').prop('selectedIndex', -1);
-      $('#dselname').prop('selectedIndex', -1);
-      $('#ddsname').prop('selectedIndex', -1);
-      $('#dspecies').prop('selectedIndex', -1);
+      var boxNames = ['#dlibname', '#dselname', '#ddsname', '#dspecies'];
+
+      $.each(boxNames, function(index, value){
+        $(value).prop('selectedIndex', -1);
+      });
+/*
+     $('#adddata').submit(function(){
+      if($('#validerrors').is(':visible')){
+        $('#validerrors').toggle();
+      }
+      $.ajax({
+        data: $(this).serialize(),
+        type: $(this).attr('method'),
+        url: $(this).attr('action'),
+        success: function(response){
+          $('#validerrors').html(response);
+          });
+        });
+      return false;
+      });
+*/
       $('#dspecies').change(function(){
         var valSel = $(this).children("option:selected").text();
         $.get('/formdrop', {columnname: "tissue", selected1: valSel, table:"targets", where1:"species", boxID:"dtissue"}, function(data){

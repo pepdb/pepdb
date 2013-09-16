@@ -1,31 +1,14 @@
 %h3 Browse by Sequencing Dataset
-= partial :tables, locals: {table_class: "display", table_id:"select_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets}
+%input{:type => "hidden", :id => "reftype", :value => "Sequencing Dataset"}
+#selectdata
+  = partial :tables, locals: {table_class: "display", table_id:"select_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets}
 
-- if params.size != 0
-  %p 
-    peptides in selected sequencing dataset 
-    = params[:set_name]
-    = partial :tables, locals: {table_class:"display", table_id:"show_table", choice:"#{params[:pep_seq]}", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => "#{params[:set_name]}")}
-
-  - if params.size > 3  
+#showdata
+  - if params.size != 0
     %p
-      all data on peptide
-      = params[:pep_seq]
-      = partial :info_tables, locals: {data_to_display:@peptide_info.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :sequencing_datasets__dataset_name => "#{params[:set_name]}")}
-
-  - if params.size > 3  
-    %p
-      dna sequences encoding 
-      = params[:pep_seq]
-      in sequencing dataset
+      %input{:type => "hidden", :id => "refelem1", :value => "#{params[:set_name]}"}
+      Peptides in Sequencing Dataset 
       = params[:set_name]
-    %table{:border => 1}
-      %thead
-        %tr
-          - @peptide_dna.first.each do |name|
-            %th= name[0].to_s.tr('_', ' ')
-      %tbody
-        - @peptide_dna.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :sequencing_datasets__dataset_name => "#{params[:set_name]}").each do |info|
-          %tr
-            - info.each do |column|
-              %td= column[1]
+      = partial :tables, locals: {table_class:"display", table_id:"show_table", choice:"#{params[:pep_seq]}", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => "#{params[:set_name]}")}
+
+#datainfo

@@ -1,6 +1,13 @@
 pepdb.initbutton = pepdb.initbutton || {};
 
 $(document).ready(function(){
+  
+  $('#continue').click(function(){
+    var url = $(this).attr('action');
+    var cont = $('#refele2').val();
+    url = url + "/"+ cont;
+    window.location = url; 
+  });
   if(!isFirstLoad(pepdb.initbutton, "initbutton.js")){
     return;
   }
@@ -12,7 +19,6 @@ $(document).ready(function(){
         checkedDS.push(elemVal);
       }
     });
-     //getScript für geladene table
     $('#results').load('/systemic-results', {sysDS: checkedDS}, function(){
       $.getScript("/script/tableinit.js")
     });

@@ -1,15 +1,15 @@
 %h3 Browse by Selection
-= partial :tables, locals: {table_class: "display", table_id:"select_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections}
+%input{:type => "hidden", :id => "reftype", :value => "Selection"}
+#selectdata
+  = partial :tables, locals: {table_class: "display", table_id:"select_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections}
 
-- if params.size != 0
-  %p 
-    sequencing datasets in selection 
-    = params[:sel_name]
-    = partial :tables, locals: {table_class: "display", table_id:"show_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets.where(:selection_name => "#{params[:sel_name]}")}  
-
-  - if params.size > 3
+#showdata
+  - if params.size != 0
     %p
-      all data on dataset
-      = params[:set_name]
-      = partial :info_tables, locals: {data_to_display:@dataset_info.where(:dataset_name => "#{params[:set_name]}")}
+      %input{:type => "hidden", :id => "refelem1", :value => "#{params[:ele_name]}"}
+      Sequencing Datasets in Selection 
+      = params[:sel_name]
+      = partial :tables, locals: {table_class: "display", table_id:"show_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets.where(:selection_name => "#{params[:sel_name]}")}  
+
+#datainfo
 

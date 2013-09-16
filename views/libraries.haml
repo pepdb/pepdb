@@ -1,14 +1,14 @@
 %h3 Browse by Library
-= partial :tables, locals: {table_class:"display", table_id:"select_table", choice:"#{params[:lib_name]}", first_data_to_display:@libraries, second_data_to_display:@libraries}
+%input{:type => "hidden", :id => "reftype", :value => "Library"}
+#selectdata
+  = partial :tables, locals: {table_class:"display", table_id:"select_table", choice:"#{params[:lib_name]}", first_data_to_display:@libraries, second_data_to_display:@libraries}
 
-- if params.size != 0
-  %p 
-    selections in Library
-    = params[:lib_name] 
-    = partial :tables, locals: {table_class:"display", table_id:"show_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections.where(:library_name => "#{params[:lib_name]}")}    
+#showdata
+  - if params.size != 0
+    %p 
+      %input{:type => "hidden", :id => "refelem1", :value => "#{params[:ele_name]}"}
+      Selections in Library
+      = params[:lib_name] 
+      = partial :tables, locals: {table_class:"display", table_id:"show_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections.where(:library_name => "#{params[:lib_name]}")}    
 
-  - if params.size > 3 
-    %p
-      all data on selection
-      = params[:sel_name]
-      = partial :info_tables, locals: {data_to_display:@selection_info.where(:selection_name => "#{params[:sel_name]}")}
+#datainfo
