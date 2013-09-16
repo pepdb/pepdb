@@ -1,5 +1,6 @@
 %h3 Add Sequencing Dataset
-%form{:id => "addds", :action => "/add-data", :method => "post"}
+%form{:id => "addds", :action => "/validate-data", :method => "post"}
+  %input{:type => "hidden", :value => "dataset", :name => "submittype", :id =>"submittype"}
   %fieldset.dsform
     %legend sequencing dataset information:
     %p
@@ -12,6 +13,20 @@
       %label{:for => "date"}
         %span date:
         %input{:type => "text", :name => "date", :id => "date", :value => "yyyy-mm-dd"} 
+    %p
+      = partial :datalist, locals: {req: false, label:"readtype", fieldname:"read type:", listname:"rtypelist", listlabel:"readtypes", dbdata:@ds_infos.group(:read_type), columnname: :read_type}
+    %p
+      = partial :datalist, locals: {req: false, label:"usedind", fieldname:"used indices:", listname:"indicelist", listlabel:"usedindices", dbdata:@ds_infos.group(:used_indices), columnname: :used_indices}
+    %p
+      = partial :datalist, locals: {req: false, label:"origin", fieldname:"origin:", listname:"originlist", listlabel:"origins", dbdata:@ds_infos.group(:origin), columnname: :origin}
+    %p
+      = partial :datalist, locals: {req: false, label:"produced", fieldname:"produced by:", listname:"prodlist", listlabel:"prods", dbdata:@ds_infos.group(:produced_by), columnname: :produced_by}
+    %p
+      = partial :datalist, locals: {req: false, label:"seqer", fieldname:"sequencer:", listname:"seqlist", listlabel:"sequencers", dbdata:@ds_infos.group(:sequencer), columnname: :sequencer}
+    %p
+      = partial :datalist, locals: {req: false, label:"selround", fieldname:"selection round:", listname:"selrlist", listlabel:"selrounds", dbdata:@ds_infos.group(:selection_round), columnname: :selection_round}
+    %p
+      = partial :datalist, locals: {req: false, label:"seql", fieldname:"sequence length:", listname:"seqllist", listlabel:"seqlengths", dbdata:@ds_infos.group(:sequence_length), columnname: :sequence_length}
   %fieldset.dsform
     %legend sequencing target:
     %p

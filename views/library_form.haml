@@ -1,5 +1,6 @@
 %h3 Add Library
-%form{:id => "addlib", :action => "/add-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post"}
+  %input{:type => "hidden", :value => "library", :name => "submittype", :id =>"submittype"}
   %fieldset.libform
     %legend 
       library information:
@@ -31,3 +32,5 @@
         
   %input{:type => "submit", :value => "add library"}
   %input{:type => "reset", :value => "reset fields"}
+
+#validerrors

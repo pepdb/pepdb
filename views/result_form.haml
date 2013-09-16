@@ -1,5 +1,6 @@
 %h3 Add Peptide Result 
-%form{:id => "addres", :action => "/add-data", :method => "post"}
+%form{:id => "addres", :action => "/validate-data", :method => "post"}
+  %input{:type => "hidden", :value => "result", :name => "submittype", :id =>"submittype"}
   %fieldset.resform
     %legend result information:
     %p.formfield
