@@ -39,18 +39,18 @@ $(document).ready(function(){
     var dataType = $('#reftype').val();
     var firstChoice = $('#refelem1').val();
    // var first_choice =  $('#select_table').data('first-choice');
-    if (route == "/comp-search"){
+    if (route == "/comparative-search" || route == "/systemic-search"){
       $('#infos').load('/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
     } else if (route == "/cluster-search"){
-      if($('#clsearch').is(':visible')){
+    /*  if($('#clsearch').is(':visible')){
         $('#clsearch').toggle();
       }
-      $('#clprop').load('/cluster-infos', {selCl: selectedID}, function(){
-        $.getScript('/script/tableinit.js', function(){
+      $('#pepprop').load('/peptide-infos', {selCl: selectedID}, function(){
+        $.getScript('/script/initshowtable.js', function(){
           $('#clsearch').toggle();
         });
         
-      });
+      });*/
     } else {
       $.get('/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
         $('#datainfo').html(data);

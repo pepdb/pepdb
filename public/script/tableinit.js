@@ -42,21 +42,24 @@ $(document).ready(function(){
   $('#select_table tr:has(td)').click(function(){
     var selectedID = $(this).find("td:first").html();
     var route = $('#reftype').val();
+    var path = document.location.pathname;
+    if (path == "/cluster-search"){
+      if($('#clsearch').is(':visible')){
+        $('#clsearch').toggle();
+      }
+      $('#clprop').load('/cluster-infos', {selCl: selectedID}, function(){
+        $.getScript('/script/initshowtable.js', function(){
+          $('#clsearch').toggle();
+        });
+
+      });
+    } else {
     $.get('/show_sn_table', {ele_name:selectedID, ref: route}, function(data){
       $('#showdata').html(data);
       $.getScript('/script/initshowtable.js');
     });
+  }
   });
-
-
-  $('.cldisplay').dataTable({
-    "bPaginate": false,
-    "bInfo": false,
-    "bRetrieve": true,
-  })
-    .columnFilter();
-
-
 
 
 });
