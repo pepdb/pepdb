@@ -12,6 +12,7 @@ end
 
 DB.create_table?(:selections) do
   String :selection_name, :primary_key => true
+  String :performed_by
   Date :date
   foreign_key :target_id, :targets, :on_delete => :set_null
   foreign_key :library_name, :libraries, :on_delete => :cascade, :type=>'varchar(255)' 
