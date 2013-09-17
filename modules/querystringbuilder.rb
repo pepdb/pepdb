@@ -7,7 +7,7 @@ module Sinatra
       placeholders = Array.new
 
       if !params['type'].nil?
-        if params['type'] == "exact sequence"
+        if params['type'] == "complete sequence"
           querystring << 'peptides.peptide_sequence = ?'
           placeholders.insert(-1, params['seq'].to_s.upcase!)
         elsif params['type'] == "partial sequence"

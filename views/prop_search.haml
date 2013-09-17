@@ -3,7 +3,7 @@
   %form{:id => "propsearch", :action => "/property-search", :method => "get"}
     #top
       %select{:id => "type", :name => "type", :value => "#{params['type']}"}
-        %option exact sequence
+        %option complete sequence
         %option partial sequence
       %input{:type => "text", :id => "seq", :size => 7, :name => "seq", :value => "#{params['seq']}"}
       #blossum
