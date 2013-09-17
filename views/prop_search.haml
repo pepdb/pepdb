@@ -7,7 +7,7 @@
         %option partial sequence
       %input{:type => "text", :id => "seq", :size => 7, :name => "seq", :value => "#{params['seq']}"}
       #blossum
-        %label blossum62 value
+        %label similiar neighbour sequences 
         %input{:type => "text", :id => "blos", :size => 5, :name => "blos", :value => "#{params['blos']}"}
     %fieldset#first 
       = partial :dropdown, locals: {labelname: "library", values:@libraries, column: :library_name, para:"l"}
