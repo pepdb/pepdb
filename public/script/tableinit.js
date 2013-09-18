@@ -8,6 +8,7 @@ $(document).ready(function(){
   var oTable = $('#select_table').dataTable({
     "bPaginate": false,
     "bInfo": false,
+    "bJQueryUI": true,
   });
   
     

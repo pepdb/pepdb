@@ -3,6 +3,7 @@ $(document).ready(function(){
   var qTable = $('#show_table').dataTable({
     "bPaginate": false,
     "bInfo": false,
+    "bJQueryUI": true,
   });
   $('#show_table thead input').keyup( function(){
     qTable.fnFilter(this.value, $("#show_table thead input").index(this));

@@ -6,10 +6,13 @@
     %script{:src => "/script/main.js"}
     %script{:src => "/script/jquery.dataTables.min.js"}
     %script{:src => "/script/jquery.dataTables.columnFilter.js"}
+    %script{:src => "/script/jquery-ui-1.10.3.custom.min.js"}
     %script{:src => "/script/jquery.jstree.js"}
     %script{:src => "/script/jquery.cookie.js"}
     %script{:src => "/script/tableinit.js"}
-    %link{:rel=>"stylesheet", :href=> "/demo_table.css" }
+    //%link{:rel=>"stylesheet", :href=> "/demo_table.css" }
+    %link{:rel=>"stylesheet", :href=> "/jquery-ui-1.10.3.custom.min.css" }
+    %link{:rel=>"stylesheet", :href=> "/jquery.dataTables_themeroller.css" }
     %link{ :rel => "stylesheet", :href => "/style.css"}
     %title pepDB main
   %body
@@ -20,6 +23,8 @@
     #content
       #left
         %ul{:id=>'navigation'}
+          %li.ui-state-disabled 
+            %a{:href =>"/libraries"} Browse by 
           %li 
             %a{:href =>"/libraries"} Library
           %li 
@@ -27,21 +32,23 @@
           %li 
             %a{:href =>"/datasets"} Sequencing Dataset
           %li 
-            Peptide 
-            %ul
-              %li 
-                %a{:href =>"/systemic-search"} Systemic Search
-              %li 
-                %a{:href =>"/property-search"} Property Search
-              %li 
-                %a{:href =>"/comparative-search"} Comparative Search 
-              %li
-                %a{:href =>"/motif-search"} Motif Search
-          %li 
             %a{:href =>"/clusters"} Cluster
-            %ul
-              %li
-                %a{:href =>"/cluster-search"} Cluster Search
-              %li
-                %a{:href =>"/comparative-cluster-search"} Comparative Cluster Search
+          %li -
+          %li.ui-state-disabled 
+            %a{:href =>"/libraries"} Peptide search 
+          %li 
+            %a{:href =>"/systemic-search"} Systemic Search
+          %li 
+            %a{:href =>"/property-search"} Property Search
+          %li 
+            %a{:href =>"/comparative-search"} Comparative Search 
+          %li
+            %a{:href =>"/motif-search"} Motif Search
+          %li -
+          %li.ui-state-disabled 
+            %a{:href =>"/libraries"} Cluster search 
+          %li
+            %a{:href =>"/cluster-search"} Sequence Search
+          %li
+            %a{:href =>"/comparative-cluster-search"} Comparative Search
       #right= yield
