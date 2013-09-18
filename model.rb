@@ -1,6 +1,6 @@
 require 'sequel'
 DB = Sequel.sqlite('pep.db')
-load 'create_tables.rb'
+require './create_tables'
 
 
 
@@ -95,4 +95,4 @@ class MotifList < Sequel::Model
   many_to_many :motifs, :key => :motif_sequence
 end
 
-load 'fill_db.rb'
+require './fill_db'

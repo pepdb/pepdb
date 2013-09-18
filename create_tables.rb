@@ -101,6 +101,7 @@ end
 
 DB.create_table?(:motifs) do
   String :motif_sequence, :primary_key => true
+  String :comment
   index :motif_sequence
 end
 
