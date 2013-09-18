@@ -1,12 +1,12 @@
-%table{:id=>"#{table_id}", :class => "#{table_class}",:data=>{:first_choice => "#{choice}"}}
-  %thead
+%table{:id=>"#{table_id}",:class => "ui-widget", :data=>{:first_choice => "#{choice}"}}
+  %thead.ui-widget-header
     %tr
       - first_data_to_display.first.each do |column_name|
         %th
           = column_name[0].to_s.tr('_', ' ')
           %br
           %input{:type => "text", :placeholder => "filter"}
-  %tbody
+  %tbody.ui-widget-conten
     - second_data_to_display.each do |data_element|
       %tr
         - data_element.each do |cell_data|

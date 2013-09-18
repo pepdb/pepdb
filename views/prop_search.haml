@@ -5,15 +5,16 @@
       %select{:id => "type", :name => "type", :value => "#{params['type']}"}
         %option complete sequence
         %option partial sequence
+        %option wildcard sequence
       %input{:type => "text", :id => "seq", :size => 7, :name => "seq", :value => "#{params['seq']}"}
       #blossum
         %label similiar neighbour sequences 
         %input{:type => "text", :id => "blos", :size => 5, :name => "blos", :value => "#{params['blos']}"}
-    %fieldset#first 
+    %fieldset#first.ui-widget-content 
       = partial :dropdown, locals: {labelname: "library", values:@libraries, column: :library_name, para:"l"}
       = partial :dropdown, locals: {labelname: "selection", values:@selections, column: :selection_name, para:"s"}
       = partial :dropdown, locals: {labelname: "sequencing dataset", values:@datasets, column: :dataset_name, para:"ds"}
-    %fieldset#second
+    %fieldset#second.ui-widget-content
       = partial :dropdown, locals: {labelname: "carrier", values:@libraries.distinct.select(:carrier), column: :carrier, para:"c"}
       %p
         %label peptide length:
