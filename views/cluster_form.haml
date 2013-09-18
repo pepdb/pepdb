@@ -1,5 +1,5 @@
 %h3 Add Cluster 
-%form{:id => "addds", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post"}
   %input{:type => "hidden", :value => "cluster", :name => "submittype", :id =>"submittype"}
   %fieldset.clform
     %legend clustering information:
@@ -26,3 +26,4 @@
       
   %input{:type => "submit", :value => "add cluster"}
   %input{:type => "reset"}
+#valerrors

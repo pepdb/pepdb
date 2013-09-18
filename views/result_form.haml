@@ -1,5 +1,5 @@
 %h3 Add Peptide Result 
-%form{:id => "addres", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post"}
   %input{:type => "hidden", :value => "result", :name => "submittype", :id =>"submittype"}
   %fieldset.resform
     %legend result information:
@@ -32,3 +32,4 @@
     %p#formpeps
   %input{:type => "submit", :value => "add result"}
   %input{:type => "reset"}
+#valerrors

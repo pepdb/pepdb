@@ -1,0 +1,8 @@
+- errors.each do |error|
+  .ui-widget
+    %div{:class => "ui-state-error ui-corner-all", :id=> "errorbox"}
+      %p
+        %span{:class => "ui-icon ui-icon-alert", :id => "errorspan"}
+        %strong Error:
+        = error[1]
+

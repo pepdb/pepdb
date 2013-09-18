@@ -12,7 +12,7 @@
     %p
       %label{:for => "date"}
         %span date:
-        %input{:type => "text", :name => "date", :id => "date", :value => "yyyy-mm-dd"} 
+        %input{:type => "text", :name => "date", :id => "date", :placeholder => "yyyy-mm-dd"} 
     %p
       %label{:for => "perf"}
         %span performed_by:
@@ -41,3 +41,4 @@
       = partial :formdrop, locals:{para: "dlibname", values:@libraries, column: :library_name, required: true}
   %input{:type => "submit", :value => "add selection"}
   %input{:type => "reset"}
+#valerrors

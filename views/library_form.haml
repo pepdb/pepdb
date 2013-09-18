@@ -7,7 +7,7 @@
     %p
       %label{:for => "libname"}
         %span name:
-        %input{:type => "text", :name => "libname", :id => "libname", :required => true} 
+        %input.ui-corner-all{:type => "text", :name => "libname", :id => "libname", :required => true} 
         %strong
           %abbr{:title => "required"}*
     %p
@@ -27,10 +27,10 @@
     %p
       %label{:for => "date"}
         %span date:
-        %input{:type => "text", :name => "date", :id => "date", :value => "yyyy-mm-dd"} 
+        %input{:type => "text", :name => "date", :id => "date", :placeholder => "yyyy-mm-dd"} 
           
         
   %input{:type => "submit", :value => "add library"}
   %input{:type => "reset", :value => "reset fields"}
 
-#validerrors
+#valerrors

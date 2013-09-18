@@ -1,5 +1,5 @@
 %h3 Add Sequencing Dataset
-%form{:id => "addds", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post"}
   %input{:type => "hidden", :value => "dataset", :name => "submittype", :id =>"submittype"}
   %fieldset.dsform
     %legend sequencing dataset information:
@@ -12,7 +12,7 @@
     %p
       %label{:for => "date"}
         %span date:
-        %input{:type => "text", :name => "date", :id => "date", :value => "yyyy-mm-dd"} 
+        %input{:type => "text", :name => "date", :id => "date", :placeholder => "yyyy-mm-dd"} 
     %p
       = partial :datalist, locals: {req: false, label:"readtype", fieldname:"read type:", listname:"rtypelist", listlabel:"readtypes", dbdata:@ds_infos.group(:read_type), columnname: :read_type}
     %p
@@ -54,12 +54,8 @@
     %legend data files:
     %p
       %label{:for => "pepfile"}
-        %span peptide sequence file:
+        %span peptide sequences file:
         %input{:type => "file", :name => "pepfile", :id => "pepfile"}
-    %p
-      %label{:for => "dnafile"}
-        %span dna sequenc file:
-        %input{:type => "file", :name => "dnafile", :id => "dnafile"}
-      
   %input{:type => "submit", :value => "add sequencing dataset"}
   %input{:type => "reset"}
+#valerrors

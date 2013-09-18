@@ -5,10 +5,11 @@ require './modules/querystringbuilder'
 require './modules/formvalidation'
 require './modules/utilities'
 require './modules/comparativesearch'
+require './modules/dbinsert'
 require 'date'
 require 'sass'
 require 'haml'
-load 'model.rb'
+require './model'
 
 Haml::Options.defaults[:format] = :xhtml
 
@@ -95,14 +96,7 @@ get '/selections/:sel_name' do
   @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
   haml :selections
 end
-=begin
-get '/selections/:sel_name/:set_name' do
-  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
-  @dataset_info = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_all_columns)
-  haml :selections
-end
-=end
+
 get '/datasets' do
   @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns)
   haml :datasets
@@ -114,54 +108,6 @@ get '/datasets/:set_name' do
   haml :datasets
 end
 
-=begin  
-get '/datasets/:set_name/:pep_seq' do
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_info_columns)
-  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
-end
-
-get '/selection-info' do
-  @selection_info = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
-  haml :selection_info, :layout => false
-end
-
-get '/selections' do
-  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
-  haml :selections
-end
-
-get '/selections/:sel_name' do
-  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
-  haml :selections
-end
-
-get '/selections/:sel_name/:set_name' do
-  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
-  @dataset_info = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_all_columns)
-  haml :selections
-end
-
-get '/datasets' do
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_info_columns)
-  haml :datasets
-end
-
-get '/datasets/:set_name' do
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_info_columns)
-  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
-  haml :datasets
-end
-  
-get '/datasets/:set_name/:pep_seq' do
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_info_columns)
-  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
-  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
-  @peptide_dna = Peptide.join(DNAFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DNASequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
-  haml :datasets
-end
-=end
 get '/clusters' do
   @clusters = Cluster
   haml :clusters
@@ -351,13 +297,17 @@ get '/datalist' do
 end
 
 post '/validate-data' do
-  @errors = validate_form(params)
-  @value = params
-  if @error.empty?
-    haml :insert_data
+  @errors = validate(params)
+  @values = params
+  if @errors.empty?
+    @dberrors = insert_data(@values)
+    if @dberrors.empty? 
+      haml :insert_success, :layout => false
+    else
+      haml :validation_errors, :layout => false, locals:{errors: @dberrors}
+    end
   else
-    haml :valid_errors
+    haml :validation_errors, :layout => false, locals:{errors: @errors}
   end
-    
 end
 

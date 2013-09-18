@@ -1,5 +1,5 @@
 %h3 Add Motif list 
-%form{:id => "addml", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post"}
   %input{:type => "hidden", :value => "motif", :name => "submittype", :id =>"submittype"}
   %fieldset.mlform
     %legend motif list information:
@@ -9,5 +9,13 @@
         %input{:type => "text", :name => "mlname", :id => "mlname", :required => true} 
         %strong 
           %abbr{:title => "required"}*
+  %fieldset.mlform
+    %legend data file:
+    %p
+      %label{:for => "pepfile"}
+        %span motif list file:
+        %input{:type => "file", :name => "motfile", :id => "motfile"}
+
   %input{:type => "submit", :value => "add motif list"}
   %input{:type => "reset"}
+#valerrors
