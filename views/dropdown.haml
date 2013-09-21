@@ -2,6 +2,8 @@
   %label
     = labelname 
   %select{:name => para, :id => para }
+    %option
+      &nbsp;
     - values.all.each do |elem|
       - if elem[column] == params[para]
         %option{:selected => true}
