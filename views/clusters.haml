@@ -2,13 +2,15 @@
 #clusterlist  
   = partial :clusterlist, locals: {clusters:@clusters}
 - if params.size != 0
-  %p 
-    all data on selected cluster
-    = partial :info_tables, locals: {data_to_display:@cluster_info.where(:cluster_id => "#{params[:sel_cluster]}")}
-    all contained peptides in selected cluster
-    = partial :tables, locals: {table_class: "display", table_id:"show_table", choice:"#{params[:sel_cluster]}", first_data_to_display:@cluster_pep, second_data_to_display:@cluster_pep.where(:clusters_peptides__cluster_id => "#{params[:sel_cluster]}", :peptides_sequencing_datasets__dataset_name => Cluster.select(:clusters__dataset_name).where(:cluster_id => "#{params[:sel_cluster]}"))}    
+  #clusterlist_sel
+    %p 
+      all data on selected cluster
+      = partial :info_tables, locals: {data_to_display:@cluster_info.where(:cluster_id => "#{params[:sel_cluster]}")}
+      all contained peptides in selected cluster
+      = partial :tables, locals: {table_class: "display", table_id:"show_table", choice:"#{params[:sel_cluster]}", first_data_to_display:@cluster_pep, second_data_to_display:@cluster_pep.where(:clusters_peptides__cluster_id => "#{params[:sel_cluster]}", :peptides_sequencing_datasets__dataset_name => Cluster.select(:clusters__dataset_name).where(:cluster_id => "#{params[:sel_cluster]}"))}    
 - if params.size > 3
-  %p 
-    all info on selected peptide 
-    = params[:pep_seq]
-    = partial :info_tables, locals: {data_to_display: @peptide_info.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :peptides_sequencing_datasets__dataset_name => Cluster.select(:clusters__dataset_name).where(:cluster_id => "#{params[:sel_cluster]}"))}
+  #clusterlist_pep
+    %p
+      all info on selected peptide 
+      = params[:pep_seq]
+      = partial :info_tables, locals: {data_to_display: @peptide_info.where(:peptides__peptide_sequence => "#{params[:pep_seq]}", :peptides_sequencing_datasets__dataset_name => Cluster.select(:clusters__dataset_name).where(:cluster_id => "#{params[:sel_cluster]}"))}
