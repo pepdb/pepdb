@@ -117,7 +117,7 @@ end
 
 get '/clusters/:sel_cluster' do
   @clusters = Cluster
-  @cluster_info = Cluster.select(:consensus_sequence, :dominance, :parameters)
+  @cluster_info = Cluster.select(:consensus_sequence, :dominance_sum, :reads_sum)
  @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
   haml :clusters
 end
