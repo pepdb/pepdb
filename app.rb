@@ -13,6 +13,8 @@ require './model'
 
 Haml::Options.defaults[:format] = :xhtml
 
+set :environment, :development
+set :sessions, false
 set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 
@@ -103,7 +105,7 @@ get '/datasets' do
 end
 
 get '/datasets/:set_name' do
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :library_name => :library_name).select(*dataset_info_columns)
+  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
   @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
   haml :datasets
 end
@@ -248,6 +250,7 @@ get '/addlibrary' do
 end
 get '/addselection' do
   @libraries = Library.distinct.select(:library_name)
+  @performs = Selection.distinct.select(:performed_by)
   @species = Target.distinct.select(:species)
   haml :selection_form, :layout => false
 end
@@ -301,7 +304,7 @@ post '/validate-data' do
   @values = params
   if @errors.empty?
     @dberrors = insert_data(@values)
-    if @dberrors.empty? 
+    if @dberrors.empty?
       haml :insert_success, :layout => false
     else
       haml :validation_errors, :layout => false, locals:{errors: @dberrors}
