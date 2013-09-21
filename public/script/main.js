@@ -134,18 +134,20 @@ $(document).ready(function(){
         selected = "motif";
       }
       $("#dataform").load('/add'+ selected, function(){
-        var boxNames = ['#dlibname', '#dselname', '#ddsname', '#dspecies', '#schemes', '#encodinglist'];
+        var boxNames = ['#dlibname', '#dselname', '#ddsname', '#dspecies'];
 
         $.each(boxNames, function(index, value){
           $(value).prop('selectedIndex', -1);
         });
-
+/*
        $('#adddata').submit(function(){
       /*  if($('#validerrors').is(':visible')){
           $('#validerrors').toggle();
-        }*/
+        }
         $.ajax({
           data: $(this).serialize(),
+          contentType: false,
+          processData:false,
           type: $(this).attr('method'),
           url: $(this).attr('action'),
           success: function(response){
@@ -153,7 +155,7 @@ $(document).ready(function(){
             }
           });
         return false;
-        });
+        });*/
 
         $('#dspecies').change(function(){
           var valSel = $(this).children("option:selected").text();
@@ -185,12 +187,6 @@ $(document).ready(function(){
             $('#ddsname').html(data);
             $('#ddsname').prop('selectedIndex', -1);
           });
-        });
-        $('#ddsname').change(function(){
-          var valSel = $(this).children("option:selected").text();
-          $.get('/datalist', {required: "true", selected1: valSel, where1:"dataset_name", columnname: "peptide_sequence", label:"peptide", fieldname:"peptide", listname:"peptidelist", listlabel: "peptides", table:"peptides_sequencing_datasets"}, function(data){
-            $('#formpeps').html(data);
-          }); 
         });
       });
     });
