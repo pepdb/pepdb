@@ -1,12 +1,19 @@
 // variables
 $sidebar-color: #A0A0A0;
 // general
+html{
+  height:100%;
+  width:100%;
+}
+
 body {
   color: black;
   background-color: white;
-  font-size: 100.01%;
+  font-size: small;
   font-family: Helvetica,Arial,sans-serif;
   margin: 0;
+  width: 100%;
+  height:100%;
  // padding: 1em;
 
 }
@@ -127,6 +134,15 @@ ul {
 }
 #clusterlist {
   border:none;
+  float:left;
+  width:25%;
+}
+#clusterlist_sel{
+  float:left;
+  width:50%;
+}
+#clusterlist_pep {
+  overflow-x:scroll;  
 }
 
 ul#navigation{
@@ -201,7 +217,7 @@ div#clinput {
 #content {
   width: 100%;
   height: 100%;
-  overflow:hidden;
+  overflow:auto;
 }
 
 .text_filter {
@@ -270,3 +286,10 @@ div{
   float:left;
   margin-right: .3em;
 }
+
+iframe#notify {
+  frameBorder:0;
+  border:0;
+  width:100%;
+}
+

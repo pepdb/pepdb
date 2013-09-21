@@ -45,7 +45,8 @@ DB.create_table?(:clusters) do
   primary_key :cluster_id
   String :parameters
   String :consensus_sequence
-  Float :dominance
+  Float :dominance_sum
+  Integer :reads_sum
   foreign_key :library_name, :libraries, :on_delete => :cascade, :type=>'varchar(255)'
   foreign_key :selection_name, :selections, :on_delete => :cascade, :type=>'varchar(255)'
   foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade, :type=>'varchar(255)'

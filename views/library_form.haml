@@ -1,5 +1,5 @@
 %h3 Add Library
-%form{:id => "adddata", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post", :target => "notify"}
   %input{:type => "hidden", :value => "library", :name => "submittype", :id =>"submittype"}
   %fieldset.libform
     %legend 
@@ -11,11 +11,11 @@
         %strong
           %abbr{:title => "required"}*
     %p
-      = partial :datalist, locals: {req: false, label:"encodings", fieldname:"encoding scheme:", listname:"encodinglist", listlabel:"schemes", dbdata:@schemes, columnname: :encoding_scheme} 
+      = partial :datalist, locals: {req: false, label:"enc", fieldname:"encoding scheme:", listname:"enclist", listlabel:"fbenc", dbdata:@schemes, columnname: :encoding_scheme} 
     %p
-      = partial :datalist, locals: {req: false, label:"carrier", fieldname:"carrier:", listname:"carrierlist", listlabel:"carriers", dbdata:@carriers, columnname: :carrier} 
+      = partial :datalist, locals: {req: false, label:"ca", fieldname:"carrier:", listname:"calist", listlabel:"fbca", dbdata:@carriers, columnname: :carrier} 
     %p
-      = partial :datalist, locals: {req: false, label:"prod", fieldname:"produced by:", listname:"prodlist", listlabel:"producers", dbdata:@producers, columnname: :produced_by} 
+      = partial :datalist, locals: {req: false, label:"prod", fieldname:"produced by:", listname:"prodlist", listlabel:"fbprod", dbdata:@producers, columnname: :produced_by} 
     %p
       %label{:for => "insert"}
         %span insert length:
@@ -33,4 +33,6 @@
   %input{:type => "submit", :value => "add library"}
   %input{:type => "reset", :value => "reset fields"}
 
-#valerrors
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+

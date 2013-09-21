@@ -1,8 +1,17 @@
-- errors.each do |error|
-  .ui-widget
-    %div{:class => "ui-state-error ui-corner-all", :id=> "errorbox"}
-      %p
-        %span{:class => "ui-icon ui-icon-alert", :id => "errorspan"}
-        %strong Error:
-        = error[1]
+!!! 5
+%html
+  %head
+    %meta{:charset => 'UTF-8'}
+    %script{:src => "/script/jquery-1.10.2.min.js"}
+    %script{:src => "/script/jquery-ui-1.10.3.custom.min.js"}
+    %link{:rel=>"stylesheet", :href=> "/jquery-ui-1.10.3.custom.min.css" }
+    %link{ :rel => "stylesheet", :href => "/style.css"}
+  %body
+    - errors.each do |error|
+      .ui-widget
+        %div{:class => "ui-state-error ui-corner-all", :id=> "errorbox"}
+          %p
+            %span{:class => "ui-icon ui-icon-alert", :id => "errorspan"}
+            %strong Error:
+            = error[1]
 

@@ -1,12 +1,12 @@
 %h3 Add Peptide Result 
-%form{:id => "adddata", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :target => "notify",:method => "post", :enctype => "multipart/form-data"}
   %input{:type => "hidden", :value => "result", :name => "submittype", :id =>"submittype"}
   %fieldset.resform
     %legend result information:
     %p.formfield
       %label{:for => "perf"}
         %span performance:
-        %textarea{:form => "addres", :name =>"perf", :id => "perf"}
+        %textarea{:form => "adddata", :name =>"perf", :id => "perf"}
   %fieldset.resform
     %legend target
     %p
@@ -29,7 +29,12 @@
     %label{:for => "ddsname"}
       %span sequencing dataset:
       = partial :formdrop, locals:{para: "ddsname", values:@datasets, column: :dataset_name, required: true}
-    %p#formpeps
+    %p
+      %label{:for => "pseq"}
+        %span peptide sequence:
+        %input{:type => "text", :id => "pseq", :name => "pseq", :required => true}
   %input{:type => "submit", :value => "add result"}
   %input{:type => "reset"}
-#valerrors
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+

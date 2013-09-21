@@ -1,5 +1,5 @@
 %h3 Add Sequencing Dataset
-%form{:id => "adddata", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post", :enctype => "multipart/form-data", :target => "notify"}
   %input{:type => "hidden", :value => "dataset", :name => "submittype", :id =>"submittype"}
   %fieldset.dsform
     %legend sequencing dataset information:
@@ -14,19 +14,19 @@
         %span date:
         %input{:type => "text", :name => "date", :id => "date", :placeholder => "yyyy-mm-dd"} 
     %p
-      = partial :datalist, locals: {req: false, label:"readtype", fieldname:"read type:", listname:"rtypelist", listlabel:"readtypes", dbdata:@ds_infos.group(:read_type), columnname: :read_type}
+      = partial :datalist, locals: {req: false, label:"rt", fieldname:"read type:", listname:"rtlist", listlabel:"fbrt", dbdata:@ds_infos.group(:read_type), columnname: :read_type}
     %p
-      = partial :datalist, locals: {req: false, label:"usedind", fieldname:"used indices:", listname:"indicelist", listlabel:"usedindices", dbdata:@ds_infos.group(:used_indices), columnname: :used_indices}
+      = partial :datalist, locals: {req: false, label:"ui", fieldname:"used indices:", listname:"uilist", listlabel:"fbui", dbdata:@ds_infos.group(:used_indices), columnname: :used_indices}
     %p
-      = partial :datalist, locals: {req: false, label:"origin", fieldname:"origin:", listname:"originlist", listlabel:"origins", dbdata:@ds_infos.group(:origin), columnname: :origin}
+      = partial :datalist, locals: {req: false, label:"or", fieldname:"origin:", listname:"orlist", listlabel:"fbor", dbdata:@ds_infos.group(:origin), columnname: :origin}
     %p
-      = partial :datalist, locals: {req: false, label:"produced", fieldname:"produced by:", listname:"prodlist", listlabel:"prods", dbdata:@ds_infos.group(:produced_by), columnname: :produced_by}
+      = partial :datalist, locals: {req: false, label:"prod", fieldname:"produced by:", listname:"prodlist", listlabel:"fbprod", dbdata:@ds_infos.group(:produced_by), columnname: :produced_by}
     %p
-      = partial :datalist, locals: {req: false, label:"seqer", fieldname:"sequencer:", listname:"seqlist", listlabel:"sequencers", dbdata:@ds_infos.group(:sequencer), columnname: :sequencer}
+      = partial :datalist, locals: {req: false, label:"seq", fieldname:"sequencer:", listname:"seqlist", listlabel:"fbseq", dbdata:@ds_infos.group(:sequencer), columnname: :sequencer}
     %p
-      = partial :datalist, locals: {req: false, label:"selround", fieldname:"selection round:", listname:"selrlist", listlabel:"selrounds", dbdata:@ds_infos.group(:selection_round), columnname: :selection_round}
+      = partial :datalist, locals: {req: false, label:"selr", fieldname:"selection round:", listname:"selrlist", listlabel:"fbselr", dbdata:@ds_infos.group(:selection_round), columnname: :selection_round}
     %p
-      = partial :datalist, locals: {req: false, label:"seql", fieldname:"sequence length:", listname:"seqllist", listlabel:"seqlengths", dbdata:@ds_infos.group(:sequence_length), columnname: :sequence_length}
+      = partial :datalist, locals: {req: false, label:"seql", fieldname:"sequence length:", listname:"seqllist", listlabel:"fbseql", dbdata:@ds_infos.group(:sequence_length), columnname: :sequence_length}
   %fieldset.dsform
     %legend sequencing target:
     %p
@@ -58,4 +58,5 @@
         %input{:type => "file", :name => "pepfile", :id => "pepfile"}
   %input{:type => "submit", :value => "add sequencing dataset"}
   %input{:type => "reset"}
-#valerrors
+#respage
+  %iframe{:name => "notify", :id =>"notify"}

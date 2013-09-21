@@ -1,5 +1,14 @@
-.ui-widget
-  %div{:class => "ui-state-highlight ui-corner-all", :id => "highlightbox"}
-    %p
-      %span{:class => "ui-icon ui-icon-info", :id => "highlightspan"}
-        %p All data inserted successfully!
+!!! 5
+%html
+  %head
+    %meta{:charset => 'UTF-8'}
+    %script{:src => "/script/jquery-1.10.2.min.js"}
+    %script{:src => "/script/jquery-ui-1.10.3.custom.min.js"}
+    %link{:rel=>"stylesheet", :href=> "/jquery-ui-1.10.3.custom.min.css" }
+    %link{ :rel => "stylesheet", :href => "/style.css"}
+  %body
+    .ui-widget
+      %div{:class => "ui-state-highlight ui-corner-all", :id => "highlightbox"}
+        %p
+          %span{:class => "ui-icon ui-icon-info", :id => "highlightspan"}
+            %p All data inserted successfully!

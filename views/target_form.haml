@@ -1,16 +1,18 @@
 %h3 Add Target 
-%form{:id => "adddata", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post", :target => "notify"}
   %input{:type => "hidden", :value => "target", :name => "submittype", :id =>"submittype"}
   %fieldset.tarform
     %legend 
       target information:
     %p
-      = partial :datalist, locals: {req: false, label:"species", fieldname:"species:", listname:"specieslist", listlabel:"speciess", dbdata:@species, columnname: :species} 
+      = partial :datalist, locals: {req: false, label:"sp", fieldname:"species:", listname:"splist", listlabel:"fbsp", dbdata:@species, columnname: :species} 
     %p
-      = partial :datalist, locals: {req: false, label:"tissue", fieldname:"tissue:", listname:"tissuelist", listlabel:"tissues", dbdata:@tissues, columnname: :tissue} 
+      = partial :datalist, locals: {req: false, label:"tis", fieldname:"tissue:", listname:"tislist", listlabel:"fbtis", dbdata:@tissues, columnname: :tissue} 
     %p
-      = partial :datalist, locals: {req: false, label:"cell", fieldname:"cell:", listname:"celllist", listlabel:"cells", dbdata:@cells, columnname: :cell} 
+      = partial :datalist, locals: {req: false, label:"cell", fieldname:"cell:", listname:"celllist", listlabel:"fbcell", dbdata:@cells, columnname: :cell} 
         
   %input{:type => "submit", :value => "add target"}
   %input{:type => "reset", :value => "reset fields"}
-#valerrors
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+

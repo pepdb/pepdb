@@ -1,5 +1,5 @@
 %h3 Add Selection
-%form{:id => "adddata", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post", :target => "notify"}
   %input{:type => "hidden", :value => "selection", :name => "submittype", :id =>"submittype"}
   %fieldset.selform
     %legend selection information:
@@ -14,9 +14,7 @@
         %span date:
         %input{:type => "text", :name => "date", :id => "date", :placeholder => "yyyy-mm-dd"} 
     %p
-      %label{:for => "perf"}
-        %span performed_by:
-        %input{:type => "text", :name => "perf", :id => "perf"} 
+      = partial :datalist, locals: {req: false, label:"perf", fieldname:"performed by:", listname:"perflist", listlabel:"fbperf", dbdata:@performs, columnname: :performed_by}
   %fieldset.selform
     %legend target
     %p
@@ -41,4 +39,6 @@
       = partial :formdrop, locals:{para: "dlibname", values:@libraries, column: :library_name, required: true}
   %input{:type => "submit", :value => "add selection"}
   %input{:type => "reset"}
-#valerrors
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+

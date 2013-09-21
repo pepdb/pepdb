@@ -1,5 +1,5 @@
 %h3 Add Cluster 
-%form{:id => "adddata", :action => "/validate-data", :method => "post"}
+%form{:id => "adddata", :action => "/validate-data", :method => "post", :enctype => "multipart/form-data", :target => "notify"}
   %input{:type => "hidden", :value => "cluster", :name => "submittype", :id =>"submittype"}
   %fieldset.clform
     %legend clustering information:
@@ -26,4 +26,6 @@
       
   %input{:type => "submit", :value => "add cluster"}
   %input{:type => "reset"}
-#valerrors
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+
