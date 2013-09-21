@@ -35,9 +35,12 @@ module Sinatra
 
       def validate_library
         if given? @params[:libname] 
-          @errors[:date] = "Date format not valid, must be yyyy-mm-dd" if !@params[:date].empty? && !valid_date_format?(@params[:date])
+          @errors[:date] = "Date format not valid, must be yyyy-mm-dd" unless valid_date_format? @params[:date]
           @errors[:diversity] = "Peptide diversity not a valid floating point number. Use . as decimal delimiter" if !@params[:diversity].empty? && !valid_floating_point?(@params[:diversity])
           @errors[:insert] = "Insert length invalid number" if !@params[:insert].empty? && !valid_number?(@params[:insert]) 
+          @params[:enc] = @params[:fbenc] unless given? @params[:enc]
+          @params[:ca] = @params[:fbca] unless given? @params[:ca]
+          @params[:prod] = @params[:fbprod] unless given? @params[:prod]
         else
           @errors[:libname] = "Field name is required"
         end
@@ -45,8 +48,9 @@ module Sinatra
 
       def validate_selection
         if given? @params[:selname] 
-          @errors[:date] = "Date format not valid, must be yyyy-mm-dd" if !@params[:date].empty? && !valid_date_format?(@params[:date])
+          @errors[:date] = "Date format not valid, must be yyyy-mm-dd" unless valid_date_format? @params[:date]
           @errors[:dlibname] = "Field library is required" unless given? @params[:dlibname]
+          @params[:perf] = @params[:fbperf] unless given? @params[:perf]
         else
           @errors[:selname] = "Field name is required"
         end
@@ -54,28 +58,48 @@ module Sinatra
         
       def validate_dataset
         if given? @params[:dsname] 
-          @errors[:date] = "Date format not valid, must be yyyy-mm-dd" if !@params[:date].empty? && !valid_date_format?(@params[:date])
+          @errors[:date] = "Date format not valid, must be yyyy-mm-dd" unless valid_date_format? @params[:date]
           @errors[:dselname] = "Field selection is required" unless given? @params[:dselname]
+          if !@params[:pepfile].nil?
+            @errors[:filetype] = "Given file type must be plain text" unless valid_file_format? @params[:pepfile]
+          else
+            @errors[:pepfile] = "No sequence file given" 
+          end
           @errors[:seql] = "Sequence length invalid number" if !@params[:seql].empty? && !valid_number?(@params[:seql]) 
-          @errors[:selround] = "Selection round invalid number" if !@params[:selround].empty? && !valid_number?(@params[:selround]) 
+          @errors[:selr] = "Selection round invalid number" if !@params[:selr].empty? && !valid_number?(@params[:selr]) 
+          @params[:rt] = @params[:fbrt] unless given? @params[:rt]
+          @params[:ui] = @params[:fbui] unless given? @params[:ui]
+          @params[:or] = @params[:fbor] unless given? @params[:or]
+          @params[:prod] = @params[:fbprod] unless given? @params[:prod]
+          @params[:seq] = @params[:fbseq] unless given? @params[:seq]
+          @params[:selr] = @params[:fbselr] unless given? @params[:selr]
+          @params[:seql] = @params[:fbseql] unless given? @params[:seql]
         else
           @errors[:dsname] = "Field name is required"
         end
       end #valid_dataset
         
       def validate_cluster
-        if given? @params[:ddsname] 
+        if given? @params[:ddsname]
+          if !@params[:clfile].nil?
+            @errors[:filetype] = "Given file type must be plain text" unless valid_file_format? @params[:clfile]
+          else
+            @errors[:clfile] = "No clustering file given" 
+          end
         else
           @errors[:ddsname] = "Field sequencing dataset is required"
         end
       end #valid_cluster
 
       def validate_target
+          @params[:sp] = @params[:fbsp] unless given? @params[:sp]
+          @params[:tis] = @params[:fbtis] unless given? @params[:tis]
+          @params[:cell] = @params[:fbcell] unless given? @params[:cell]
       end #valid_target
 
       def validate_result
         if given? @params[:ddsname] 
-          @errors[:peptide] = "Field peptide sequence is required" unless given? @params[:peptide]
+          @errors[:pseq] = "Field peptide sequence is required" unless given? @params[:pseq]
         else
           @errors[:ddsname] = "Field sequencing dataset is required"
         end
@@ -83,12 +107,19 @@ module Sinatra
 
       def validate_motif
         if given? @params[:mlname] 
+          if !@params[:motfile].nil?
+            @errors[:filetype] = "Given file type must be plain text" unless valid_file_format? @params[:motfile]
+          else
+            @errors[:motfile] = "No motifs file given" 
+          end
         else
           @errors[:mlname] = "Field name is required"
         end
-      end #valid_result
+      end #valid_motif_
 
-
+      def valid_file_format?(file)
+        if file[:type] == "text/plain" then true else false end
+      end
 
       def valid_date_format?(date)
         begin
