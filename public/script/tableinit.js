@@ -11,8 +11,13 @@ $(document).ready(function(){
     "bJQueryUI": true,
   });
   
-    
-  $('#select_table thead input').keyup( function(){
+ 
+  $('#select_table thead input').click( function(e){
+    stopTableSorting(e);
+  });
+
+  $('#select_table thead input').keyup( function(e){
+    stopTableSorting(e);
     oTable.fnFilter(this.value, $("#select_table thead input").index(this));
   });
 
@@ -59,7 +64,7 @@ $(document).ready(function(){
       $('#showdata').html(data);
       $.getScript('/script/initshowtable.js');
     });
-  }
+    }
   });
 
 

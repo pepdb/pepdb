@@ -6,9 +6,11 @@ require './modules/formvalidation'
 require './modules/utilities'
 require './modules/comparativesearch'
 require './modules/dbinsert'
+require './modules/datatablesserver'
 require 'date'
 require 'sass'
 require 'haml'
+require 'json'
 require './model'
 
 Haml::Options.defaults[:format] = :xhtml
@@ -39,7 +41,7 @@ get '/*style.css' do
 end
 
 get '/libraries' do
-  @libraries = Library.select(*library_columns)
+  @libraries = Library.select(*library_columns).order(Sequel.lit(" "))
   haml :libraries
 end
 
@@ -53,14 +55,17 @@ get '/show_sn_table' do
   if params['ref'] == "Library" 
     @column = :library_name
     @eletype = "Selections"
+    @id = :show_table
     @data = Selection.join(Target, :target_id=>:target_id).select(*selection_columns)
   elsif params['ref'] == "Selection" 
     @column = :selection_name
     @eletype = "Sequencing Datasets"
+    @id = :show_table
     @data = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
   elsif params['ref'] == "Sequencing Dataset" 
     @column = :sequencing_datasets__dataset_name
     @eletype = "Peptides"
+    @id = :pep_table
     @data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
   end
   haml :show_sn_table, :layout => false
@@ -312,5 +317,11 @@ post '/validate-data' do
   else
     haml :validation_errors, :layout => false, locals:{errors: @errors}
   end
+end
+
+get '/datatables' do
+  puts request.url()
+  content_type :json
+  get_datatable_json(params)
 end
 

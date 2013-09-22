@@ -4,5 +4,5 @@
   in
   = params[:ref] 
   = params[:ele_name] 
-  = partial :tables, locals: {table_class:"display", table_id:"show_table", choice:"#{params[:sel_name]}", first_data_to_display:@data, second_data_to_display:@data.where(@column => "#{params[:ele_name]}")}    
+  = partial :tables, locals: {table_id:@id, choice:"#{params[:sel_name]}", first_data_to_display:@data, second_data_to_display:@data.where(@column => "#{params[:ele_name]}").limit(10)}    
 

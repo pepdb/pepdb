@@ -5,6 +5,66 @@ $(document).ready(function(){
     "bInfo": false,
     "bJQueryUI": true,
   });
+  var elem = $('#refelem1').val();
+
+  var pTable = $('#pep_table').dataTable({
+    "bJQueryUI": true,
+    "bProcessing": true,
+    "bInfo": true,
+    "bSearchable": true,
+    "sPaginationType": "full_numbers",
+    "bPaginate": true,
+    "sDom": '<"H"lfrT>t<"F"ip>',
+    //"sDom": 'T<"clear">lfrtip',
+    //:"sDom": 'T<"clear">lfrtip',
+    "oTableTools":{
+      "sSwfPath": "/copy_csv_xls_pdf.swf",
+      "aButtons": [
+      {
+        "sExtends": "collection",
+        "sButtonText": "save as",
+        "aButtons": ["csv", "pdf"],
+        }]
+    },
+    "bServerSide": true,
+    "sAjaxSource": "/datatables",
+    "fnServerParams": function(aoData){
+      aoData.push({ "name": "selElem", "value": elem });
+    }
+  
+  });
+
+  $('#pep_table thead input').click( function(e){
+    stopTableSorting(e);
+  });
+
+  $('#pep_table thead input').keyup( function(){
+    pTable.fnFilter(this.value, $("#pep_table thead input").index(this));
+  });
+
+  $('#pep_table thead input').each( function (i) {
+    asInitVals[i] = this.value;
+  } );
+
+  $('#pep_table thead input').focus( function () {
+    if ( this.className == "search_init" )
+    {
+      this.className = "";
+      this.value = "";
+    }
+  } );
+
+  $('#pep_table thead input').blur( function (i) {
+    if ( this.value == "" )
+    {
+      this.className = "search_init";
+      this.value = asInitVals[$("#pep_table thead input").index(this)];
+    }
+  });
+
+  $('#show_table thead input').click( function(e){
+    stopTableSorting(e);
+  });
   $('#show_table thead input').keyup( function(){
     qTable.fnFilter(this.value, $("#show_table thead input").index(this));
   });
@@ -27,7 +87,9 @@ $(document).ready(function(){
       this.className = "search_init";
       this.value = asInitVals[$("#show_table thead input").index(this)];
     }
-  } );
+  });
+
+  
 
   $('#show_table tr').hover(function(){
     $(this).toggleClass('highlight');

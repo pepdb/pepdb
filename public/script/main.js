@@ -12,6 +12,12 @@ var isFirstLoad = function(namesp, jsFile) {
   return isFirst;
 };
 
+function stopTableSorting(e) {
+    if (!e) var e = window.event
+    e.cancelBubble = true;
+    if (e.stopPropagation) e.stopPropagation();
+}
+
 /* get url parameter "name" or return "" if does not exist */
 function urlParam(name){
   var result = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
