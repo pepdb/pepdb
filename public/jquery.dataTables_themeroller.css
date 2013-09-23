@@ -1,4 +1,7 @@
-
+/* custom general settings */
+th, td {
+  white-space:nowrap;
+}
 
 /*
  * Table

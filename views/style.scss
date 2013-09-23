@@ -6,6 +6,7 @@ html{
   width:100%;
 }
 
+
 body {
   color: black;
   background-color: white;
@@ -14,6 +15,7 @@ body {
   margin: 0;
   width: 100%;
   height:100%;
+  overflow:auto;
  // padding: 1em;
 
 }
@@ -217,7 +219,7 @@ div#clinput {
 #content {
   width: 100%;
   height: 100%;
-  overflow:auto;
+ # overflow:auto;
 }
 
 .text_filter {
