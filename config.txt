@@ -14,3 +14,6 @@ zypper in libopenssl-devel
 zypper in apache2-devel
 vi /etc/apache2/httpd.conf.pepdb
 gem install rack-test
+gem1.9 install json
+zypper in pcre-devel
+make sqlite-regexp-master

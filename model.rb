@@ -1,9 +1,13 @@
 require 'sequel'
 require 'logger'
-DB = Sequel.sqlite('pep.db', :synchronous => "off")
+
+DB = Sequel.sqlite('pep.db', :synchronous => "off", :after_connect => (proc do |db|
+  db.enable_load_extension(1) 
+  db.execute("SELECT load_extension('./regexp.sqlext')")
+  db.enable_load_extension(0) 
+end))
 require './create_tables'
 #DB.loggers << Logger.new($stdout)
-
 
 trigger_count = DB.fetch("SELECT name FROM sqlite_master WHERE name = 'pep_div_up'")
 
