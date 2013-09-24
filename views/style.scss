@@ -6,6 +6,9 @@ html{
   width:100%;
 }
 
+.ui-button-text {
+  background-color:#1bf011;
+}
 
 body {
   color: black;
@@ -25,11 +28,6 @@ fieldset {
     width:75%;
   }
 }
-
-#show_table {
-  width:40%;
-}
-
 #selectdata {
   overflow:auto;
 }
@@ -45,6 +43,17 @@ fieldset.checklist {
   border: 0;
   padding: 0;
 }
+
+//library browsing
+#selectedinfo{
+  float:left;
+  width: 35%;
+}
+#selecteddata{
+  float:left;
+  width: 65%;
+}
+
 
 // prop-search
 #properties {
@@ -152,29 +161,7 @@ ul#navigation{
   margin-left:0.5em;
   margin-top:0.5em;
 }
-/*
-ul#navigation {
-  overflow:hidden;
-  list-style-type: none;
-  font-size: 0.91em;
-  //float: left;
-  width: 15em;
-  margin: 0;
-  padding: 0em;
-  background-color: $sidebar-color;
- // border: 1px dashed;
 
-  li { margin:0; padding: 0.1em; }
-  a { 
-    display: block;
-    padding: 0.2em;
-  }
-  a:link {
-    color: black;
-    background-color: $sidebar-color;
-  }
-}
-*/
 #left {
   float:left;
   overflow:hidden;

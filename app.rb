@@ -20,12 +20,14 @@ set :sessions, false
 set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 
-library_columns = [:library_name, :carrier, :encoding_scheme, :insert_length]
-selection_columns = [:selection_name___selection]
-selection_all_columns = [:selection_name___selection, :library_name___library, :date, :performed_by,:species, :tissue, :cell]
-dataset_columns = [:dataset_name ]
-dataset_info_columns = [:dataset_name, :libraries__library_name, :selection_name, :sequencing_datasets__date, :species, :tissue, :cell, :selection_round, :carrier]
-dataset_all_columns = [:dataset_name, :library_name, :selection_name, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
+library_columns = [:library_name___name, :carrier, :encoding_scheme, :insert_length]
+library_all = [:library_name___name, :encoding_scheme, :carrier, :produced_by, :date, :insert_length, :distinct_peptides, :peptide_diversity]
+selection_columns = [:selection_name___selection, :species, :tissue, :cell]
+selection_all_columns = [:selection_name___name, :selections__library_name___library, :selections__date, :carrier, :performed_by,:species, :tissue, :cell]
+selection_info_columns = [:selection_name___name, :library_name___library, :date, :performed_by,:species, :tissue, :cell]
+dataset_columns = [:dataset_name___name, :species, :tissue, :cell ]
+dataset_info_columns = [:dataset_name___name, :libraries__library_name___library, :selection_name___selection, :sequencing_datasets__date, :species, :tissue, :cell, :selection_round, :carrier]
+dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
 peptide_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance]
 sys_peptide_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name,:rank, :reads , :dominance]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
@@ -41,12 +43,13 @@ get '/*style.css' do
 end
 
 get '/libraries' do
-  @libraries = Library.select(*library_columns).order(Sequel.lit(" "))
+  @libraries = Library.select(*library_columns)
   haml :libraries
 end
 
 get '/libraries/:lib_name' do
   @libraries = Library.select(*library_columns)
+  @infodata = Library.select(*library_all)
   @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_columns)
   haml :libraries
 end
@@ -71,9 +74,20 @@ get '/show_sn_table' do
   haml :show_sn_table, :layout => false
 end
 
+get '/info-tables' do
+  if request.referer.include?("libraries")
+    @infodata = Library.select(*library_all).where(:library_name => params[:infoElem])
+  elsif request.referer.include?("selection")
+    @infodata = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:infoElem])
+  elsif request.referer.include?("datasets")
+    @infodata = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:infoElem])
+  end
+  haml :info_tables, :layout => false, locals:{data_to_display:@infodata, element:"#{h params[:infoElem]}"}
+end
+
 get '/show-info' do
   if params['ref'] == "Library"
-    @info_data = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
+    @info_data = Selection.join(Target, :target_id=>:target_id).select(*selection_info_columns)
     @eletype = "Selection"
     @next = "selections"
     @column = :selection_name
@@ -89,17 +103,17 @@ get '/show-info' do
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
   end
-  puts params['ele_name2'] 
   haml :show_info, :layout => false
 end
 
 get '/selections' do
-  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
+  @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
   haml :selections
 end
 
 get '/selections/:sel_name' do
-  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_all_columns)
+  @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
+  @infodata = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:sel_name])
   @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
   haml :selections
 end
@@ -111,6 +125,7 @@ end
 
 get '/datasets/:set_name' do
   @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
+  @infodata = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
   @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
   haml :datasets
 end

@@ -2,3 +2,5 @@
 pep.db
 pep.db-journal
 .sass-cache
+regexp.o
+regexp.sqlext

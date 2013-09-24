@@ -6,8 +6,9 @@ $(document).ready(function(){
 /* --------------DataTables configuration----------------  */
   /* initialize first table with searchable columns*/
   var oTable = $('#select_table').dataTable({
-    "bPaginate": false,
-    "bInfo": false,
+    "bPaginate": "true",
+    "sPaginationType": "full_numbers",
+    "bInfo": true,
     "bJQueryUI": true,
   });
   
@@ -28,7 +29,7 @@ $(document).ready(function(){
   $('#select_table thead input').focus( function () {
     if ( this.className == "search_init" )
     {
-      this.className = "";
+      this.className = "text_filter";
       this.value = "";
     }
   } );
@@ -36,7 +37,7 @@ $(document).ready(function(){
   $('#select_table thead input').blur( function (i) {
     if ( this.value == "" )
     {
-      this.className = "search_init";
+      $(this).addClass("search_init");
       this.value = asInitVals[$("#select_table thead input").index(this)];
     }
   } );
@@ -60,9 +61,18 @@ $(document).ready(function(){
 
       });
     } else {
+    if ($('#selecteddata').is(':visible')){
+      $('#selecteddata').hide();
+      $('#datainfo').hide();
+    }
+    $.get('/info-tables', {infoElem:selectedID}, function(data){
+      $('#selectedinfo').html(data);
+    });
     $.get('/show_sn_table', {ele_name:selectedID, ref: route}, function(data){
-      $('#showdata').html(data);
-      $.getScript('/script/initshowtable.js');
+      $('#selecteddata').html(data);
+      $.getScript('/script/initshowtable.js', function(){
+        $('#selecteddata').show();
+      });
     });
     }
   });

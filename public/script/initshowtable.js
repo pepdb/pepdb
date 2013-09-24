@@ -1,9 +1,20 @@
 $(document).ready(function(){
 /* initialize second table with searchable columns*/
   var qTable = $('#show_table').dataTable({
-    "bPaginate": false,
-    "bInfo": false,
     "bJQueryUI": true,
+    "bInfo": true,
+    "sPaginationType": "full_numbers",
+    "bPaginate": true,
+    "sDom": '<"H"lfrT>t<"F"ip>',
+    "oTableTools":{
+      "sSwfPath": "/copy_csv_xls_pdf.swf",
+      "aButtons": [
+      {
+        "sExtends": "collection",
+        "sButtonText": "save as",
+        "aButtons": ["csv", "pdf"],
+        }]
+    },
   });
   var elem = $('#refelem1').val();
 
@@ -15,8 +26,6 @@ $(document).ready(function(){
     "sPaginationType": "full_numbers",
     "bPaginate": true,
     "sDom": '<"H"lfrT>t<"F"ip>',
-    //"sDom": 'T<"clear">lfrtip',
-    //:"sDom": 'T<"clear">lfrtip',
     "oTableTools":{
       "sSwfPath": "/copy_csv_xls_pdf.swf",
       "aButtons": [
@@ -49,7 +58,7 @@ $(document).ready(function(){
   $('#pep_table thead input').focus( function () {
     if ( this.className == "search_init" )
     {
-      this.className = "";
+      this.className = "text_filter";
       this.value = "";
     }
   } );
@@ -57,7 +66,7 @@ $(document).ready(function(){
   $('#pep_table thead input').blur( function (i) {
     if ( this.value == "" )
     {
-      this.className = "search_init";
+      $(this).addClass("search_init");
       this.value = asInitVals[$("#pep_table thead input").index(this)];
     }
   });
@@ -76,7 +85,7 @@ $(document).ready(function(){
   $('#show_table thead input').focus( function () {
     if ( this.className == "search_init" )
     {
-      this.className = "";
+      this.className = "text_filter";
       this.value = "";
     }
   } );
@@ -84,15 +93,46 @@ $(document).ready(function(){
   $('#show_table thead input').blur( function (i) {
     if ( this.value == "" )
     {
-      this.className = "search_init";
+      $(this).addClass("search_init");
       this.value = asInitVals[$("#show_table thead input").index(this)];
     }
   });
 
   
+  $('#pep_table tr').hover(function(){
+    $(this).toggleClass('highlight');
+  });
 
   $('#show_table tr').hover(function(){
     $(this).toggleClass('highlight');
+  });
+  $('#pep_table tr:has(td)').click(function(){
+    var selectedID = $(this).find("td:first").html();
+    var selectedDS = $(this).find("td:nth-child(2)").html();
+    var route = document.location.pathname;
+    var dataType = $('#reftype').val();
+    var firstChoice = $('#refelem1').val();
+   // var first_choice =  $('#select_table').data('first-choice');
+    if (route == "/comparative-search" || route == "/systemic-search"){
+      $('#infos').load('/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
+    } else if (route == "/cluster-search"){
+    /*  if($('#clsearch').is(':visible')){
+        $('#clsearch').toggle();
+      }
+      $('#pepprop').load('/peptide-infos', {selCl: selectedID}, function(){
+        $.getScript('/script/initshowtable.js', function(){
+          $('#clsearch').toggle();
+        });
+        
+      });*/
+    } else {
+      $.get('/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
+        $('#datainfo').html(data);
+        $.getScript('/script/initbutton.js', function(){
+          $('#datainfo').show();
+        });
+      });
+    }     
   });
 
   $('#show_table tr:has(td)').click(function(){
@@ -117,8 +157,10 @@ $(document).ready(function(){
     } else {
       $.get('/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
         $('#datainfo').html(data);
-        $.getScript('/script/initbutton.js');
+        $.getScript('/script/initbutton.js', function(){
+          $('#datainfo').show();
+        });
       });
     }     
-  })
+  });
 });
