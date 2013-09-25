@@ -2,6 +2,79 @@ require 'sinatra/base'
 
 module Sinatra
   module QueryStringBuilder
+    class WildcardSearch
+      include Rack::Utils
+      alias_method :h, :escape_html 
+      WILDCARD = {:X => "ARNDCQEGHILKMFPSTWYV", :+ => "KRH", :- => "DE", :B => "TSGCNQY", :Z => "AVLIPMFW", :< => "AGS", :J => "ANDCGILPSTV", :> => "REQHKMFWY", :U => "HFWY"}    
+      AMINOACIDS = "ARNDCQEGHILKMFPSTWYV"
+
+      def initialize(seq)
+        @seq = seq.upcase
+        @regexp = ''
+      end
+      
+      def build_string
+        bracket_open = false
+        bracket_class = ''
+        @seq.each_char do |char|
+          if bracket_open
+            if char == "]"
+              bracket_open = false
+              @regexp << bracket_class + "]"
+              bracket_class = ''
+            else
+              test_char(char, bracket_class, bracket_open) 
+            end # ]
+          else
+            if char == "["
+              bracket_open = true
+              bracket_class << '['
+            else
+              test_char(char, @regexp, bracket_open) 
+            end # [
+          end # bracket_open
+        end # char
+        puts @regexp
+        @regexp
+      end # end buid_string
+      
+      def test_char(char, container, open)
+        if AMINOACIDS.include? char
+          container << char
+        elsif WILDCARD[char.to_sym] != nil
+          container << "[" + WILDCARD[char.to_sym] + "]" unless open
+          container << WILDCARD[char.to_sym] if open
+        else
+          raise ArgumentError, "invalid wildcard character #{h char} given!"
+        end # AMINO
+      end #test_char
+
+    end # end class
+
+    class ReverseWildcardSearch
+      include Rack::Utils
+      alias_method :h, :escape_html 
+      REVERSEWC = {:A => "Z<J", :R => "+>", :N => "BJ", :D => "-J", :C => "BJ", :Q => "B>", :E => "->", :G => "B<J", :H => "+>U", :I => "ZJ", :L => "ZJ", :K => "+>", :M => "Z>", :F => "Z>U", :P => "ZJ", :S => "B<J", :T => "BJ", :W => "Z>U", :Y => "B>U", :V => "ZJ"}
+      def initialize(seq)
+        @seq = seq.upcase
+        @regexp = ''
+        @wildcard = ''
+      end
+      
+      def build_string
+        @seq.each_char do |char|
+          unless REVERSEWC[char.to_sym].nil?
+            @wildcard << "[" << REVERSEWC[char.to_sym] << "]"
+          else
+            raise ArgumentError, "invalid amino acid #{h char} given!"
+          end
+        end #char
+        puts @wildcard
+        wc = WildcardSearch.new(@wildcard)
+        @regexp = wc.build_string
+      end #build_string
+    end # class
+
     def build_property_array(params)
       querystring = ''
       placeholders = Array.new
@@ -14,6 +87,16 @@ module Sinatra
           querystring << 'peptides.peptide_sequence LIKE ?'
           likestr = '%' << params['seq'].to_s.upcase << '%'
           placeholders.insert(-1, likestr)
+        elsif params['type'] == "wildcard sequence"
+          querystring << 'peptides.peptide_sequence REGEXP ?'
+          wc = WildcardSearch.new(params[:seq])
+          wildcard = wc.build_string
+          placeholders.insert(-1, wildcard)
+        elsif params['type'] == "reverse wildcard sequence"
+          querystring << 'peptides.peptide_sequence REGEXP ?'
+          rwc = ReverseWildcardSearch.new(params[:seq].upcase) 
+          wildcard = rwc.build_string
+          placeholders.insert(-1, wildcard)
         end
       end
 
@@ -48,74 +131,53 @@ module Sinatra
       end
 
       if !params['ts'].nil?
-        querystring << ' AND species = ?' if querystring.length > 0
-        querystring << 'species = ?' if querystring.length == 0
+        querystring << ' AND sel_target.species = ?' if querystring.length > 0
+        querystring << 'sel_target.species = ?' if querystring.length == 0
         placeholders.insert(-1, params['ts'].to_s)
       end
       if !params['tt'].nil?
-        querystring << ' AND tissue = ?' if querystring.length > 0
-        querystring << 'tissue = ?' if querystring.length == 0
+        querystring << ' AND sel_target.tissue = ?' if querystring.length > 0
+        querystring << 'sel_target.tissue = ?' if querystring.length == 0
         placeholders.insert(-1, params['tt'].to_s)
       end
 
       if !params['tc'].nil?
-        querystring << ' AND cell = ?' if querystring.length > 0
-        querystring << 'cell = ?' if querystring.length == 0
+        querystring << ' AND sel_target.cell = ?' if querystring.length > 0
+        querystring << 'sel_target.cell = ?' if querystring.length == 0
         placeholders.insert(-1, params['tc'].to_s)
       end
       
-      ####### sequenced targets???     #############
-=begin
       if !params['ss'].nil?
-        querystring[:] = params['ss']
+        querystring << ' AND seq_target.species = ?' if querystring.length > 0
+        querystring << 'seq_target.species = ?' if querystring.length == 0
+        placeholders.insert(-1, params['ss'].to_s)
       end 
 
       if !params['st'].nil?
-        querystring[:] = params['st']
+        querystring << ' AND seq_target.tissue = ?' if querystring.length > 0
+        querystring << 'seq_target.tissue = ?' if querystring.length == 0
+        placeholders.insert(-1, params['st'].to_s)
       end 
 
       if !params['sc'].nil?
-        querystring[:] = params['sc']
+        querystring << ' AND seq_target.cell = ?' if querystring.length > 0
+        querystring << 'seq_target.cell = ?' if querystring.length == 0
+        placeholders.insert(-1, params['sc'].to_s)
       end 
-=end
 
-      if !params['ralt'].nil? && !params['ragt'].nil?
-        querystring << ' AND rank BETWEEN ? AND ?' if querystring.length > 0
-        querystring << 'rank BETWEEN ? AND ?' if querystring.length == 0
-        placeholders.insert(-1, params['ragt'].to_i, params['ralt'].to_i)
-      elsif !params['ralt'].nil?
-        querystring << ' AND rank < ?' if querystring.length > 0
-        querystring << 'rank < ?' if querystring.length == 0
-        placeholders.insert(-1, params['ralt'].to_i)
-      elsif !params['ragt'].nil?
+      if !params['ragt'].nil?
         querystring << ' AND rank > ?' if querystring.length > 0
-        querystring << ' AND rank > ?' if querystring.length > 0
+        querystring << ' AND rank > ?' if querystring.length == 0
         placeholders.insert(-1, params['ragt'].to_i)
       end
 
-      if !params['relt'].nil? && !params['regt'].nil?
-        querystring << ' AND reads BETWEEN ? AND ?' if querystring.length > 0
-        querystring << 'reads BETWEEN ? AND ?' if querystring.length == 0
-        placeholders.insert(-1, params['regt'].to_i, params['relt'].to_i)
-      elsif !params['relt'].nil?
-        querystring << ' AND reads < ?' if querystring.length > 0
-        querystring << 'reads < ?' if querystring.length == 0
-        placeholders.insert(-1, params['relt'].to_i)
-      elsif !params['regt'].nil?
-        querystring << ' AND rank > ?' if querystring.length > 0
-        querystring << 'rank > ?' if querystring.length == 0
+      if !params['regt'].nil?
+        querystring << ' AND reads > ?' if querystring.length > 0
+        querystring << 'reads > ?' if querystring.length == 0
         placeholders.insert(-1, params['regt'].to_i)
       end
 
-      if !params['dlt'].nil? && !params['dgt'].nil?
-        querystring << ' AND dominance BETWEEN ? AND ?' if querystring.length > 0
-        querystring << 'dominance BETWEEN ? AND ?' if querystring.length == 0
-        placeholders.insert(-1, params['dgt'].to_f, params['dlt'].to_f)
-      elsif !params['dlt'].nil?
-        querystring << ' AND dominance < ?' if querystring.length > 0
-        querystring << 'dominance < ?' if querystring.length == 0
-        placeholders.insert(-1, params['dlt'].to_f)
-      elsif !params['dgt'].nil?
+      if !params['dgt'].nil?
         querystring << ' AND dominance > ?' if querystring.length > 0
         querystring << 'dominance > ?' if querystring.length == 0
         placeholders.insert(-1, params['dgt'].to_f)

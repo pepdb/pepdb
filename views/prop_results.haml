@@ -1,0 +1,10 @@
+- if !@error.nil?
+  .ui-widget
+    %div{:class => "ui-state-error ui-corner-all", :id => "errorbox" }
+      %p
+        %span{:class => "ui-icon ui-icon-alert", :id => "errorspan"}
+        %strong Error:
+        = @error
+-else
+  = partial :tables, locals: {table_id:"show_table", choice:"",first_data_to_display:@results, second_data_to_display:@results.where(Sequel.lit(@querystring, *@placeholders)).limit(params[:lim])}
+

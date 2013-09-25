@@ -29,7 +29,7 @@ dataset_columns = [:dataset_name___name, :species, :tissue, :cell ]
 dataset_info_columns = [:dataset_name___name, :libraries__library_name___library, :selection_name___selection, :sequencing_datasets__date, :species, :tissue, :cell, :selection_round, :carrier]
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
 peptide_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance]
-sys_peptide_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name,:rank, :reads , :dominance]
+sys_peptide_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name___dataset,:rank, :reads , :dominance]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
 dna_columns = [:dna_sequences__dna_sequence, :reads]
@@ -180,9 +180,28 @@ get '/property-search' do
   @datasets = SequencingDataset
   @selections = Selection
   @targets = Target
-  @results = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).join(Target, :selections__target_id___target => :targets__target_id___target)
-  @querystring, @placeholders = build_property_array(params)
+  @results = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).join(:targets___sel_target, :selections__target_id => :sel_target__target_id).join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
+  begin
+    @querystring, @placeholders = build_property_array(params)
+  rescue ArgumentError => e
+    @error = e.message
+  end
+  puts @querystring
+  puts @placeholders
   haml :prop_search
+end
+
+get '/property-results' do
+  @results = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).join(:targets___sel_target, :selections__target_id => :sel_target__target_id).join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
+  begin
+    @querystring, @placeholders = build_property_array(params)
+  rescue ArgumentError => e
+    @error = e.message
+  end
+  puts @querystring
+  puts @placeholders
+
+  haml :prop_results, :layout => false
 end
 
 get '/comparative-search' do
@@ -335,8 +354,8 @@ post '/validate-data' do
 end
 
 get '/datatables' do
-  puts request.url()
   content_type :json
-  get_datatable_json(params)
+  puts params[:route]
+  get_datatable_json(params, request.referer)
 end
 

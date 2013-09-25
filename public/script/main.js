@@ -28,6 +28,9 @@ $(document).ready(function(){
   var formAll = ["#all_lib", "#all_sel", "#all_ds", "#c_all_lib", "#r_all_lib" ];
   var propSelect = ['#l', '#s', '#ds', '#c', '#ts', '#tt', '#tc', '#ss', '#st', '#sc'];
   var propInput = ['#seq', '#blos', '#pl', '#sr', '#ralt', '#ragt', '#relt', '#regt', '#dlt', '#dgt'];
+  var species = ['#ss', '#ts'];
+  var tissue = ['#st', '#tt'];
+  var cell = ['#sc', '#tc'];
 
   $('#addlink').button();  
   $('#editlink').button();  
@@ -145,23 +148,6 @@ $(document).ready(function(){
         $.each(boxNames, function(index, value){
           $(value).prop('selectedIndex', -1);
         });
-/*
-       $('#adddata').submit(function(){
-      /*  if($('#validerrors').is(':visible')){
-          $('#validerrors').toggle();
-        }
-        $.ajax({
-          data: $(this).serialize(),
-          contentType: false,
-          processData:false,
-          type: $(this).attr('method'),
-          url: $(this).attr('action'),
-          success: function(response){
-            $('#valerrors').html(response);
-            }
-          });
-        return false;
-        });*/
 
         $('#dspecies').change(function(){
           var valSel = $(this).children("option:selected").text();
@@ -208,23 +194,89 @@ $(document).ready(function(){
         });
       });
 
-    $('#propsearch').submit(function(){
-      $.each(propInput, function(index,value){
-        if($(value).val() == ""){
-          if(value == '#seq'){
-            $('#type').attr('name', '');
-          }
-          $(value).attr('name', '');
+   $('#propsearch').submit(function(){
+    if($('#propresults').is(':visible')){
+      $('#propresults').toggle();
+    }
+    $.each(propInput, function(index,value){
+      if($(value).val() == ""){
+        if(value == '#seq'){
+          $('#type').attr('name', '');
         }
+        $(value).attr('name', '');
+      }
+    });
+    $.ajax({
+      data: $(this).serialize(),
+      type: $(this).attr('method'),
+      url: $(this).attr('action'),
+      success: function(response){
+        $('#propresults').html(response);
+        $.getScript('/script/tableinit.js', function(){
+          $('#propresults').toggle();
+        });
+      }
+    });
+    return false;
+  });
+    $.each(species, function(index, value){
+      $(value).change(function(){
+        var valSel = $(this).children("option:selected").text();
+        $.get('/formdrop', {columnname: "tissue", selected1: valSel, table:"targets", where1:"species", boxID:tissue[index].substring(1)}, function(data){
+          $(tissue[index]).html(data);
+          $(tissue[index]).prop('selectedIndex', -1);
+          $(cell[index]).html('');
+        });
       });
-    }); 
+    });
+
+    $.each(tissue, function(index, value){
+      $(value).change(function(){
+        var valSel1 = $(species[index]).children("option:selected").text();
+        var valSel2 = $(this).children("option:selected").text();
+        $.get('/formdrop', {columnname: "cell", selected1: valSel1, selected2: valSel2,table:"targets", where2:"tissue", where1:"species",boxID:cell[index].substring(1)}, function(data){
+          $(cell[index]).html(data);
+        });
+      });
+
+    });
+
+    $('#l').change(function(){
+      var valSel = $(this).children("option:selected").text();
+      $.get('/formdrop', {columnname: "selection_name", selected1: valSel, table:"selections", where1:"library_name", boxID:"s"}, function(data){
+        $('#s').html(data);
+        $('#s').prop('selectedIndex', -1);
+        $('#ds').html('');
+      });
+      $('#c').prop('disabled', true);
+    });
+    $('#s').change(function(){
+      var valSel1 = $('#l').children("option:selected").text();
+      var valSel2 = $(this).children("option:selected").text();
+      $.get('/formdrop', {columnname: "dataset_name", selected1: valSel1, selected2: valSel2,table:"sequencing_datasets", where2:"selection_name", where1:"library_name",boxID:"ds"}, function(data){
+        $('#ds').html(data);
+      });
+    });
       
       
     $('#type').change(function(){
+      if ($(this).val() == "complete sequence"){ 
+        $('#blossum').show();
+        $('#wchelp').hide();
+      } else if ($(this).val() == "wildcard sequence"){ 
+        $('#blossum').hide();
+        $('#wchelp').show();
+      } else {
+        $('#blossum').hide();
+        $('#wchelp').hide();
       
-      $('#blossum').toggle();
+      }
     });
-
+    $('#wcicon').tooltip({
+      content: function(callback){
+        callback($(this).prop('title').replace(/\|/g, '<br />'));
+      }
+    });
 
 
     /* -----------jsTree configuration------------------- */  
