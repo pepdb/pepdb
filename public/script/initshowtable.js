@@ -17,6 +17,7 @@ $(document).ready(function(){
     },
   });
   var elem = $('#refelem1').val();
+  var route = document.location.pathname;
 
   var pTable = $('#pep_table').dataTable({
     "bJQueryUI": true,
@@ -38,7 +39,7 @@ $(document).ready(function(){
     "bServerSide": true,
     "sAjaxSource": "/datatables",
     "fnServerParams": function(aoData){
-      aoData.push({ "name": "selElem", "value": elem });
+      aoData.push({ "name": "selElem", "value": elem});
     }
   
   });

@@ -70,23 +70,36 @@ fieldset.checklist {
 
 fieldset#first{
   float:left;
-  width: 24%;
-}
-fieldset#second{
-  float:left;
-  width: 24%;
+  width: 15%;
+  clear:left;
+  p select {
+    #text-align:right;
+    display:block;
+  }
 }
 fieldset#third{
   float:left;
-  width: 24%;
+  width: 15%;
+  p select {
+    #text-align:right;
+    display:block;
+  }
 }
 fieldset#fourth{
   float:left;
-  width: 24%;
+  width: 15%;
+  p select {
+    #text-align:right;
+    display:block;
+  }
 }
 fieldset#fifth{
-  clear:both;
+  //clear:both;
+  width: 20%;
   float:left;
+  input {
+    float:right;
+  }
 }
 fieldset#sixth{
   float:left;
@@ -169,13 +182,8 @@ ul#navigation{
 }
 #right {
   float: left;
-  //margin-left: 15em;
-  //margin-right: 0.4em;
   width: 80%;
-  //min-width: 10em;
   overflow:hidden;
-
-
 }
 div#results{
   float:left;
@@ -192,7 +200,12 @@ div#clinput {
   }
 
 }
-
+#seqselect {
+  float:left;
+}
+#blossum{
+  //float:left;
+}
 #dataselection {
   float:left;
   width: 30%;
@@ -255,12 +268,13 @@ div#motifs {
 
 
 // add forms
-label span {
-  display: inline-block;
-  width: 10em;
-  text-align: right;
+#adddata {
+  label span {
+    display: inline-block;
+    width: 10em;
+    text-align: right;
+  }
 }
-
 p.reqfield {
   font-size:small;
 }
@@ -281,4 +295,11 @@ iframe#notify {
   border:0;
   width:100%;
 }
-
+#show-res {
+  height:100%;
+}
+iframe#propresults {
+  frameBorder:0;
+  border:0;
+  width:100%;
+}

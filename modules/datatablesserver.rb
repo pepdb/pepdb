@@ -5,30 +5,27 @@ module Sinatra
     
     class DataTablesData
 
-      def initialize(params)
-        @dataset = params['selElem']
+      def initialize(params, referer)
+        @referer = referer
         @json_result = {}
         @total_disp_rec = 0 
         @placeholder_args = []
         @params = params
+        @dataset = params['selElem']
         @columns = [:peptide_sequence, :rank, :reads, :dominance]      
         @indexcolumn = :peptide_sequence
         @table = :peptides_sequencing_datasets
         @placeholder_args.insert(-1, *@columns, @table, @dataset)
         @select = "SELECT ?, ?, ?, ? FROM ? WHERE dataset_name = ? "
+        @total_rec = Observation.where(:dataset_name => @dataset).count
         @where = build_where_string
-
         qry_string = "" << @select << @where 
-        puts qry_string
-        puts @placeholder_args
-        puts DB.fetch(qry_string, *@placeholder_args).inspect
         @total_disp_rec = DB.fetch(qry_string, *@placeholder_args).count
         @order = build_order_string
         
         @limit = build_limit_string
         @result_array = get_result
         @secho = params[:sEcho].to_i      
-        @total_rec = Observation.where(:dataset_name => @dataset).count
       end #initialize
 
       def json_result
@@ -65,12 +62,8 @@ module Sinatra
         filter =""
         (0...@columns.size).each do |column|
           if @params['bSearchable_' + column.to_s] == "true" && @params['sSearch_' + column.to_s] != ""
-          #  filter = " AND " 
-             # (0...@columns.size).each do |index|
-                filter << " AND ? LIKE ?"
-                @placeholder_args.insert(-1, @columns[column], "%"+@params['sSearch_' + column.to_s].to_s+"%")
-             # end #each
-            #filter.chop!.chop!.chop! 
+            filter << " AND ? LIKE ?"
+            @placeholder_args.insert(-1, @columns[column], "%"+@params['sSearch_' + column.to_s].to_s.upcase+"%")
           end #if
         end #each 
         filter 
@@ -79,8 +72,6 @@ module Sinatra
       def get_result
         qry_string = "" << @select << @where << @order << @limit 
         rows = []
-        test = DB.fetch(qry_string, *@placeholder_args)
-        puts test.inspect
         DB.fetch(qry_string, *@placeholder_args) do |row|
           row_array = []
           @columns.each do |cell|
@@ -93,8 +84,8 @@ module Sinatra
   
     end #end class
     
-    def get_datatable_json(params)
-        dt_json = DataTablesData.new(params)
+    def get_datatable_json(params, referer)
+        dt_json = DataTablesData.new(params, referer)
         dt_json.json_result
     end
 

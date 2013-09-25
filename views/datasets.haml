@@ -15,6 +15,6 @@
         %input{:type => "hidden", :id => "refelem1", :value => "#{params[:set_name]}"}
         Peptides in Sequencing Dataset 
         = params[:set_name]
-        = partial :tables, locals: {table_class:"display", table_id:"show_table", choice:"#{params[:pep_seq]}", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => "#{params[:set_name]}").limit(30)}
+        = partial :tables, locals: {table_id:"pep_table", choice:"#{params[:pep_seq]}", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => "#{params[:set_name]}").limit(30)}
 
 #datainfo
