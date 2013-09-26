@@ -19,7 +19,7 @@ $(document).ready(function(){
         checkedDS.push(elemVal);
       }
     });
-    $('#results').load('/systemic-results', {sysDS: checkedDS}, function(){
+    $('#sysresults').load('/systemic-results', {sysDS: checkedDS}, function(){
       $.getScript("/script/tableinit.js")
     });
   });

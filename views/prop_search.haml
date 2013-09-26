@@ -8,10 +8,10 @@
           %option partial sequence
           %option wildcard sequence
           %option reverse wildcard sequence
-        %input.ui-corner-all{:type => "text", :id => "seq", :size => 15, :name => "seq", :value => "#{params['seq']}"}
+        %input.ui-corner-all{:type => "text", :id => "seq", :size => 15, :name => "seq"}
       #blossum
         %label similiar neighbour sequences 
-        %input.ui-corner-all{:type => "text", :id => "blos", :size => 5, :name => "blos", :value => "#{params['blos']}"}
+        %input.ui-corner-all{:type => "text", :id => "blos", :size => 5, :name => "blos"}
       #wchelp{:hidden => true}
         %span{ :class => " ui-icon ui-icon-help", :id => "wcicon", :title => "possible symbols|X = any amino acid| + = postive (KRH)|-  = negative (DE)| B = hydrophilic (TSGCNQY)|Z = hydrophobic (AVLIPMFW)|< = tiny, MW < 110 Da (AGS)|J = small, MW < 140 Da (ANDCGILPSTV)|> = bulky, MW > 140 Da (REQHKMFWY)| U = aromatic (HFWY)| e.g. [+M] => at this position K,R,H or M"}
     %fieldset#first.ui-widget-content 

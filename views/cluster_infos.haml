@@ -1,6 +1,6 @@
 #clinfos
   %p infos on selected cluster
-  = partial :info_tables, locals: {data_to_display:@cluster_infos }
+  = partial :info_tables, locals: {data_to_display:@cluster_infos , element:@cluster_info[:consensus_sequence]}
 
 #clpeps
   %p all peptides in this cluster
