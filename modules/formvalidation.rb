@@ -108,7 +108,7 @@ module Sinatra
       def validate_motif
         if given? @params[:mlname] 
           if !@params[:motfile].nil?
-            @errors[:filetype] = "Given file type must be plain text" unless valid_file_format? @params[:motfile]
+            #@errors[:filetype] = "Given file type must be plain text" unless valid_file_format? @params[:motfile]
           else
             @errors[:motfile] = "No motifs file given" 
           end

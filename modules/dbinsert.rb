@@ -1,5 +1,6 @@
 require 'sinatra/base'
 require 'sqlite3'
+require 'csv'
 
 module Sinatra
   module DBInserter 
@@ -47,31 +48,55 @@ module Sinatra
       end
       
       def read_cluster_file(cluster_paras, selection, library)
-        current_cluster_id = Cluster.last[:cluster_id]
+        if Cluster.all.count > 0
+          current_cluster_id = Cluster.last[:cluster_id]
+        else
+          current_cluster_id = 0 
+        end
         clusters = []
         cluster_data = []
-        
+        puts current_cluster_id
+        puts "+++++++++++++++++++++" 
         clfile = File.readlines(@file)
         clfile.each do |line|
           linematch = line.match(/(\S+)\s+(\d+)\s+(\S+)/)
           if linematch[1][0] == "+"
             con_seq = linematch[1].slice(1, linematch[1].size-1)
-            puts con_seq
             clusters.insert(-1, [@dataset, selection, library, con_seq, linematch[2], linematch[3], cluster_paras])
-            puts @dataset
             current_cluster_id += 1
           else
             cluster_data.insert(-1, [current_cluster_id, linematch[1]])
+            if Peptide.select(:peptide_sequence).where(:peptide_sequence => linematch[1]).count == 0 
+              puts "ohoh"
+              puts linematch[1]
+            end
           end
         end #end line
         return clusters, cluster_data
       end
         
       def read_motif_file
-        dsfile = File.readlines(@file)
-        dsfile.each do |line|
-          match1 = line.match(/(\w+)\s+(\d+)\s+(\S+)\s+(\w+)\s+(\d+)/)
+        if DB[:motifs].all.count > 0
+          current_motif_id = DB[:motifs].last[:motif_id]
+        else
+          current_motif_id =  0
         end
+        mots_mot_lists = []
+        motifs = []
+        line_counter = 1
+        CSV.foreach(@file, :col_sep => ';', :row_sep => :auto ) do |row|
+          current_motif_id += 1
+          row[0].gsub!(/\s+/, "")
+          if row[0].match(/[^\[\]\w]/)
+            raise ArgumentError, "invalid motif character on line #{line_counter}"
+          end
+          motif = [row[0].upcase, row[1], row[2], row[3]]
+          list = [@dataset, current_motif_id]
+          mots_mot_lists.insert(-1,list)
+          motifs.insert(-1, motif)
+          line_counter += 1 
+        end
+        return motifs, mots_mot_lists
       end
     end #class
 
@@ -169,8 +194,8 @@ module Sinatra
         DB[:peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :reads, :dominance, :rank], pep_ds)
         #end # trans
       end
-      update_ds = DB["UPDATE libraries SET distinct_peptides = (SELECT COUNT (DISTINCT peptide_sequence) FROM peptides_sequencing_datasets AS pep_seq INNER JOIN sequencing_datasets AS ds ON pep_seq.dataset_name = ds.dataset_name  WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)) WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)", @values[:dsname].to_s, @values[:dsname].to_s]
-      update_ds.update
+      update_distinct_peptides = DB["UPDATE libraries SET distinct_peptides = (SELECT COUNT (DISTINCT peptide_sequence) FROM peptides_sequencing_datasets AS pep_seq INNER JOIN sequencing_datasets AS ds ON pep_seq.dataset_name = ds.dataset_name  WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)) WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)", @values[:dsname].to_s, @values[:dsname].to_s]
+      update_distinct_peptides.update
       end #dataset
        
       def into_cluster
@@ -181,6 +206,10 @@ module Sinatra
             fr = FileReader.new(@values[:submittype], @values[:clfile][:tempfile], @values[:ddsname])
             clusters, cluster_data =  fr.read_file(@values[:paras], selection, library)
             DB[:clusters].import([:dataset_name, :selection_name, :library_name, :consensus_sequence, :reads_sum, :dominance_sum, :parameters], clusters)
+            Cluster.all.each do |cl|
+              puts cl[:cluster_id]
+            end
+            puts cluster_data
             DB[:clusters_peptides].import([:cluster_id, :peptide_sequence], cluster_data)
           rescue Sequel::Error => e
             if e.message.include? "unique"
@@ -209,7 +238,6 @@ module Sinatra
           target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first[:target_id]
         begin
           id = DB[:results].insert(:target_id => target, :performance => "#{es @values[:perf].to_s}")
-          puts id
           DB[:peptides_sequencing_datasets].where(:dataset_name => @values[:ddsname], :peptide_sequence => @values[:pseq]).update(:result_id => id)
         rescue Sequel::Error => e
           if e.message.include? "unique"
@@ -221,21 +249,36 @@ module Sinatra
       end #result
       
       def into_motif
-        begin
-          id = DB[:motif_list].insert(:list_name => "#{es @values[:mlname].to_s}")
-        rescue Sequel::Error => e
-          if e.message.include? "unique"
-            @errors[:tar] = "Given name not unique"
-          else
-           @errors[:tar] = "database error" 
-          end
-        end
+        DB.transaction do
+          begin
+            DB[:motif_lists].insert(:list_name => "#{es @values[:mlname].to_s}")
+            fr = FileReader.new(@values[:submittype], @values[:motfile][:tempfile], @values[:mlname])
+            motifs, motifs_mot_lists = fr.read_file
+            motifs_qry, motifs_placeholder_args = build_compound_select_string(motifs, :motifs, :motif_sequence, :target, :receptor, :source)
+
+            motifs_qry.zip(motifs_placeholder_args).each do |qry, args|
+              new_data= DB[qry, *args]
+              new_data.insert
+            end
+            DB[:motifs_motif_lists].import([:list_name, :motif_id], motifs_mot_lists)
+           
+          rescue Sequel::Error => e
+            if e.message.include? "unique"
+              @errors[:mot] = e.message #"Given name not unique"
+            else
+             @errors[:mot] = e.message#"database error" 
+            end #if
+            raise Sequel::Rollback
+          rescue ArgumentError => e
+            @errors[:mot] = e.message
+            raise Sequel::Rollback
+          end #rescue
+        end #transaction
       end #motif
       
       def build_compound_select_string(data, table, *columns)
         qry = []
         placeholder_args = []
-        #qry_string = "INSERT OR IGNORE INTO #{table} (#{column}) select ? AS '#{column}'"
         qry_string = build_qrystring(table, columns) 
         (1...MAX_SQLITE_STATEMENTS).each do |index|
           qry_string << " UNION SELECT ?" << ",?" * (columns.size-1)

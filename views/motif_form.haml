@@ -1,5 +1,5 @@
 %h3 Add Motif list 
-%form{:id => "adddata", :action => "/validate-data", :method => "post", :target=> "notify"}
+%form{:id => "adddata", :action => "/validate-data", :enctype => "multipart/form-data",:method => "post", :target=> "notify"}
   %input{:type => "hidden", :value => "motif", :name => "submittype", :id =>"submittype"}
   %fieldset.mlform
     %legend motif list information:
