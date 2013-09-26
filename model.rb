@@ -99,4 +99,4 @@ class MotifList < Sequel::Model
   many_to_many :motifs, :key => :motif_sequence
 end
 
-require './fill_db'
+#require './fill_db'
