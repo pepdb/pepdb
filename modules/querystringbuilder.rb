@@ -1,101 +1,43 @@
 require 'sinatra/base'
+require './modules/wcsearch'
+require './modules/neighboursearch'
 
 module Sinatra
   module QueryStringBuilder
-    class WildcardSearch
-      include Rack::Utils
-      alias_method :h, :escape_html 
-      WILDCARD = {:X => "ARNDCQEGHILKMFPSTWYV", :+ => "KRH", :- => "DE", :B => "TSGCNQY", :Z => "AVLIPMFW", :< => "AGS", :J => "ANDCGILPSTV", :> => "REQHKMFWY", :U => "HFWY"}    
-      AMINOACIDS = "ARNDCQEGHILKMFPSTWYV"
 
-      def initialize(seq)
-        @seq = seq.upcase
-        @regexp = ''
+    class NeighbourSearch
+      def initialize
       end
-      
-      def build_string
-        bracket_open = false
-        bracket_class = ''
-        @seq.each_char do |char|
-          if bracket_open
-            if char == "]"
-              bracket_open = false
-              @regexp << bracket_class + "]"
-              bracket_class = ''
-            else
-              test_char(char, bracket_class, bracket_open) 
-            end # ]
-          else
-            if char == "["
-              bracket_open = true
-              bracket_class << '['
-            else
-              test_char(char, @regexp, bracket_open) 
-            end # [
-          end # bracket_open
-        end # char
-        puts @regexp
-        @regexp
-      end # end buid_string
-      
-      def test_char(char, container, open)
-        if AMINOACIDS.include? char
-          container << char
-        elsif WILDCARD[char.to_sym] != nil
-          container << "[" + WILDCARD[char.to_sym] + "]" unless open
-          container << WILDCARD[char.to_sym] if open
-        else
-          raise ArgumentError, "invalid wildcard character #{h char} given!"
-        end # AMINO
-      end #test_char
-
-    end # end class
-
-    class ReverseWildcardSearch
-      include Rack::Utils
-      alias_method :h, :escape_html 
-      REVERSEWC = {:A => "Z<J", :R => "+>", :N => "BJ", :D => "-J", :C => "BJ", :Q => "B>", :E => "->", :G => "B<J", :H => "+>U", :I => "ZJ", :L => "ZJ", :K => "+>", :M => "Z>", :F => "Z>U", :P => "ZJ", :S => "B<J", :T => "BJ", :W => "Z>U", :Y => "B>U", :V => "ZJ"}
-      def initialize(seq)
-        @seq = seq.upcase
-        @regexp = ''
-        @wildcard = ''
-      end
-      
-      def build_string
-        @seq.each_char do |char|
-          unless REVERSEWC[char.to_sym].nil?
-            @wildcard << "[" << REVERSEWC[char.to_sym] << "]"
-          else
-            raise ArgumentError, "invalid amino acid #{h char} given!"
-          end
-        end #char
-        puts @wildcard
-        wc = WildcardSearch.new(@wildcard)
-        @regexp = wc.build_string
-      end #build_string
-    end # class
+    end #class
 
     def build_property_array(params)
       querystring = ''
       placeholders = Array.new
 
       if !params['type'].nil?
-        if params['type'] == "complete sequence"
+        if params['type'] == "complete sequence" && params[:blos].nil?
           querystring << 'peptides.peptide_sequence = ?'
-          placeholders.insert(-1, params['seq'].to_s.upcase!)
+          placeholders.insert(-1, params['seq'].to_s.upcase)
+        elsif params['type'] == "complete sequence" && !params[:blos].nil?
+          in_clause = find_neighbours(params[:seq], params[:blos])
+          querystring << 'peptides.peptide_sequence IN ('
+          (0...in_clause.size).each do |neighbour_seq|
+            querystring << '?, '
+          end
+          querystring.chop!.chop!
+          querystring << ')'
+          placeholders.insert(-1, *in_clause)
         elsif params['type'] == "partial sequence"
           querystring << 'peptides.peptide_sequence LIKE ?'
           likestr = '%' << params['seq'].to_s.upcase << '%'
           placeholders.insert(-1, likestr)
         elsif params['type'] == "wildcard sequence"
           querystring << 'peptides.peptide_sequence REGEXP ?'
-          wc = WildcardSearch.new(params[:seq])
-          wildcard = wc.build_string
+          wildcard = wc_search(params[:seq])
           placeholders.insert(-1, wildcard)
         elsif params['type'] == "reverse wildcard sequence"
           querystring << 'peptides.peptide_sequence REGEXP ?'
-          rwc = ReverseWildcardSearch.new(params[:seq].upcase) 
-          wildcard = rwc.build_string
+          wildcard = rev_wc_search(params[:seq]) 
           placeholders.insert(-1, wildcard)
         end
       end
