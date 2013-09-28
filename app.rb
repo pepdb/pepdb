@@ -19,6 +19,7 @@ set :environment, :development
 set :sessions, false
 set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
+set :public_folder, Proc.new {File.join(root, "public_html")}
 
 library_columns = [:library_name___name, :carrier, :encoding_scheme, :insert_length]
 library_all = [:library_name___name, :encoding_scheme, :carrier, :produced_by, :date, :insert_length, :distinct_peptides, :peptide_diversity]
@@ -198,9 +199,6 @@ get '/property-results' do
   rescue ArgumentError => e
     @error = e.message
   end
-  puts @querystring
-  puts @placeholders
-
   haml :prop_results, :layout => false
 end
 
@@ -262,6 +260,7 @@ end
 
 get '/motif-search' do
   @libraries = Library
+  @motiflists = MotifList
   haml :motif_search
 end
 
@@ -270,6 +269,19 @@ post '/motif-search' do
   @datasets = SequencingDataset
   @selections = Selection
   haml :motif_search
+end
+
+get '/mot-checklist' do
+  params[:checkedElem]
+  @motlists = DB[:motifs_motif_lists].select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:checkedElem])
+  haml :mot_checklist, :layout => false
+end
+
+get '/motif-search-results' do
+  @peptides = Observation.distinct.select(:peptide_sequence).where(:dataset_name => params[:checked_motl[]])
+  @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence).where(:list_name => params[:checked_motl[]])
+  @results = search_peptide_motif_matches(@motlists, @peptides)
+  haml :mot_search_res
 end
 
 get '/comparative-cluster-search' do
@@ -339,6 +351,8 @@ get '/datalist' do
 end
 
 post '/validate-data' do
+  puts params[:motfile]
+  puts params[:submittype]
   @errors = validate(params)
   @values = params
   if @errors.empty?
