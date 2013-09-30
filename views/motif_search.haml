@@ -1,7 +1,7 @@
 %h3 motif search
 #checkboxes
   %p sequencing datasets
-  %form{:id => "libform", :action => "/sys-search", :method => 'post'}
+  %form{:id => "motsearch", :action => "/motif-search-results", :method => 'get'}
     .check-select#ref-library
       %fieldset.checklist
         %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
@@ -19,17 +19,26 @@
     #motif-select
       %p motifs
       .check-select#motif-list
-      .check-select#motifs
+        %fieldset.checklist
+          %input{:type => "checkbox", :name => "checked_motl[]", :id => "all_motl",:value => "all_motl"}/ 
+          all
+          %br 
+          - @motiflists.each do |elem|
+            %input{:type => "checkbox", :name => "checked_motl[]", :id => "#{elem[:list_name]}",:value => "#{elem[:list_name]}"}/
+            = elem[:list_name]
+            %br
+      #motifs
 
     #comp-buttons
       %fieldset.checklist  
         %label show hits
-        %input{:type => "radio", :name => "hits-sel", :id => "hits-sel"} 
+        %input{:type => "radio", :name => "searchtype", :id => "searchtype", :value => "hits"} 
         %label show non-hits 
-        %input{:type => "radio", :name => "hits-sel", :id => "hits-sel"} 
+        %input{:type => "radio", :name => "searchtype", :id => "searchtype", :value => "nonhits"} 
       %fieldset.checklist
         %input{:type => "button", :id => "clear-button",:value => "clear selection"}
         %input{:type => "submit", :id => "search", :value => "search"}
+        %img.loading{:src => "/images/ajax-loader.gif", :hidden => true}
 
 #results
 

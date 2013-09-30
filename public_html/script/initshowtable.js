@@ -1,3 +1,15 @@
+/* Formating function for row details */
+function fnFormatDetails ( mTable, nTr )
+{
+    var aData = mTable.fnGetData( nTr );
+    var sOut = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+    sOut += '<tr><td>target:</td><td>'+aData[1]+' '+aData[4]+'</td></tr>';
+    sOut += '<tr><td>receptor:</td><td>Could provide a link here</td></tr>';
+    sOut += '<tr><td>source:</td><td>And any further details here (images etc)</td></tr>';
+    sOut += '</table>';
+
+    return sOut;
+}
 $(document).ready(function(){
 /* initialize second table with searchable columns*/
   var qTable = $('#show_table').dataTable({
@@ -164,4 +176,46 @@ $(document).ready(function(){
       });
     }     
   });
+
+  var nCloneTh = document.createElement('th');
+  var nCloneTd = document.createElement('td');
+  nCloneTd.innerHTML = '<img src = "/images/details_open.png">';
+  nCloneTd.className  = "center";
+
+  $('#motinfos thead tr').each( function () {
+        this.insertBefore( nCloneTh, this.childNodes[0] );
+    } );
+
+  $('#motinfos tbody tr').each( function () {
+      this.insertBefore(  nCloneTd.cloneNode( true ), this.childNodes[0] );
+  } );
+
+  /* motif-search motif table with collapsible detail rows*/
+  var mTable = $('#motinfos').dataTable({
+    "bPaginate": "true",
+    "sPaginationType": "full_numbers",
+    "bInfo": true,
+    "bJQueryUI": true,
+    "aoColumnDefs": [
+      {"bSortable": false, "aTargets": [0]}
+    ],
+      "aaSorting": [[1, 'asc']]
+  });
+
+  $('#motinfos tbody td img').on('click', function () {
+    var nTr = $(this).parents('tr')[0];
+    if ( mTable.fnIsOpen(nTr) )
+    {
+      /* This row is already open - close it */
+      this.src = "/images/details_open.png";
+      mTable.fnClose( nTr );
+    }
+    else
+    {
+      /* Open this row*/ 
+      this.src = "/images/details_close.png";
+      mTable.fnOpen( nTr, fnFormatDetails(mTable, nTr), 'details' );
+    }
+    } );
+
 });

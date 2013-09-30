@@ -13,7 +13,7 @@ var isFirstLoad = function(namesp, jsFile) {
 };
 
 function stopTableSorting(e) {
-    if (!e) var e = window.event
+    if (!e) var e = window.event;
     e.cancelBubble = true;
     if (e.stopPropagation) e.stopPropagation();
 }
@@ -77,6 +77,9 @@ $(document).ready(function(){
   });
 
   $('#motif-list input:checkbox').click(function(){
+    if($('#motifs').is(':visible')){
+      $('#motifs').toggle();
+    }
     var checkedLists = [];
     $(this).closest('fieldset').find(':checkbox').each(function(){
       var elemVal = $(this).attr('value');
@@ -86,7 +89,9 @@ $(document).ready(function(){
     });
     $.get('/mot-checklist', {checkedElem: checkedLists},function(data){
       $('#motifs').html(data);
-      $.getScript("/script/checkbox.js");
+      $.getScript("/script/initshowtable.js", function(){
+        $('#motifs').toggle();
+      });
 
     });
   });
@@ -94,6 +99,9 @@ $(document).ready(function(){
    $('#compdata').submit(function(){
     if($('#results').is(':visible')){
       $('#results').toggle();
+    }
+    if($('.loading').is(':hidden')){
+      $('.loading').toggle();
     }
     $.ajax({
       data: $(this).serialize(),
@@ -103,6 +111,28 @@ $(document).ready(function(){
         $('#results').html(response);
         $.getScript('/script/tableinit.js', function(){
           $('#results').toggle();
+        });
+      }
+    });
+    return false;
+  });
+
+   $('#motsearch').submit(function(){
+    if($('#results').is(':visible')){
+      $('#results').toggle();
+    }
+    if($('.loading').is(':hidden')){
+      $('.loading').toggle();
+    }
+    $.ajax({
+      data: $(this).serialize(),
+      type: $(this).attr('method'),
+      url: $(this).attr('action'),
+      success: function(response){
+        $('#results').html(response);
+        $.getScript('/script/tableinit.js', function(){
+          $('#results').toggle();
+          $('.loading').toggle();
         });
       }
     });
@@ -201,8 +231,9 @@ $(document).ready(function(){
         $(value).prop('selectedIndex', -1);
       }
       $(value).on('beforeunload', function(){
-        if ($(this).attr('selectedIndex') == -1)
+        if ($(this).attr('selectedIndex') == -1){
           $(this).prop('name', '');
+        }
         });
       });
 
@@ -345,5 +376,4 @@ $(document).ready(function(){
      } );
 
 
-  } );
-
+});

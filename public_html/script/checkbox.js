@@ -1,7 +1,7 @@
 pepdb.checkbox = pepdb.checkbox || {};
 
 $(document).ready(function(){
-  var formAll = ["#c_all_sel", "#r_all_sel", "#r_all_ds" ,"#all_sell", "#all_ds"]
+  var formAll = ["#c_all_sel", "#r_all_sel", "#r_all_ds", "#all_sell", "#all_ds"];
 
     /*(un)check all checkboxes on checking "all"*/
   $.each(formAll, function(index, value){
@@ -13,9 +13,6 @@ $(document).ready(function(){
     });
   });
 
-
-
-
   $('#comp-selection input:checkbox').click(function(){
     var checkedSels = [];
     $(this).closest('fieldset').find(':checkbox').each(function(){
@@ -24,7 +21,6 @@ $(document).ready(function(){
         checkedSels.push(elemVal);
       }
     });
- 
     $('#comp-dataset').load('/radiolist',{checkedElem: checkedSels, radioName:'radio_ds' } );
   });
 

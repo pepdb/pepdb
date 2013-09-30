@@ -1,0 +1,10 @@
+%table{:id=>"motinfos",:class => "ui-widget"}
+  %thead.ui-widget-header
+    %tr
+      %th
+        = @motlists.first.keys[0].to_s.tr('_', ' ')
+  %tbody.ui-widget-content
+    - @motlists.each do |data_element|
+      %tr
+        %td= data_element[:motif_sequence]
+

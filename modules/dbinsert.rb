@@ -55,8 +55,6 @@ module Sinatra
         end
         clusters = []
         cluster_data = []
-        puts current_cluster_id
-        puts "+++++++++++++++++++++" 
         clfile = File.readlines(@file)
         clfile.each do |line|
           linematch = line.match(/(\S+)\s+(\d+)\s+(\S+)/)
@@ -76,25 +74,18 @@ module Sinatra
       end
         
       def read_motif_file
-        if DB[:motifs].all.count > 0
-          current_motif_id = DB[:motifs].last[:motif_id]
-        else
-          current_motif_id =  0
-        end
         mots_mot_lists = []
         motifs = []
         line_counter = 1
         CSV.foreach(@file, :col_sep => ';', :row_sep => :auto ) do |row|
-          current_motif_id += 1
           row[0].gsub!(/\s+/, "")
           if row[0].match(/[^\[\]\w]/)
             raise ArgumentError, "invalid motif character on line #{line_counter}"
           end
-          motif = [row[0].upcase, row[1], row[2], row[3]]
-          list = [@dataset, current_motif_id]
+          motif = [row[0].upcase]
+          list = [@dataset, row[0].upcase, row[1], row[2], row[3]]
           mots_mot_lists.insert(-1,list)
           motifs.insert(-1, motif)
-          line_counter += 1 
         end
         return motifs, mots_mot_lists
       end
@@ -254,13 +245,19 @@ module Sinatra
             DB[:motif_lists].insert(:list_name => "#{es @values[:mlname].to_s}")
             fr = FileReader.new(@values[:submittype], @values[:motfile][:tempfile], @values[:mlname])
             motifs, motifs_mot_lists = fr.read_file
-            motifs_qry, motifs_placeholder_args = build_compound_select_string(motifs, :motifs, :motif_sequence, :target, :receptor, :source)
+            motifs_qry, motifs_placeholder_args = build_compound_select_string(motifs, :motifs, :motif_sequence)
 
             motifs_qry.zip(motifs_placeholder_args).each do |qry, args|
               new_data= DB[qry, *args]
               new_data.insert
             end
-            DB[:motifs_motif_lists].import([:list_name, :motif_id], motifs_mot_lists)
+            
+            motifs.each_with_index do |entry, index|
+              raise ArgumentError, "duplicate motif sequence on line #{index+1}"  if motifs.slice(0, index).include?(entry)    
+        
+            end
+
+            DB[:motifs_motif_lists].import([:list_name, :motif_sequence, :target, :receptor, :source], motifs_mot_lists)
            
           rescue Sequel::Error => e
             if e.message.include? "unique"

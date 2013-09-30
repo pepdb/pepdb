@@ -101,11 +101,7 @@ DB.create_table?(:dna_sequences_peptides_sequencing_datasets) do
 end
 
 DB.create_table?(:motifs) do
-  primary_key :motif_id
-  String :motif_sequence
-  String :target
-  String :receptor
-  String :source
+  String :motif_sequence, :primary_key => true
   index :motif_sequence
 end
 
@@ -115,8 +111,11 @@ DB.create_table?(:motif_lists) do
 end
 
 DB.create_table?(:motifs_motif_lists) do
-  foreign_key :list_name
-  foreign_key :motif_id
-  primary_key [:list_name, :motif_id]
-  index [:list_name, :motif_id]
+  foreign_key :list_name, :motif_lists
+  foreign_key :motif_sequence, :motifs, :type => "varchar(255)"
+  String :target
+  String :receptor
+  String :source
+  primary_key [:list_name, :motif_sequence]
+  index [:list_name, :motif_sequence]
 end
