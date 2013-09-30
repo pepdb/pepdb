@@ -7,7 +7,15 @@ html{
 }
 
 .ui-button-text {
-  background-color:#1bf011;
+#  background-color:#1bf011;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  background-color: #60b044;
+  background-image: -moz-linear-gradient(#8add6d, #60b044);
+  background-image: -webkit-linear-gradient(#8add6d, #60b044);
+  background-image: linear-gradient(#8add6d, #60b044);
+  background-repeat: repeat-x;
+  border-color: #5ca941;
 }
 
 body {
@@ -21,6 +29,21 @@ body {
   overflow:auto;
  // padding: 1em;
 
+}
+
+li.ui-state-disabled{
+  background-color:#069df4;
+}
+
+a.ui-corner-all {
+  color:black;
+}
+
+img#logo {
+  height: 50px;
+  width:150px;
+  margin-left:2.1em;
+  margin-top: 2.2em;
 }
 
 fieldset {
@@ -95,7 +118,7 @@ fieldset#fourth{
 }
 fieldset#fifth{
   //clear:both;
-  width: 20%;
+  width: 15%;
   float:left;
   input {
     float:right;
@@ -248,9 +271,24 @@ div#motif-list {
   float:left;
   width: 10em;
 }
-div#motifs {
-  float:left;
-  width: 10em;
+
+#motifs {
+  overflow:scroll;
+  width:65%;
+  //height:50em;
+  td {
+    word-wrap:break-word;
+    white-space: normal;
+    border-width:2px;
+  }
+  table {
+    width:100%;
+    table-layout:fixed;
+    word-wrap:break-word;
+  }
+  col {
+    width:15%;
+  }
 }
 
 #datalinks {
@@ -263,7 +301,15 @@ div#motifs {
   position:relative;
   height: 100px;
   width: 100%;
-  background-color: grey;
+  //background-color: grey;
+  background: rgb(240,249,255); /* Old browsers */
+background: -moz-linear-gradient(left, rgba(240,249,255,1) 0%, rgba(203,235,255,1) 47%, rgba(161,219,255,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(240,249,255,1)), color-stop(47%,rgba(203,235,255,1)), color-stop(100%,rgba(161,219,255,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(left, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(left, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(left, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* IE10+ */
+background: linear-gradient(to right, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f9ff', endColorstr='#a1dbff',GradientType=1 ); /* IE6-9 */
 }
 
 
@@ -303,3 +349,4 @@ iframe#propresults {
   border:0;
   width:100%;
 }
+
