@@ -4,3 +4,7 @@ pep.db-journal
 .sass-cache
 regexp.o
 regexp.sqlext
+.bash_history
+.ssh/
+pepdb/
+public_html/.directory
