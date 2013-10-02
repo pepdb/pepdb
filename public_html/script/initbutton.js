@@ -1,12 +1,22 @@
 pepdb.initbutton = pepdb.initbutton || {};
 
 $(document).ready(function(){
-  
+   function baseDir(){
+    var url = document.location.pathname.split('/')[1];
+    if (url == "pepdb"){
+      return '/'+url;
+    }else{
+      return '';
+    }
+  };
+
+  var url = baseDir();
+ 
   $('#continue').click(function(){
-    var url = $(this).attr('action');
+    var url2 = $(this).attr('action');
     var cont = $('#refele2').val();
-    url = url + "/"+ cont;
-    window.location = url; 
+    url2 = url2 + '/'+ cont;
+    window.location = url2; 
   });
   if(!isFirstLoad(pepdb.initbutton, "initbutton.js")){
     return;
@@ -19,8 +29,8 @@ $(document).ready(function(){
         checkedDS.push(elemVal);
       }
     });
-    $('#sysresults').load('/systemic-results', {sysDS: checkedDS}, function(){
-      $.getScript("/script/tableinit.js")
+    $('#sysresults').load(url +'/systemic-results', {sysDS: checkedDS}, function(){
+      $.getScript(url +"/script/tableinit.js")
     });
   });
 });

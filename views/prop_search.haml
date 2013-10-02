@@ -1,6 +1,6 @@
 %h3 peptide property search
 #searchbox{:class => "div-table"}
-  %form{:id => "propsearch", :action => "/property-results", :method => "get"}
+  %form{:id => "propsearch", :action => "#{url '/property-results'}", :method => "get"}
     #top
       #seqselect
         %select{:id => "type", :name => "type", :value => "#{params['type']}"}
@@ -81,6 +81,6 @@
         %label max. number of results:
         %input.ui-corner-all{:type => "text", :size => 5, :id => "lim",:name => "lim", :value => 100}
       %input{:type => "submit", :value => "search"}
-      %img.loading{:src => "/images/ajax-loader.gif", :hidden => true}
+      = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
 
 #propresults{:hidden => true}

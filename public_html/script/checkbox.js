@@ -1,6 +1,16 @@
 pepdb.checkbox = pepdb.checkbox || {};
 
 $(document).ready(function(){
+  function baseDir(){
+    var url = document.location.pathname.split('/')[1];
+    if (url == "pepdb"){
+      return '/'+url;
+    }else{
+      return '';
+    }
+  };
+
+  var url = baseDir();
   var formAll = ["#c_all_sel", "#r_all_sel", "#r_all_ds", "#all_sell", "#all_ds"];
 
     /*(un)check all checkboxes on checking "all"*/
@@ -21,7 +31,7 @@ $(document).ready(function(){
         checkedSels.push(elemVal);
       }
     });
-    $('#comp-dataset').load('/radiolist',{checkedElem: checkedSels, radioName:'radio_ds' } );
+    $('#comp-dataset').load(url+'/radiolist',{checkedElem: checkedSels, radioName:'radio_ds' } );
   });
 
   $('#ref-selection input:checkbox').click(function(){
@@ -32,12 +42,12 @@ $(document).ready(function(){
         checkedSels.push(elemVal);
       }
     });
-    $('#ref-dataset').load('/checklist',{checkedElem: checkedSels, checkName: 'ref_ds[]', allElem: 'r_all_ds', allElemVal: 'all_ds', selector: 'ds', sec: 'r_' }, function(){
+    $('#ref-dataset').load(url+'/checklist',{checkedElem: checkedSels, checkName: 'ref_ds[]', allElem: 'r_all_ds', allElemVal: 'all_ds', selector: 'ds', sec: 'r_' }, function(){
       if (!isFirstLoad(pepdb.checkbox, "checkbox.js")){
         return;
       }
-      $.getScript("/script/checkbox.js", function(){
-        $.getScript("/script/initbutton.js");
+      $.getScript(url+"/script/checkbox.js", function(){
+        $.getScript(url+"/script/initbutton.js");
       });
     });
   });

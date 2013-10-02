@@ -2,10 +2,8 @@
 %html
   %head
     %meta{:charset => 'UTF-8'}
-    %script{:src => "/script/jquery-1.10.2.min.js"}
-    %script{:src => "/script/jquery-ui-1.10.3.custom.min.js"}
-    %link{:rel=>"stylesheet", :href=> "/jquery-ui-1.10.3.custom.min.css" }
-    %link{ :rel => "stylesheet", :href => "/style.css"}
+    = javascript_script_tag("/script/jquery-1.10.2.min.js", "/script/jquery-ui-1.10.3.custom.min.js")
+    = stylesheet_link_tag("/jquery-ui-1.10.3.custom.min.css",  "/style.css")
   %body
     - errors.each do |error|
       .ui-widget

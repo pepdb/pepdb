@@ -1,5 +1,5 @@
 %h3 Add Library
-%form{:id => "adddata", :action => "/validate-data", :method => "post", :target => "notify"}
+%form{:id => "adddata", :action => "#{url '/validate-data'}", :method => "post", :target => "notify"}
   %input{:type => "hidden", :value => "library", :name => "submittype", :id =>"submittype"}
   %fieldset.libform
     %legend 

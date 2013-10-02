@@ -2,7 +2,7 @@
 #comp-data
   %p dataset
   %input{:type => "button", :id => "clear-button",:value => "clear selection"}
-  %form{:id => "compdata", :action => "/comparative-results", :method => 'post'}
+  %form{:id => "compdata", :action => "#{url '/comparative-results'}", :method => 'post'}
     .comp-select#comp-library
       %fieldset.checklist
         %input{:type => "checkbox", :id => "c_all_lib",:value => "all_lib"}/ 

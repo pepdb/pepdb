@@ -10,4 +10,4 @@
   - else
     = partial :info_tables, locals: {data_to_display:@info_data.where(@column => "#{params[:ele_name]}"), element:"#{h params[:ele_name]}"}
   - if !@next.nil?
-    %input{:id => "continue",:type => "button", :action => "/" + @next ,:method => "get", :value => "continue with "+ @eletype}
+    %input{:id => "continue",:type => "button", :action => "#{url '/'}" + @next ,:method => "get", :value => "continue with "+ @eletype}

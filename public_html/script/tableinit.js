@@ -2,7 +2,18 @@ pepdb.tableinit = pepdb.tableinit || {};
 var asInitVals = new Array();
 
 $(document).ready(function(){
-  $.getScript('/script/initshowtable.js');
+  function baseDir(){
+    var url = document.location.pathname.split('/')[1];
+    if (url == "pepdb"){
+      return '/'+url;
+    }else{
+      return '';
+    }
+  };
+
+  var url = baseDir();
+
+  $.getScript(url+'/script/initshowtable.js');
 /* --------------DataTables configuration----------------  */
   /* initialize first table with searchable columns*/
   var oTable = $('#select_table').dataTable({
@@ -50,12 +61,12 @@ $(document).ready(function(){
     var selectedID = $(this).find("td:first").html();
     var route = $('#reftype').val();
     var path = document.location.pathname;
-    if (path == "/cluster-search"){
+    if (path == url+"/cluster-search"){
       if($('#clsearch').is(':visible')){
         $('#clsearch').toggle();
       }
-      $('#clprop').load('/cluster-infos', {selCl: selectedID}, function(){
-        $.getScript('/script/initshowtable.js', function(){
+      $('#clprop').load(url+'/cluster-infos', {selCl: selectedID}, function(){
+        $.getScript(url+'/script/initshowtable.js', function(){
           $('#clsearch').toggle();
         });
 
@@ -65,12 +76,12 @@ $(document).ready(function(){
       $('#selecteddata').hide();
       $('#datainfo').hide();
     }
-    $.get('/info-tables', {infoElem:selectedID}, function(data){
+    $.get(url+'/info-tables', {infoElem:selectedID}, function(data){
       $('#selectedinfo').html(data);
     });
-    $.get('/show_sn_table', {ele_name:selectedID, ref: route}, function(data){
+    $.get(url+'/show_sn_table', {ele_name:selectedID, ref: route}, function(data){
       $('#selecteddata').html(data);
-      $.getScript('/script/initshowtable.js', function(){
+      $.getScript(url+'/script/initshowtable.js', function(){
         $('#selecteddata').show();
       });
     });

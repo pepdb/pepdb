@@ -21,6 +21,17 @@ function urlParam(name){
 }
 
 $(document).ready(function(){
+  function baseDir(){
+    var url = document.location.pathname.split('/')[1];
+    if (url == "pepdb"){
+      return '/'+url;
+    }else{ 
+      return '';
+    }
+  };
+
+
+  var url = baseDir();
   var formAll = ["#all_lib", "#all_sel", "#all_ds", "#c_all_lib", "#r_all_lib", "#all_motl"];
   var propSelect = ['#l', '#s', '#ds', '#c', '#ts', '#tt', '#tc', '#ss', '#st', '#sc'];
   var propInput = ['#seq', '#blos', '#pl', '#sr', '#ralt', '#ragt', '#relt', '#regt', '#dlt', '#dgt'];
@@ -32,8 +43,7 @@ $(document).ready(function(){
   $('#navigation').menu();
 
   $('#clear-button').click(function(){
-    alert(window.location.origin);
-    $('body').load(window.location);
+    $('body').load(window.location.pathname);
   });
    
 
@@ -54,8 +64,8 @@ $(document).ready(function(){
         checkedLibs.push(elemVal);
       }
     });
-    $('#comp-selection').load('/checklist',{checkedElem: checkedLibs, allElem: 'c_all_sel', allElemVal: 'all_sel', selector: 'sel', sec: 'c_', elemName: 'sels[]' }, function(){
-        $.getScript("/script/checkbox.js");
+    $('#comp-selection').load(url+'/checklist',{checkedElem: checkedLibs, allElem: 'c_all_sel', allElemVal: 'all_sel', selector: 'sel', sec: 'c_', elemName: 'sels[]' }, function(){
+        $.getScript(url+"/script/checkbox.js");
       } );
   });
   
@@ -68,8 +78,8 @@ $(document).ready(function(){
         checkedLibs.push(elemVal);
       }
     });
-    $('#ref-selection').load('/checklist',{checkedElem: checkedLibs, allElem: 'r_all_sel', allElemVal: 'all_sel', selector: 'sel', sec: 'r_', elemName: 'sels[]' }, function(){
-        $.getScript("/script/checkbox.js");
+    $('#ref-selection').load(url+'/checklist',{checkedElem: checkedLibs, allElem: 'r_all_sel', allElemVal: 'all_sel', selector: 'sel', sec: 'r_', elemName: 'sels[]' }, function(){
+        $.getScript(url+"/script/checkbox.js");
       } );
   });
 
@@ -84,9 +94,9 @@ $(document).ready(function(){
         checkedLists.push(elemVal);
       }
     });
-    $.get('/mot-checklist', {checkedElem: checkedLists},function(data){
+    $.get('mot-checklist', {checkedElem: checkedLists},function(data){
       $('#motifs').html(data);
-      $.getScript("/script/initshowtable.js", function(){
+      $.getScript(url+"/script/initshowtable.js", function(){
         $('#motifs').toggle();
       });
 
@@ -106,7 +116,7 @@ $(document).ready(function(){
       url: $(this).attr('action'),
       success: function(response){
         $('#results').html(response);
-        $.getScript('/script/tableinit.js', function(){
+        $.getScript(url+'/script/tableinit.js', function(){
           $('#results').toggle();
         });
       }
@@ -127,7 +137,7 @@ $(document).ready(function(){
       url: $(this).attr('action'),
       success: function(response){
         $('#motresults').html(response);
-        $.getScript('/script/accinit.js', function(){
+        $.getScript(url+'/script/accinit.js', function(){
           $('#motresults').toggle();
           $('.loading').toggle();
         });
@@ -149,7 +159,7 @@ $(document).ready(function(){
       url: $(this).attr('action'),
       success: function(response){
         $('#results').html(response);
-        $.getScript('/script/tableinit.js', function(){
+        $.getScript(url+'/script/tableinit.js', function(){
           $('#results').toggle();
         });
       }
@@ -158,7 +168,7 @@ $(document).ready(function(){
   });
 
   $('#datatype').ready(function(){
-    $("#dataform").load('/addlibrary', function(){
+    $("#dataform").load(url+'/addlibrary', function(){
       $('#adddata').submit(function(){
         $.ajax({
           data: $(this).serialize(),
@@ -181,7 +191,7 @@ $(document).ready(function(){
       if(selected == "motif list"){
         selected = "motif";
       }
-      $("#dataform").load('/add'+ selected, function(){
+      $("#dataform").load(url+'/add'+ selected, function(){
         var boxNames = ['#dlibname', '#dselname', '#ddsname', '#dspecies'];
 
         $.each(boxNames, function(index, value){
@@ -190,7 +200,7 @@ $(document).ready(function(){
 
         $('#dspecies').change(function(){
           var valSel = $(this).children("option:selected").text();
-          $.get('/formdrop', {columnname: "tissue", selected1: valSel, table:"targets", where1:"species", boxID:"dtissue"}, function(data){
+          $.get(url+'/formdrop', {columnname: "tissue", selected1: valSel, table:"targets", where1:"species", boxID:"dtissue"}, function(data){
             $('#dtissue').html(data);
             $('#dtissue').prop('selectedIndex', -1);
             $('#dcell').html('');
@@ -199,13 +209,13 @@ $(document).ready(function(){
         $('#dtissue').change(function(){
           var valSel1 = $('#dspecies').children("option:selected").text();
           var valSel2 = $(this).children("option:selected").text();
-          $.get('/formdrop', {columnname: "cell", selected1: valSel1, selected2: valSel2,table:"targets", where2:"tissue", where1:"species",boxID:"dcell"}, function(data){
+          $.get(url+'/formdrop', {columnname: "cell", selected1: valSel1, selected2: valSel2,table:"targets", where2:"tissue", where1:"species",boxID:"dcell"}, function(data){
             $('#dcell').html(data);
           });
         });
         $('#dlibname').change(function(){
           var valSel = $(this).children("option:selected").text();
-          $.get('/formdrop', {columnname: "selection_name", selected1: valSel, table:"selections", where1:"library_name", boxID:"dselname"}, function(data){
+          $.get(url+'/formdrop', {columnname: "selection_name", selected1: valSel, table:"selections", where1:"library_name", boxID:"dselname"}, function(data){
             $('#dselname').html(data);
             $('#dselname').prop('selectedIndex', -1);
             $('#ddsname').prop('selectedIndex', -1);
@@ -214,7 +224,7 @@ $(document).ready(function(){
         $('#dselname').change(function(){
           var valSel1 = $('#dlibname').children("option:selected").text();
           var valSel2 = $(this).children("option:selected").text();
-          $.get('/formdrop', {columnname: "dataset_name", selected1: valSel1, selected2: valSel2, table:"sequencing_datasets", where1:"library_name", where2:"selection_name",boxID:"dselname"}, function(data){
+          $.get(url+'/formdrop', {columnname: "dataset_name", selected1: valSel1, selected2: valSel2, table:"sequencing_datasets", where1:"library_name", where2:"selection_name",boxID:"dselname"}, function(data){
             $('#ddsname').html(data);
             $('#ddsname').prop('selectedIndex', -1);
           });
@@ -255,7 +265,7 @@ $(document).ready(function(){
       url: $(this).attr('action'),
       success: function(response){
         $('#propresults').html(response);
-        $.getScript('/script/tableinit.js', function(){
+        $.getScript(url+'/script/tableinit.js', function(){
           $('#propresults').toggle();
           $('.loading').toggle();
         });
@@ -266,7 +276,7 @@ $(document).ready(function(){
     $.each(species, function(index, value){
       $(value).change(function(){
         var valSel = $(this).children("option:selected").text();
-        $.get('/formdrop', {columnname: "tissue", selected1: valSel, table:"targets", where1:"species", boxID:tissue[index].substring(1)}, function(data){
+        $.get(url+'/formdrop', {columnname: "tissue", selected1: valSel, table:"targets", where1:"species", boxID:tissue[index].substring(1)}, function(data){
           $(tissue[index]).html(data);
           $(tissue[index]).prop('selectedIndex', -1);
           $(cell[index]).html('');
@@ -278,7 +288,7 @@ $(document).ready(function(){
       $(value).change(function(){
         var valSel1 = $(species[index]).children("option:selected").text();
         var valSel2 = $(this).children("option:selected").text();
-        $.get('/formdrop', {columnname: "cell", selected1: valSel1, selected2: valSel2,table:"targets", where2:"tissue", where1:"species",boxID:cell[index].substring(1)}, function(data){
+        $.get(url+'/formdrop', {columnname: "cell", selected1: valSel1, selected2: valSel2,table:"targets", where2:"tissue", where1:"species",boxID:cell[index].substring(1)}, function(data){
           $(cell[index]).html(data);
         });
       });
@@ -287,7 +297,7 @@ $(document).ready(function(){
 
     $('#l').change(function(){
       var valSel = $(this).children("option:selected").text();
-      $.get('/formdrop', {columnname: "selection_name", selected1: valSel, table:"selections", where1:"library_name", boxID:"s"}, function(data){
+      $.get(url+'/formdrop', {columnname: "selection_name", selected1: valSel, table:"selections", where1:"library_name", boxID:"s"}, function(data){
         $('#s').html(data);
         $('#s').prop('selectedIndex', -1);
         $('#ds').html('');
@@ -297,7 +307,7 @@ $(document).ready(function(){
     $('#s').change(function(){
       var valSel1 = $('#l').children("option:selected").text();
       var valSel2 = $(this).children("option:selected").text();
-      $.get('/formdrop', {columnname: "dataset_name", selected1: valSel1, selected2: valSel2,table:"sequencing_datasets", where2:"selection_name", where1:"library_name",boxID:"ds"}, function(data){
+      $.get(url+'/formdrop', {columnname: "dataset_name", selected1: valSel1, selected2: valSel2,table:"sequencing_datasets", where2:"selection_name", where1:"library_name",boxID:"ds"}, function(data){
         $('#ds').html(data);
       });
     });

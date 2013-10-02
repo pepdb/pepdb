@@ -1,5 +1,5 @@
 %h3 Add Sequencing Dataset
-%form{:id => "adddata", :action => "/validate-data", :method => "post", :enctype => "multipart/form-data", :target => "notify"}
+%form{:id => "adddata", :action => "#{url '/validate-data'}", :method => "post", :enctype => "multipart/form-data", :target => "notify"}
   %input{:type => "hidden", :value => "dataset", :name => "submittype", :id =>"submittype"}
   %fieldset.dsform
     %legend sequencing dataset information:

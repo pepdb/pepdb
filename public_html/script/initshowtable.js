@@ -11,6 +11,17 @@ function fnFormatDetails ( mTable, nTr )
     return sOut;
 }
 $(document).ready(function(){
+  function baseDir(){
+    var url = document.location.pathname.split('/')[1];
+    if (url == "pepdb"){
+      return '/'+url;
+    }else{
+      return '';
+    }
+  };
+
+  var url = baseDir();
+
 /* initialize second table with searchable columns*/
   var qTable = $('#show_table').dataTable({
     "bJQueryUI": true,
@@ -19,7 +30,7 @@ $(document).ready(function(){
     "bPaginate": true,
     "sDom": '<"H"lfrT>t<"F"ip>',
     "oTableTools":{
-      "sSwfPath": "/copy_csv_xls_pdf.swf",
+      "sSwfPath": url+"/copy_csv_xls_pdf.swf",
       "aButtons": [
       {
         "sExtends": "collection",
@@ -40,7 +51,7 @@ $(document).ready(function(){
     "bPaginate": true,
     "sDom": '<"H"lfrT>t<"F"ip>',
     "oTableTools":{
-      "sSwfPath": "/copy_csv_xls_pdf.swf",
+      "sSwfPath": url+"/copy_csv_xls_pdf.swf",
       "aButtons": [
       {
         "sExtends": "collection",
@@ -49,7 +60,7 @@ $(document).ready(function(){
         }]
     },
     "bServerSide": true,
-    "sAjaxSource": "/datatables",
+    "sAjaxSource": url+"/datatables",
     "fnServerParams": function(aoData){
       aoData.push({ "name": "selElem", "value": elem});
     }
@@ -126,9 +137,9 @@ $(document).ready(function(){
     var dataType = $('#reftype').val();
     var firstChoice = $('#refelem1').val();
    // var first_choice =  $('#select_table').data('first-choice');
-    if (route == "/comparative-search" || route == "/systemic-search"){
-      $('#infos').load('/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
-    } else if (route == "/cluster-search"){
+    if (route == url+"/comparative-search" || route == url +"/systemic-search"){
+      $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
+    } else if (route == url+"/cluster-search"){
     /*  if($('#clsearch').is(':visible')){
         $('#clsearch').toggle();
       }
@@ -139,9 +150,9 @@ $(document).ready(function(){
         
       });*/
     } else {
-      $.get('/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
+      $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
         $('#datainfo').html(data);
-        $.getScript('/script/initbutton.js', function(){
+        $.getScript(url+'/script/initbutton.js', function(){
           $('#datainfo').show();
         });
       });
@@ -155,9 +166,9 @@ $(document).ready(function(){
     var dataType = $('#reftype').val();
     var firstChoice = $('#refelem1').val();
    // var first_choice =  $('#select_table').data('first-choice');
-    if (route == "/comparative-search" || route == "/systemic-search"){
-      $('#infos').load('/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
-    } else if (route == "/cluster-search"){
+    if (route == url+"/comparative-search" || route == url+"/systemic-search"){
+      $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
+    } else if (route == url+"/cluster-search"){
     /*  if($('#clsearch').is(':visible')){
         $('#clsearch').toggle();
       }
@@ -168,9 +179,9 @@ $(document).ready(function(){
         
       });*/
     } else {
-      $.get('/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
+      $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
         $('#datainfo').html(data);
-        $.getScript('/script/initbutton.js', function(){
+        $.getScript(url+'/script/initbutton.js', function(){
           $('#datainfo').show();
         });
       });
@@ -179,7 +190,8 @@ $(document).ready(function(){
 
   var nCloneTh = document.createElement('th');
   var nCloneTd = document.createElement('td');
-  nCloneTd.innerHTML = '<img src = "/images/details_open.png">';
+  var imgurl = url + '/images/details_open.png';
+  nCloneTd.innerHTML = '<img src = '+imgurl+'>';
   nCloneTd.className  = "center";
 
   $('#motinfos thead tr').each( function () {
@@ -217,13 +229,13 @@ $(document).ready(function(){
     if ( mTable.fnIsOpen(nTr) )
     {
       /* This row is already open - close it */
-      this.src = "/images/details_open.png";
+      this.src = url+'/images/details_open.png';
       mTable.fnClose( nTr );
     }
     else
     {
       /* Open this row*/ 
-      this.src = "/images/details_close.png";
+      this.src =url+'/images/details_close.png';
       mTable.fnOpen( nTr, fnFormatDetails(mTable, nTr), 'details' );
     }
     } );

@@ -1,7 +1,7 @@
 %h3 motif search
 #checkboxes
   %p sequencing datasets
-  %form{:id => "motsearch", :action => "/motif-search-results", :method => 'get'}
+  %form{:id => "motsearch", :action => "#{url '/motif-search-results'}", :method => 'get'}
     .check-select#ref-library
       %fieldset.checklist
         %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
@@ -38,7 +38,7 @@
       %fieldset.checklist
         %input{:type => "button", :id => "clear-button",:value => "clear selection"}
         %input{:type => "submit", :id => "search", :value => "search"}
-        %img.loading{:src => "/images/ajax-loader.gif", :hidden => true}
+        = image_tag("/images/ajax-loader.gif", :clasee => "loading", :hidden => true)
 
 #motresults
 

@@ -1,5 +1,5 @@
 %h3 Add Peptide Result 
-%form{:id => "adddata", :action => "/validate-data", :target => "notify",:method => "post", :enctype => "multipart/form-data"}
+%form{:id => "adddata", :action => "#{url '/validate-data'}", :target => "notify",:method => "post", :enctype => "multipart/form-data"}
   %input{:type => "hidden", :value => "result", :name => "submittype", :id =>"submittype"}
   %fieldset.resform
     %legend result information:

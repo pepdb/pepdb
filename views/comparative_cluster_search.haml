@@ -1,7 +1,7 @@
 %h3 comparative cluster search
 #checkboxes
   %p select sequencing datasets to compare
-  %form{:id => "compclform", :action => "/comparative-cluster-results", :method => 'get'}
+  %form{:id => "compclform", :action => "#{url '/comparative-cluster-results'}", :method => 'get'}
     .check-select#ref-library
       %fieldset.checklist
         %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 

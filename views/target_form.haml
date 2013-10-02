@@ -1,5 +1,5 @@
 %h3 Add Target 
-%form{:id => "adddata", :action => "/validate-data", :method => "post", :target => "notify"}
+%form{:id => "adddata", :action => "#{url '/validate-data'}", :method => "post", :target => "notify"}
   %input{:type => "hidden", :value => "target", :name => "submittype", :id =>"submittype"}
   %fieldset.tarform
     %legend 

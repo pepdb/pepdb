@@ -38,7 +38,10 @@ cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads ,
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
 dna_columns = [:dna_sequences__dna_sequence, :reads]
 
+
 get '/' do
+  
+  @info =  put_base_path
   haml :login
 end
 
@@ -47,6 +50,7 @@ get '/*style.css' do
 end
 
 get '/libraries' do
+  puts "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
   @libraries = Library.select(*library_columns)
   haml :libraries
 end
