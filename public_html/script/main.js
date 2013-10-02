@@ -1,10 +1,6 @@
 // define namespace to prevent loading js files multiple times
 var pepdb = pepdb || {};
-/*
-$.ajaxSetup({
-  cache: true
-});
-*/
+
 var isFirstLoad = function(namesp, jsFile) {
   var isFirst = namesp.firstLoad === undefined;
   namesp.firstLoad = false;
@@ -31,15 +27,13 @@ $(document).ready(function(){
   var species = ['#ss', '#ts'];
   var tissue = ['#st', '#tt'];
   var cell = ['#sc', '#tc'];
-/*
-  $('#addlink').button();  
-  $('#editlink').button();  
-  */
+
   $('.optbut').button();  
   $('#navigation').menu();
 
   $('#clear-button').click(function(){
-    $('body').load(window.location.pathname);
+    alert(window.location.origin);
+    $('body').load(window.location);
   });
    
 
