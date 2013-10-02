@@ -6,9 +6,14 @@ PassengerDefaultRuby /usr/bin/ruby1.9
 
 <VirtualHost *:80>
     ServerName localhost
-    DocumentRoot /home/christian/bachelor/pepdb/public
-    <Directory /home/christian/bachelor/pepdb/public>
-        Allow from all
-        Options -MultiViews
+    DocumentRoot /srv/www/htdocs
+    <Directory /srv/www/htdocs>
+	Options FollowSymLinks
     </Directory>
+   RackBaseURI /pepdb
+   <Directory /srv/www/htdocs/pepdb>
+	Allow from all
+	Options -MultiViews
+   </Directory>
 </VirtualHost>
+
