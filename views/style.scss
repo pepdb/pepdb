@@ -281,14 +281,26 @@ div#motif-list {
     white-space: normal;
     border-width:2px;
   }
-  table {
+ /* table {
     width:100%;
     table-layout:fixed;
     word-wrap:break-word;
   }
   col {
     width:15%;
-  }
+  }*/
+}
+
+td.details {
+  background-color:#d1cfd0;
+  border:2px solid #A19B9E;
+}
+
+.detailtab {
+  border-spacing:0;
+  border-collapse:separate;
+  padding-left:50px;
+  
 }
 
 #datalinks {

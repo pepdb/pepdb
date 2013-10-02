@@ -1,1 +1,34 @@
-%p OK
+#motacc
+  - @motlists.each do |motif|
+    %h3 
+      =motif[:motif_sequence]
+    %div
+      %table.mot_table
+        %thead.ui-widget-header
+          %tr
+            %th 
+              peptide sequence
+              %br
+              %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+            
+            - @datasets.each do
+              %th 
+                dataset
+                %br
+                %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+              %th 
+                rank
+                %br
+                %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        %tbody.ui-widget-content
+          - @results.where(:motif_sequence => motif[:motif_sequence]).group(:peptide).each do |row|
+            %tr
+              %td 
+                =row[:peptide]
+                - @datasets.each do |ds|
+                  - @results.where(:peptides_sequencing_datasets__dataset_name => ds, :motif_sequence => motif[:motif_sequence], :peptides_sequencing_datasets__peptide_sequence => row[:peptide]).each do |cell|
+                    %td 
+                      = cell[:dataset]  
+                    %td
+                      = cell[:rank]
+            

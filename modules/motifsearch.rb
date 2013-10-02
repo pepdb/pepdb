@@ -5,7 +5,6 @@ module Sinatra
   
   class MotifSearcher  
     def initialize(motlist, peptides, dataset, table)
-      puts dataset
       @table = table.to_sym
       @peptides = peptides
       @dataset = dataset
@@ -49,7 +48,6 @@ module Sinatra
         motif = motif.gsub(/\d/, substitutions)
         regexes.insert(-1, Regexp.new(motif))
       else
-        puts "here"
         length = peptide.size
         diff = motif.size - peptide.size
         (0..diff).each do |index|
@@ -60,9 +58,16 @@ module Sinatra
         end
       end
       regexes.each do |regex|
-        puts regex.inspect
         unless peptide.match(regex).nil? 
-          @matches[real_motif.to_sym].insert(-1, [@dataset, real_motif, peptide]) 
+          if @dataset.size == 1
+            @matches[real_motif.to_sym].insert(-1, [@dataset, real_motif, peptide]) 
+          else
+            @dataset.each do |ds|
+              if Observation.select(:peptide_sequence).where(:dataset_name => ds).count != 0
+                @matches[real_motif.to_sym].insert(-1, [ds, real_motif, peptide]) 
+              end
+            end #each
+          end #if
           @match_found = true
           break
         end   

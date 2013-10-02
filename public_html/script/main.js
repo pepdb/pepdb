@@ -31,10 +31,13 @@ $(document).ready(function(){
   var species = ['#ss', '#ts'];
   var tissue = ['#st', '#tt'];
   var cell = ['#sc', '#tc'];
-
+/*
   $('#addlink').button();  
   $('#editlink').button();  
+  */
+  $('.optbut').button();  
   $('#navigation').menu();
+
   $('#clear-button').click(function(){
     $('body').load(window.location.pathname);
   });
@@ -118,8 +121,8 @@ $(document).ready(function(){
   });
 
    $('#motsearch').submit(function(){
-    if($('#results').is(':visible')){
-      $('#results').toggle();
+    if($('#motresults').is(':visible')){
+      $('#motresults').toggle();
     }
     if($('.loading').is(':hidden')){
       $('.loading').toggle();
@@ -129,9 +132,9 @@ $(document).ready(function(){
       type: $(this).attr('method'),
       url: $(this).attr('action'),
       success: function(response){
-        $('#results').html(response);
-        $.getScript('/script/tableinit.js', function(){
-          $('#results').toggle();
+        $('#motresults').html(response);
+        $.getScript('/script/accinit.js', function(){
+          $('#motresults').toggle();
           $('.loading').toggle();
         });
       }

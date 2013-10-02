@@ -8,6 +8,7 @@ require './modules/comparativesearch'
 require './modules/dbinsert'
 require './modules/datatablesserver'
 require './modules/motifsearch'
+require './modules/compclustersearch'
 require 'date'
 require 'sass'
 require 'haml'
@@ -273,39 +274,60 @@ post '/motif-search' do
 end
 
 get '/mot-checklist' do
-  @motlists = DB[:motifs_motif_lists].select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:checkedElem])
+  @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:checkedElem])
   haml :mot_checklist, :layout => false
 end
 
 get '/motif-search-results' do
-  if params[:searchtype] == "hits"
-    DB.create_table?(:mot_matches, :temp => true) do
-      String :motif_sequence
-      String :dataset_name
-      String :peptide_sequence
-      primary_key [:motif_sequence, :peptide_sequence, :dataset_name]
-      index [:motif_sequence, :peptide_sequence, :dataset_name]
-    end
-    @table = :mot_matches
-  else
-    DB.create_table?(:mot_non_matches, :temp => true) do
-      String :motif_sequence
-      String :dataset_name
-      String :peptide_sequence
-      primary_key [:motif_sequence, :pepdb_peptide_sequence, :dataset_name]
-      index [:motif_sequence, :peptide_sequence, :dataset_name]
-    end
-    @table = :mot_non_matches
+  @errors = {}
+  if params[:searchtype].nil?
+    @errors[:type] = "no search type selected!"
+  elsif params[:ref_ds].nil?
+    @errors[:dataset] = "no dataset selected!" 
+  elsif params[:checked_motl].nil?
+    @errors[:motl] = "no motif list selected!" 
   end
-  @peptides = Observation.distinct.select(:peptide_sequence).where(:dataset_name => params[:ref_ds])
-  @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence).where(:list_name => params[:checked_motl])
-  @results = search_peptide_motif_matches(@motlists, @peptides, params[:ref_ds], @table)
-  haml :mot_search_res, :layout => false
+  if @errors.empty?
+    if params[:searchtype] == "hits"
+      DB.create_table?(:mot_matches, :temp => true) do
+        String :motif_sequence
+        String :dataset_name
+        String :peptide_sequence
+        primary_key [:motif_sequence, :peptide_sequence, :dataset_name]
+        index [:motif_sequence, :peptide_sequence, :dataset_name]
+      end
+      @table = :mot_matches
+    else
+      DB.create_table?(:mot_non_matches, :temp => true) do
+        String :motif_sequence
+        String :dataset_name
+        String :peptide_sequence
+        primary_key [:motif_sequence, :pepdb_peptide_sequence, :dataset_name]
+        index [:motif_sequence, :peptide_sequence, :dataset_name]
+      end
+      @table = :mot_non_matches
+    end
+    @datasets = params[:ref_ds]
+    @peptides = Observation.distinct.select(:peptide_sequence).where(:dataset_name => @datasets)
+    @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence).where(:list_name => params[:checked_motl])
+    
+    search_peptide_motif_matches(@motlists, @peptides, @datasets, @table)
+    puts "fertisch"
+    @results = DB[@table].distinct.select(:motif_sequence, :peptides_sequencing_datasets__peptide_sequence___peptide, :peptides_sequencing_datasets__dataset_name___dataset, :rank).left_join(:peptides_sequencing_datasets, :peptide_sequence => :peptide_sequence)
+    haml :mot_search_res, :layout => false
+  else
+    haml :validation_errors, :layout => false, locals:{errors:@errors}
+  end
 end
 
 get '/comparative-cluster-search' do
   @libraries = Library
   haml :comparative_cluster_search
+end
+
+get 'comparative-cluster-results' do
+
+  haml :comparative_cluster_results
 end
 
 get '/add-data' do

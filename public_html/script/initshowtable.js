@@ -2,10 +2,10 @@
 function fnFormatDetails ( mTable, nTr )
 {
     var aData = mTable.fnGetData( nTr );
-    var sOut = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
-    sOut += '<tr><td>target:</td><td>'+aData[1]+' '+aData[4]+'</td></tr>';
-    sOut += '<tr><td>receptor:</td><td>Could provide a link here</td></tr>';
-    sOut += '<tr><td>source:</td><td>And any further details here (images etc)</td></tr>';
+    var sOut = '<table cellpadding ="5", cellspacing = "0", class = detailtab>';
+    sOut += '<tr><td>target:</td><td>'+aData[2]+'</td></tr>';
+    sOut += '<tr><td>receptor:</td><td>'+aData[3]+'</td></tr>';
+    sOut += '<tr><td>source:</td><td>'+aData[4]+'</td></tr>';
     sOut += '</table>';
 
     return sOut;
@@ -195,14 +195,24 @@ $(document).ready(function(){
     "bPaginate": "true",
     "sPaginationType": "full_numbers",
     "bInfo": true,
+    "bAutoWidth": false,
+    "aoColumns": [
+      {"sWidth": "5%"},
+      {"sWidth": "95%"},
+    ],
     "bJQueryUI": true,
     "aoColumnDefs": [
-      {"bSortable": false, "aTargets": [0]}
+      {"bSortable": false, "aTargets": [0]},
+      {"bVisible": false, "aTargets":[2]},
+      {"bVisible": false, "aTargets":[3]},
+      {"bVisible": false, "aTargets":[4]},
     ],
       "aaSorting": [[1, 'asc']]
   });
 
-  $('#motinfos tbody td img').on('click', function () {
+  
+  //$('#motinfos tbody td img').on('click','#motinfos tbody td img' ,function () {
+  $('#motinfos').on('click','tbody td img' ,function () {
     var nTr = $(this).parents('tr')[0];
     if ( mTable.fnIsOpen(nTr) )
     {
