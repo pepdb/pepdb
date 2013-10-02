@@ -8,3 +8,5 @@ regexp.sqlext
 .ssh/
 pepdb/
 public_html/.directory
+.viminfo
+.gitconfig
