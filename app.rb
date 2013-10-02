@@ -1,6 +1,7 @@
 #pepdb.rb
 require 'sinatra'
 require 'sinatra/partial'
+require 'sinatra/static_assets'
 require './modules/querystringbuilder'
 require './modules/formvalidation'
 require './modules/utilities'

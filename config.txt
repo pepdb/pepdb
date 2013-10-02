@@ -17,3 +17,4 @@ gem install rack-test
 gem1.9 install json
 zypper in pcre-devel
 make sqlite-regexp-master
+gem install sinatra-static-assets -s http://gemcutter.org

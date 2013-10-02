@@ -2,56 +2,46 @@
 %html
   %head
     %meta{:charset=>'UTF-8'}
-    %script{:src => "/script/jquery-1.10.2.min.js"}
-    %script{:src => "/script/main.js"}
-    %script{:src => "/script/jquery.dataTables.min.js"}
-    %script{:src => "/script/jquery.dataTables.columnFilter.js"}
-    %script{:src => "/script/jquery-ui-1.10.3.custom.min.js"}
-    %script{:src => "/script/jquery.jstree.js"}
-    %script{:src => "/script/jquery.cookie.js"}
-    %script{:src => "/script/tableinit.js"}
-    %script{:src => "/script/TableTools.min.js"}
-    %script{:src => "/script/ZeroClipboard.js"}
-    %link{:rel=>"stylesheet", :href=> "/jquery-ui-1.10.3.custom.min.css" }
-    %link{:rel=>"stylesheet", :href=> "/jquery.dataTables_themeroller.css" }
-    %link{:rel=>"stylesheet", :href=> "/TableTools.css" }
-    %link{ :rel => "stylesheet", :href => "/style.css"}
+    = javascript_script_tag("/script/jquery-1.10.2.min.js", "/script/main.js", "/script/jquery.dataTables.min.js", "/script/jquery.dataTables.columnFilter.js", "/script/jquery-ui-1.10.3.custom.min.js", "/script/jquery.jstree.js", "/script/tableinit.js", "/script/TableTools.min.js", "/script/ZeroClipboard.js")
+    = stylesheet_link_tag("/jquery-ui-1.10.3.custom.min.css", "/jquery.dataTables_themeroller.css" , "/TableTools.css", "/style.css") 
     %title pepDB main
   %body
     #topbar
-      %img{:src => "/images/pepdb_logo.png", :id => "logo"}
+      = image_tag("/images/pepdb_logo.png", :id => "logo")
       #datalinks
-        %a{:href => "/add-data", :id => "addlink"} add data
-        %a{:href => "/edit-data", :id => "editlink"} edit/delete data
+        = link_to("add data", "/add-data", :class => "optbut")
+        = link_to("edit data", "/edit-data", :class => "optbut")
+        = link_to("user management", "/users", :class => "optbut")
     #content
       #left
         %ul{:id=>'navigation'}
           %li.ui-state-disabled 
-            %a{:href =>"/libraries"} Browse by 
+            %a{:href =>"#"} Browse by 
           %li 
-            %a{:href =>"/libraries"} Library
+            = link_to("Library", "/libraries")
           %li 
-            %a{:href =>"/selections"} Selection
+            = link_to("Selection", "/selections")
           %li 
-            %a{:href =>"/datasets"} Sequencing Dataset
+            = link_to("Sequencing Dataset", "/datasets")
           %li 
-            %a{:href =>"/clusters"} Cluster
+            = link_to("Cluster", "/clusters")
           %li -
           %li.ui-state-disabled 
-            %a{:href =>"/libraries"} Peptide search 
+            %a{:href =>"#"} Peptide search 
           %li 
-            %a{:href =>"/systemic-search"} Systemic Search
+            = link_to("Systemic Search", "/systemic-search")
           %li 
-            %a{:href =>"/property-search"} Property Search
+            = link_to("Property Search", "/property-search")
           %li 
-            %a{:href =>"/comparative-search"} Comparative Search 
+            = link_to("Comparative Search", "/comparative-search")
           %li
-            %a{:href =>"/motif-search"} Motif Search
+            = link_to("Motif Search", "/motif-search")
           %li -
           %li.ui-state-disabled 
-            %a{:href =>"/libraries"} Cluster search 
+            %a{:href =>"#"} Cluster search 
           %li
-            %a{:href =>"/cluster-search"} Sequence Search
+            = link_to("Peptide Sequence Search", "/cluster-search")
           %li
-            %a{:href =>"/comparative-cluster-search"} Comparative Search
+            = link_to("Comparative Search", "/comparative-cluster-search")
+        = link_to("Logout", "/logout", :class => "optbut")
       #right= yield
