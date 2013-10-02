@@ -1,7 +1,7 @@
 %h3 comparative cluster search
 #checkboxes
   %p select sequencing datasets to compare
-  %form{:id => "compclform", :action => "/comparative-cluster-search", :method => 'get'}
+  %form{:id => "compclform", :action => "/comparative-cluster-results", :method => 'get'}
     .check-select#ref-library
       %fieldset.checklist
         %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
@@ -31,8 +31,8 @@
             %input{:type => "text", :name => "domthr", :id=> "domthr", :size => 5 }
             %label cluster dominance threshold 
       %fieldset.checklist
-        %input{:type => "button", :id => "clear-button",:value => "clear selection"}
         %input{:type => "submit", :id => "search", :value => "compare"}
+        %input{:type => "button", :id => "clear-button",:value => "clear selection"}
 
 #results
 
