@@ -1,0 +1,10 @@
+%label{:for => label}
+  %span
+    = fieldname 
+%input{:type => "text", :name => label, :id => label, :list => listname, :value => selected}
+%datalist{:id => listname}
+  %label{:for => listlabel}
+    or pick exisiting 
+    = fieldname
+    = partial :formdrop, locals: {para: listlabel, values: dbdata, column: columnname, required:false}
+

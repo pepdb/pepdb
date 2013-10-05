@@ -1,0 +1,8 @@
+%label select cluster to edit
+%select{:name => "clusterselect", :id => "clusterselect" }
+  %option 
+    &nbsp;
+  - @clusters.each do |elem|
+    %option{:value => elem[:cluster_id]}<                    
+      = elem[:consensus_sequence]
+

@@ -1,0 +1,47 @@
+%h3 Edit Peptide Result 
+%form{:id => "editdata", :action => "#{url '/validate-data'}", :target => "notify",:method => "post", :enctype => "multipart/form-data"}
+  %input{:type => "hidden", :value => "result", :name => "submittype", :id =>"submittype"}
+  %input{:type => "hidden", :value => params[:selElem], :id =>"eleid"}
+  %input{:type => "hidden", :value => "results", :id =>"tab"}
+  %fieldset.resform
+    %legend result information:
+    %p.formfield
+      %label{:for => "perf"}
+        %span performance:
+        %textarea{:form => "editdata", :name =>"perf", :id => "perf"}
+          = @result[:performance].to_s
+  %fieldset.resform
+    %legend target
+    %p
+      %label{:for => "dspecies"}
+        %span species:
+        = partial :editformdrop, locals:{selected:@result[:species],para: "dspecies", values:@species, column: :species,required:false}
+    %p
+      %label{:for => "dtissue"}
+        %span tissue:
+        %select{:name => "dtissue", :id => "dtissue"}
+          %option
+            = @result[:tissue]
+    %p
+      %label{:for => "dcells"}
+        %span cell:
+        %select{:name => "dcell", :id => "dcell"}
+          %option
+            = @result[:cell]
+  %fieldset.resform
+    %legend
+      related entities:
+      %strong 
+        %abbr{:title => "required"}*
+    %label{:for => "ddsname"}
+      %span sequencing dataset:
+      = partial :editformdrop, locals:{selected:@result[:dataset], para: "ddsname", values:@datasets, column: :dataset_name, required:true}
+    %p
+      %label{:for => "pseq"}
+        %span peptide sequence:
+        %input{:type => "text", :id => "pseq", :name => "pseq", :value=> @result[:peptide_sequence].to_s, :required => true}
+  %input{:type => "submit", :value => "update result"}
+  %input{:type => "button", :id => "delbut",:value => "delete entry"}
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+

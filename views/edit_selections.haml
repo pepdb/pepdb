@@ -1,0 +1,53 @@
+%h3 
+  Edit Selection
+  = h params[:selElem].to_s
+%form{:id => "editdata", :action => "#{url '/validate-data'}", :method => "post", :target => "notify"}
+  %input{:type => "hidden", :value => "selection", :name => "submittype", :id =>"submittype"}
+  %input{:type => "hidden", :value => params[:selElem], :id =>"eleid"}
+  %input{:type => "hidden", :value => "selections", :id =>"tab"}
+  %fieldset.selform
+    %legend selection information:
+    %p
+      %label{:for => "selname"}
+        %span name:
+        %input{:type => "hidden", :name => "selname", :id => "selname" ,:value => @selection[:name]} 
+        %input{:type => "text", :disabled => true ,:value => @selection[:name]} 
+        %strong 
+          %abbr{:title => "required"}*
+    %p
+      %label{:for => "date"}
+        %span date:
+        %input{:type => "text", :name => "date", :id => "date", :value => @selection[:date]} 
+    %p
+      = partial :editlist, locals: {selected:@selection[:performed_by], label:"perf", fieldname:"performed by:", listname:"perflist", listlabel:"fbperf", dbdata:@performs, columnname: :performed_by}
+  %fieldset.selform
+    %legend target
+    %p
+      %label{:for => "dspecies"}
+        %span species:
+        = partial :editformdrop, locals:{selected:@selection[:species], para: "dspecies", values:@species, column: :species, required: false}
+    %p
+      %label{:for => "dtissue"}
+        %span tissue:
+        %select{:name => "dtissue", :id => "dtissue"}
+          %option
+            = @selection[:tissue]
+    %p
+      %label{:for => "dcells"}
+        %span cell:
+        %select{:name => "dcell", :id => "dcell"}
+          %option
+            = @selection[:cell]
+  %fieldset.selform
+    %legend
+      related entities:
+      %strong 
+        %abbr{:title => "required"}*
+    %label{:for => "dlibname"}
+      %span library:
+      = partial :editformdrop, locals:{selected:@selection[:library], para: "dlibname", values:@libraries, column: :library_name, required: true}
+  %input{:type => "submit", :value => "update entry"}
+  %input{:type => "button", :id => "delbut",:value => "delete entry"}
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+

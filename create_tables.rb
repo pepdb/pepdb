@@ -75,14 +75,14 @@ end
 
 DB.create_table?(:clusters_peptides) do
   foreign_key :cluster_id, :clusters, :on_delete => :cascade
-  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade, :type=>'varchar(255)'
+  foreign_key :peptide_sequence, :peptides, :type=>'varchar(255)'
   primary_key [:cluster_id, :peptide_sequence]
   index [:cluster_id, :peptide_sequence]
 end
 
 DB.create_table?(:peptides_sequencing_datasets) do
   foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade, :type=>'varchar(255)'
-  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade, :type=>'varchar(255)'
+  foreign_key :peptide_sequence, :peptides, :type=>'varchar(255)'
   Integer :rank
   Integer :reads
   Float :dominance
@@ -92,8 +92,8 @@ DB.create_table?(:peptides_sequencing_datasets) do
 end
 
 DB.create_table?(:dna_sequences_peptides_sequencing_datasets) do
-  foreign_key :dna_sequence, :dna_sequences, :on_delete => :cascade, :type=>'varchar(255)'
-  foreign_key :peptide_sequence, :peptides, :on_delete => :cascade, :type=>'varchar(255)'
+  foreign_key :dna_sequence, :dna_sequences, :type=>'varchar(255)'
+  foreign_key :peptide_sequence, :peptides, :type=>'varchar(255)'
   foreign_key :dataset_name, :sequencing_datasets, :on_delete => :cascade, :type=>'varchar(255)'
   Integer :reads
   primary_key [:dna_sequence, :peptide_sequence, :dataset_name]
@@ -111,7 +111,7 @@ DB.create_table?(:motif_lists) do
 end
 
 DB.create_table?(:motifs_motif_lists) do
-  foreign_key :list_name, :motif_lists
+  foreign_key :list_name, :motif_lists, :on_delete => :cascade
   foreign_key :motif_sequence, :motifs, :type => "varchar(255)"
   String :target
   String :receptor

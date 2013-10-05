@@ -167,22 +167,6 @@ $(document).ready(function(){
     return false;
   });
 
-  $('#datatype').ready(function(){
-    $("#dataform").load(url+'/addlibrary', function(){
-      $('#adddata').submit(function(){
-        $.ajax({
-          data: $(this).serialize(),
-          type: $(this).attr('method'),
-          url: $(this).attr('action'),
-          success: function(response){
-            $('#valerrors').html(response);
-            }
-          });
-        return false;
-      });
-    });
-  });
-
     $('#datatype').change(function(){
       var selected = $(this).children("option:selected").text();
       if(selected == "sequencing dataset"){
@@ -243,6 +227,15 @@ $(document).ready(function(){
         }
         });
       });
+
+    $('#edittype').change(function(){
+      var selected = $(this).children("option:selected").val();
+      $.get(url+'/editdrop', {table:selected}, function(data){
+        $('#elementselection').html(data);
+        $.getScript(url+'/script/dropbox.js');
+      });
+    });
+    
 
    $('#propsearch').submit(function(){
     if($('#propresults').is(':visible')){
@@ -312,6 +305,27 @@ $(document).ready(function(){
       });
     });
       
+   $('#compclform').submit(function(){
+    if($('#compclresults').is(':visible')){
+      $('#compclresults').toggle();
+    }
+    if($('.loading').is(':hidden')){
+      $('.loading').toggle();
+    }
+    $.ajax({
+      data: $(this).serialize(),
+      type: $(this).attr('method'),
+      url: $(this).attr('action'),
+      success: function(response){
+        $('#compclresults').html(response);
+        $.getScript(url+'/script/accinit.js', function(){
+          $('#compclresults').toggle();
+          $('.loading').toggle();
+        });
+      }
+    });
+    return false;
+  });
       
     $('#type').change(function(){
       if ($(this).val() == "complete sequence"){ 

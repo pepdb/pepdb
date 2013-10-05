@@ -33,4 +33,17 @@ $(document).ready(function(){
       $.getScript(url +"/script/tableinit.js")
     });
   });
+
+  $('#delbut').click(function(){
+    var tab = $('#tab').val();
+    var element = $('#eleid').val();
+    $.ajax({
+      type: "DELETE",
+      url: url+'/delete-entry',
+      data: {table: tab, id: element},
+      success: function(response){
+        $('#respage').html(response);
+      }
+    });
+  });
 });

@@ -1,0 +1,66 @@
+%h3 
+  Edit Sequencing Dataset
+  = h params[:selElem]
+%form{:id => "editdata", :action => "#{url '/validate-data'}", :method => "post", :enctype => "multipart/form-data", :target => "notify"}
+  %input{:type => "hidden", :value => "dataset", :name => "submittype", :id =>"submittype"}
+  %input{:type => "hidden", :value => params[:selElem], :id =>"eleid"}
+  %input{:type => "hidden", :value => "sequencing_datasets", :id =>"tab"}
+  %fieldset.dsform
+    %legend sequencing dataset information:
+    %p
+      %label{:for => "dsname"}
+        %span name:
+        %input{:type => "hidden", :name => "dsname", :id => "dsname", :value => params[:selElem]} 
+        %input{:type => "text",  :disabled => true, :value =>params[:selElem]} 
+        %strong
+          %abbr{:title => "required"}*
+    %p
+      %label{:for => "date"}
+        %span date:
+        %input{:type => "text", :name => "date", :id => "date", :value => @dataset[:date]} 
+    %p
+      = partial :editlist, locals: {selected:@dataset[:read_type], label:"rt", fieldname:"read type:", listname:"rtlist", listlabel:"fbrt", dbdata:@ds_infos.group(:read_type), columnname: :read_type}
+    %p
+      = partial :editlist, locals: {selected:@dataset[:used_indices], label:"ui", fieldname:"used indices:", listname:"uilist", listlabel:"fbui", dbdata:@ds_infos.group(:used_indices), columnname: :used_indices}
+    %p
+      = partial :editlist, locals: {selected:@dataset[:origin], label:"or", fieldname:"origin:", listname:"orlist", listlabel:"fbor", dbdata:@ds_infos.group(:origin), columnname: :origin}
+    %p
+      = partial :editlist, locals: {selected:@dataset[:produced_by], label:"prod", fieldname:"produced by:", listname:"prodlist", listlabel:"fbprod", dbdata:@ds_infos.group(:produced_by), columnname: :produced_by}
+    %p
+      = partial :editlist, locals: {selected:@dataset[:sequencer], label:"seq", fieldname:"sequencer:", listname:"seqlist", listlabel:"fbseq", dbdata:@ds_infos.group(:sequencer), columnname: :sequencer}
+    %p
+      = partial :editlist, locals: {selected:@dataset[:selection_round], label:"selr", fieldname:"selection round:", listname:"selrlist", listlabel:"fbselr", dbdata:@ds_infos.group(:selection_round), columnname: :selection_round}
+    %p
+      = partial :editlist, locals: {selected:@dataset[:sequence_length], label:"seql", fieldname:"sequence length:", listname:"seqllist", listlabel:"fbseql", dbdata:@ds_infos.group(:sequence_length), columnname: :sequence_length}
+  %fieldset.dsform
+    %legend sequencing target:
+    %p
+      %label{:for => "dspecies"}
+        %span species:
+        = partial :editformdrop, locals:{selected:@dataset[:species], para: "dspecies", values:@species, column: :species, required: false}
+    %p
+      %label{:for => "dtissue"}
+        %span tissue:
+        %select{:name => "dtissue", :id => "dtissue"}
+          %option
+            = @dataset[:tissue]
+
+    %p
+      %label{:for => "dcell"}
+        %span cell:
+        %select{:name => "dcell", :id => "dcell"}
+          %option
+            = @dataset[:cell]
+  %fieldset.dsform
+    %legend 
+      related entities:
+      %strong 
+        %abbr{:title => "required"}*
+    %p
+      %label{:for => "dselname"}
+        %span selection:
+        = partial :editformdrop, locals:{selected:@dataset[:selection], para: "dselname", values:@selections, column: :selection_name, required: true}
+  %input{:type => "submit", :value => "update dataset"}
+  %input{:type => "button", :id => "delbut",:value => "delete entry"}
+#respage
+  %iframe{:name => "notify", :id =>"notify"}

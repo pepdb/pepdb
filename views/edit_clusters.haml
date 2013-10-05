@@ -1,0 +1,35 @@
+%h3 Edit Cluster 
+%form{:id => "editdata", :action => "#{url '/validate-data'}", :method => "post", :enctype => "multipart/form-data", :target => "notify"}
+  %input{:type => "hidden", :value => "cluster", :name => "submittype", :id =>"submittype"}
+  %input{:type => "hidden", :value => @cluster[:cluster_id].to_s, :name => "cluster", :id =>"cluster"}
+  %input{:type => "hidden", :value => @cluster[:cluster_id], :id =>"eleid"}
+  %input{:type => "hidden", :value => "clusters", :id =>"tab"}
+  %fieldset.clform
+    %legend clustering information:
+    %p
+      %label{:for => "paras"}
+        %span parameters:
+        %input{:type => "text", :name => "paras", :id => "paras", :value => @cluster[:parameters]} 
+  %fieldset.clform
+    %legend 
+      related entities:
+      %strong 
+        %abbr{:title => "required"}*
+    %p
+      %label{:for => "ddsname"}
+        %span sequencing dataset:
+        = partial :editformdrop, locals:{selected: @cluster[:dataset_name], para: "ddsname", values:@datasets, column: :dataset_name, required: true}
+  
+  %fieldset.dsform
+    %legend peptides:
+    - @peptides.each do |pep|
+      %p
+        %label{:for => "peptide"}
+          %span peptide:
+          %input{:type => "text", :value => pep[:peptide_sequence], :disabled => true}
+      
+  %input{:type => "submit", :value => "update cluster"}
+  %input{:type => "button", :id => "delbut",:value => "delete entry"}
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+
