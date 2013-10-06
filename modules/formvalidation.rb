@@ -62,7 +62,7 @@ module Sinatra
           @errors[:dselname] = "Field selection is required" unless given? @params[:dselname]
           if !@params[:pepfile].nil?
             @errors[:filetype] = "Given file type must be plain text" unless valid_file_format? @params[:pepfile]
-          else
+          elsif @params[:tab].nil?
             @errors[:pepfile] = "No sequence file given" 
           end
           @errors[:seql] = "Sequence length invalid number" if !@params[:seql].empty? && !valid_number?(@params[:seql]) 
@@ -81,9 +81,9 @@ module Sinatra
         
       def validate_cluster
         if given? @params[:ddsname]
-          if !@params[:clfile].nil?
+          if !@params[:clfile].nil? 
             @errors[:filetype] = "Given file type must be plain text" unless valid_file_format? @params[:clfile]
-          else
+          elsif @params[:tab].nil?
             @errors[:clfile] = "No clustering file given" 
           end
         else
@@ -109,8 +109,7 @@ module Sinatra
         if given? @params[:mlname] 
           if !@params[:motfile].nil?
             @errors[:filetype] = "Given file type must be csv" unless valid_file_format? @params[:motfile]
-            
-          else
+          elsif @params[:tab].nil?
             @errors[:motfile] = "No motifs file given" 
           end
         else

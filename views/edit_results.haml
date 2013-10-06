@@ -1,8 +1,8 @@
 %h3 Edit Peptide Result 
 %form{:id => "editdata", :action => "#{url '/validate-data'}", :target => "notify",:method => "post", :enctype => "multipart/form-data"}
   %input{:type => "hidden", :value => "result", :name => "submittype", :id =>"submittype"}
-  %input{:type => "hidden", :value => params[:selElem], :id =>"eleid"}
-  %input{:type => "hidden", :value => "results", :id =>"tab"}
+  %input{:type => "hidden", :value => params[:selElem], :name => "eleid", :id =>"eleid"}
+  %input{:type => "hidden", :value => "results", :name => "tab",:id =>"tab"}
   %fieldset.resform
     %legend result information:
     %p.formfield

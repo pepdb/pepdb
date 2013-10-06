@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'sqlite3'
 require 'csv'
+require './modules/columnfinder'
 
 module Sinatra
   module DBInserter 
@@ -65,7 +66,6 @@ module Sinatra
           else
             cluster_data.insert(-1, [current_cluster_id, linematch[1]])
             if Peptide.select(:peptide_sequence).where(:peptide_sequence => linematch[1]).count == 0 
-              puts "ohoh"
               puts linematch[1]
             end
           end
@@ -198,9 +198,7 @@ module Sinatra
             clusters, cluster_data =  fr.read_file(@values[:paras], selection, library)
             DB[:clusters].import([:dataset_name, :selection_name, :library_name, :consensus_sequence, :reads_sum, :dominance_sum, :parameters], clusters)
             Cluster.all.each do |cl|
-              puts cl[:cluster_id]
             end
-            puts cluster_data
             DB[:clusters_peptides].import([:cluster_id, :peptide_sequence], cluster_data)
           rescue Sequel::Error => e
             if e.message.include? "unique"
@@ -319,11 +317,145 @@ module Sinatra
       end
       
     end #class  
+    
+    class UpdateData
+      include ColumnFinder
+      include Rack::Utils
+      alias_method :es, :escape_html
+      def initialize(values)
+        @mot_updates = []
+        @errors ={}
+        @table = values[:tab].to_sym
+        @row_id = values[:eleid]
+        @values = values
+        @update_hash = {}
+        @id_column = find_id_column(@values[:tab])
+        select_upd_type
+      end #init
+
+      def update
+        unless @table == :motifs_motif_lists 
+          puts "clusterdd"
+          puts @table
+          puts @id_column
+          puts @row_id
+          puts @update_hash
+          DB[@table].where(@id_column => @row_id).update(@update_hash)
+        else
+          @mot_updates.each do |upd|
+            puts upd[0]
+            puts upd[1]
+            DB[@table].where(upd[0]).update(upd[1])
+          end
+        end 
+        @errors
+      end
+      private
+      def select_upd_type
+      case @table.to_s
+      when "libraries"
+        up_library
+      when "selections"
+        up_selection
+      when "sequencing_datasets"
+        up_dataset
+      when "clusters"
+        up_cluster
+      when "results"
+        up_result
+      when  "targets"
+        up_target
+      when "motif_lists"
+        up_motlist
+      end
+      end #select_upd_t
+
+      def up_library
+        @update_hash[:encoding_scheme] = es @values[:enc].to_s      
+        @update_hash[:carrier] = es @values[:ca].to_s      
+        @update_hash[:insert_length] = es @values[:insert].to_i      
+        @update_hash[:produced_by] = es @values[:prod].to_s      
+        @update_hash[:peptide_diversity] = es @values[:diversity].to_f      
+        @update_hash[:date] = es @values[:date].to_s      
+        @row_id.to_s
+      end #up_lib
+
+      def up_selection
+        @update_hash[:performed_by] = es @values[:perf].to_s      
+        @update_hash[:date] = es @values[:date].to_s      
+        @update_hash[:target_id] = find_target
+        @update_hash[:library_name] = @values[:dlibname]
+        @row_id.to_s
+      end #up_sel
+
+      def up_dataset
+        @update_hash[:read_type] = es @values[:rt].to_s      
+        @update_hash[:used_indices] = es @values[:ui].to_s      
+        @update_hash[:origin] = es @values[:or].to_s      
+        @update_hash[:produced_by] = es @values[:prod].to_s      
+        @update_hash[:sequencer] = es @values[:seq].to_s      
+        @update_hash[:date] = es @values[:date].to_s      
+        @update_hash[:selection_round] = es @values[:selr].to_i   
+        @update_hash[:sequence_length] = es @values[:seql].to_i      
+        @update_hash[:target_id] = find_target      
+        @update_hash[:selection_name] = es @values[:dselname].to_s      
+        lib = Selection.select(:library_name).where(:selection_name => @update_hash[:selection_name]).first
+        @update_hash[:library_name] = lib[:library_name]      
+        @row_id.to_s
+      end #up_ds
+
+      def up_cluster
+        @id_column = :cluster_id
+        @update_hash[:parameters] = es @values[:paras].to_s
+        @update_hash[:dataset_name] = es @values[:ddsname].to_s
+        lib_sel = SequencingDataset.select(:library_name, :selection_name).where(:dataset_name => @update_hash[:dataset_name]).first
+        @update_hash[:selection_name] = lib_sel[:selection_name]
+        @update_hash[:library_name] = lib_sel[:library_name]
+      end
+
+      def up_target
+        @update_hash[:species] = @values[:sp]
+        @update_hash[:tissue] = @values[:tis]
+        @update_hash[:cell] = @values[:cell]
+      end
+      
+      def up_result
+        @update_hash[:performance] = es @values[:perf].to_s
+        @update_hash[:target_id] = find_target
+        @row_id.to_i
+        Observation.where(:dataset_name => @values[:ddsname].to_s, :peptide_sequence => @values[:pseq].to_s).update(:result_id => @row_id)
+      end
+
+      def up_motlist
+        @table = :motifs_motif_lists
+        @row_id.to_s
+        DB[:motifs_motif_lists].select(:motif_sequence).where(:list_name => @row_id).each_with_index do |motif, index|
+          where_hash = {:list_name => @row_id, :motif_sequence => motif[:motif_sequence].to_s}
+          upd_hash = {:target => "#{es @values["mt"<< index.to_s].to_s}", :receptor => "#{es @values["mr"<< index.to_s].to_s}", :source => "#{es @values["ms"<< index.to_s].to_s}" }
+          @mot_updates[index] = [where_hash, upd_hash]
+        end
+      end
+
+      def find_target
+        result = nil
+        unless @values[:dspecies].empty? && @values[:dtissue].empty? && @values[:dcell].empty?
+          target = Target.select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first
+          result = target[:target_id]
+        end
+        result
+      end
+
+    end #class
+  
+    def update_data(values)
+      up = UpdateData.new(values)
+      errors = up.update
+    end #update
       
     def insert_data(values)
       d = InsertData.new(values)  
       errors = d.try_insert
-    end #validate
+    end #insert
 
   end
 

@@ -3,8 +3,8 @@
   = h params[:selElem].to_s
 %form{:id => "editdata", :action => "#{url '/validate-data'}", :method => "post", :target => "notify"}
   %input{:type => "hidden", :value => "selection", :name => "submittype", :id =>"submittype"}
-  %input{:type => "hidden", :value => params[:selElem], :id =>"eleid"}
-  %input{:type => "hidden", :value => "selections", :id =>"tab"}
+  %input{:type => "hidden", :value => params[:selElem], :name => "eleid",:id =>"eleid"}
+  %input{:type => "hidden", :value => "selections", :name => "tab",:id =>"tab"}
   %fieldset.selform
     %legend selection information:
     %p

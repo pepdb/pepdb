@@ -3,8 +3,8 @@
   = h params[:selElem].to_s
 %form{:id => "editdata", :action => "#{url '/validate-data'}", :enctype => "multipart/form-data",:method => "post", :target=> "notify"}
   %input{:type => "hidden", :value => "motif", :name => "submittype", :id =>"submittype"}
-  %input{:type => "hidden", :value => params[:selElem], :id =>"eleid"}
-  %input{:type => "hidden", :value => "motif_lists", :id =>"tab"}
+  %input{:type => "hidden", :value => params[:selElem], :name => "eleid", :id =>"eleid"}
+  %input{:type => "hidden", :value => "motif_lists", :name => "tab",:id =>"tab"}
 
   %fieldset.mlform
     %legend motif list information:

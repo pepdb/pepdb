@@ -1,8 +1,8 @@
 %h3 Edit Target 
 %form{:id => "editdata", :action => "#{url '/validate-data'}", :method => "post", :target => "notify"}
   %input{:type => "hidden", :value => "target", :name => "submittype", :id =>"submittype"}
-  %input{:type => "hidden", :value => params[:selElem], :id =>"eleid"}
-  %input{:type => "hidden", :value => "targets", :id =>"tab"}
+  %input{:type => "hidden", :value => params[:selElem], :name => "eleid", :id =>"eleid"}
+  %input{:type => "hidden", :value => "targets", :name => "tab",:id =>"tab"}
   %fieldset.tarform
     %legend 
       target information:

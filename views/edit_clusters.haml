@@ -2,8 +2,8 @@
 %form{:id => "editdata", :action => "#{url '/validate-data'}", :method => "post", :enctype => "multipart/form-data", :target => "notify"}
   %input{:type => "hidden", :value => "cluster", :name => "submittype", :id =>"submittype"}
   %input{:type => "hidden", :value => @cluster[:cluster_id].to_s, :name => "cluster", :id =>"cluster"}
-  %input{:type => "hidden", :value => @cluster[:cluster_id], :id =>"eleid"}
-  %input{:type => "hidden", :value => "clusters", :id =>"tab"}
+  %input{:type => "hidden", :value => @cluster[:cluster_id], :name => "eleid",:id =>"eleid"}
+  %input{:type => "hidden", :value => "clusters", :name => "tab",:id =>"tab"}
   %fieldset.clform
     %legend clustering information:
     %p

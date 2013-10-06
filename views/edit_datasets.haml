@@ -3,8 +3,8 @@
   = h params[:selElem]
 %form{:id => "editdata", :action => "#{url '/validate-data'}", :method => "post", :enctype => "multipart/form-data", :target => "notify"}
   %input{:type => "hidden", :value => "dataset", :name => "submittype", :id =>"submittype"}
-  %input{:type => "hidden", :value => params[:selElem], :id =>"eleid"}
-  %input{:type => "hidden", :value => "sequencing_datasets", :id =>"tab"}
+  %input{:type => "hidden", :value => params[:selElem], :name => "eleid",:id =>"eleid"}
+  %input{:type => "hidden", :value => "sequencing_datasets", :name => "tab",:id =>"tab"}
   %fieldset.dsform
     %legend sequencing dataset information:
     %p
