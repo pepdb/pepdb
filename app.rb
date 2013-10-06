@@ -2,6 +2,7 @@
 require 'sinatra'
 require 'sinatra/partial'
 require 'sinatra/static_assets'
+require 'sinatra/flash'
 require './modules/querystringbuilder'
 require './modules/formvalidation'
 require './modules/utilities'
@@ -10,11 +11,16 @@ require './modules/dbinsert'
 require './modules/datatablesserver'
 require './modules/motifsearch'
 require './modules/compclustersearch'
+require './modules/columnfinder'
+require './modules/dbdelete'
+require 'digest/sha1'
 require 'date'
 require 'sass'
 require 'haml'
 require 'json'
 require './model'
+#require 'rack-flash'
+require 'sinatra-authentication'
 
 Haml::Options.defaults[:format] = :xhtml
 
@@ -23,6 +29,14 @@ set :sessions, false
 set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 set :public_folder, Proc.new {File.join(root, "public_html")}
+
+use Rack::Session::Cookie, :secret => 'better secret needeQ!'
+#use Rack::Flash
+
+class SequelUser
+  String :name
+end
+
 
 library_columns = [:library_name___name, :carrier, :encoding_scheme, :insert_length]
 library_all = [:library_name___name, :encoding_scheme, :carrier, :produced_by, :date, :insert_length, :distinct_peptides, :peptide_diversity]
@@ -40,8 +54,6 @@ dna_columns = [:dna_sequences__dna_sequence, :reads]
 
 
 get '/' do
-  
-  @info =  put_base_path
   haml :login
 end
 
@@ -50,7 +62,6 @@ get '/*style.css' do
 end
 
 get '/libraries' do
-  puts "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
   @libraries = Library.select(*library_columns)
   haml :libraries
 end
@@ -330,9 +341,27 @@ get '/comparative-cluster-search' do
   haml :comparative_cluster_search
 end
 
-get 'comparative-cluster-results' do
+get '/comparative-cluster-results' do
+  @errors = {}
+  if params[:ref_ds].nil? || params[:ref_ds].size < 2
+    puts "empty"
+    @errors[:ds] = "select two or more datasets!"
+  elsif params[:comptype].nil?
+    @errors[:type] = "no search type selected!" 
+  elsif params[:comptype] == "threshold" && params[:domthr].empty?
+    @errors[:thr] = "no dominance threshold selected!" 
+  end
 
-  haml :comparative_cluster_results
+  if @errors.empty?
+    @columns = Cluster.select(:consensus_sequence, :dominance_sum___dominance).first
+    @datasets = params[:ref_ds]
+    @results = comp_cluster_search(params)
+    @clusters = Cluster.select(:dataset_name, :dominance_sum)
+    haml :comparative_cluster_results, :layout => false
+  else
+    puts "errors"
+    haml :validation_errors, :layout => false, locals:{errors:@errors}
+  end
 end
 
 get '/add-data' do
@@ -361,7 +390,6 @@ end
 get '/addresult' do
   @datasets = SequencingDataset
   @species = Target.distinct.select(:species)
-  @peptides
   haml :result_form, :layout => false
 end
 get '/addtarget' do
@@ -397,20 +425,96 @@ get '/datalist' do
 end
 
 post '/validate-data' do
-  puts params[:motfile]
-  puts params[:submittype]
   @errors = validate(params)
   @values = params
   if @errors.empty?
-    @dberrors = insert_data(@values)
+    if params[:tab].nil?
+      @dberrors = insert_data(@values)
+      @message = "All data inserted successfully!"
+    else
+      @dberrors = update_data(@values)
+      @message = "Update successfull!"
+    end
     if @dberrors.empty?
-      haml :insert_success, :layout => false
+      haml :success, :layout => false
     else
       haml :validation_errors, :layout => false, locals:{errors: @dberrors}
     end
   else
     haml :validation_errors, :layout => false, locals:{errors: @errors}
   end
+end
+
+get '/edit-data' do
+  haml :edit_data
+end
+
+get '/editdrop' do
+  @column = find_id_column(params[:table].to_s) 
+  @data = DB[params[:table].to_sym].distinct.select(@column)
+  haml :editdrop, :layout => false
+end
+
+get '/editlibraries' do
+  @schemes = Library.distinct.select(:encoding_scheme)
+  @carriers = Library.distinct.select(:carrier)
+  @producers = Library.distinct.select(:produced_by)
+  @library = Library.select(*library_all).where(:library_name => params[:selElem].to_s).first 
+  haml :edit_libraries, :layout => false
+end
+
+get '/editselections' do
+  @species = Target.distinct.select(:species)
+  @performs = Selection.distinct.select(:performed_by)
+  @selection = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
+  @libraries = Library.all
+  haml :edit_selections, :layout => false
+end
+
+get '/editsequencing-datasets' do
+  @dataset = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
+  @libraries = Library
+  @selections = Selection
+  @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
+  @species = Target.distinct.select(:species)
+  haml :edit_datasets, :layout => false
+end
+
+get '/edittargets' do
+  @target = Target.select(:species, :tissue, :cell).where(:target_id => params[:selElem].to_i).first
+  @species = Target.distinct.select(:species)
+  @tissues = Target.distinct.select(:tissue)
+  @cells = Target.distinct.select(:cell)
+  haml :edit_targets, :layout => false
+end
+get '/editresults' do
+  @result = Result.select(:performance, :species, :tissue, :cell, :dataset_name___dataset, :peptide_sequence).join(Target, :target_id => :target_id).left_join(Observation, :results__result_id => :peptides_sequencing_datasets__result_id).where(:results__result_id => params[:selElem].to_i).first
+  @datasets = SequencingDataset
+  @species = Target.distinct.select(:species)
+  haml :edit_results, :layout => false
+end
+
+get '/editmotif-lists' do
+  @motlist = DB[:motifs_motif_lists].select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:selElem].to_s)
+  haml :edit_motiflists, :layout => false
+end
+
+get '/editclusters' do
+  @datasets = SequencingDataset.all
+  @cluster = Cluster.select(:parameters, :dataset_name, :cluster_id).where(:cluster_id => params[:selElem]).first
+  @peptides = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => params[:selElem])
+  haml :edit_clusters, :layout => false
+end
+
+get '/clusterdrop' do
+  @clusters = Cluster.select(:cluster_id, :consensus_sequence).where(:dataset_name => params[:selElem].to_s) 
+  haml :clusterdrop, :layout => false
+end
+
+delete '/delete-entry' do
+  delete_entry(params)
+  @message = "Entry deleted!"
+  haml :success_wo_header, :layout => false
 end
 
 get '/datatables' do
