@@ -2,17 +2,39 @@ pepdb.accinit = pepdb.accinit || {};
 var asInitVals = new Array();
 
 $(document).ready(function(){
+  function baseDir(){
+    var url = document.location.pathname.split('/')[1];
+    if (url == "pepdb"){
+      return '/'+url;
+    }else{
+      return '';
+    }
+  };
+
+  var url = baseDir();
   $('#motacc').accordion({ heightStyle: "content" },
+                          {collapsible:true } );  
+  $('#compacc').accordion({ heightStyle: "content" },
                           {collapsible:true } );  
     var oTable = $('.mot_table').dataTable({
     "bPaginate": "true",
     "sPaginationType": "full_numbers",
     "bInfo": true,
     "bJQueryUI": true,
+    "sDom": '<"H"lfrT>t<"F"ip>',
+    "oTableTools":{
+      "sSwfPath": url+"/copy_csv_xls_pdf.swf",
+      "aButtons": [
+      {
+        "sExtends": "collection",
+        "sButtonText": "save as",
+        "aButtons": ["csv", "pdf"],
+        }]
+    }
   });
 
     $('.mot_table thead input').click( function(e){
-    stopTableSorting(e);
+      stopTableSorting(e);
     });
     
      $('.mot_table thead input').keyup( function(e){

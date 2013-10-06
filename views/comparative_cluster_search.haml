@@ -33,7 +33,7 @@
       %fieldset.checklist
         %input{:type => "submit", :id => "search", :value => "compare"}
         %input{:type => "button", :id => "clear-button",:value => "clear selection"}
-
-#results
+        = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
+#compclresults
 
 #infos
