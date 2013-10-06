@@ -19,19 +19,19 @@ require 'sass'
 require 'haml'
 require 'json'
 require './model'
-#require 'rack-flash'
 require 'sinatra-authentication'
+require 'rack-flash'
 
 Haml::Options.defaults[:format] = :xhtml
 
 set :environment, :development
-set :sessions, false
 set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 set :public_folder, Proc.new {File.join(root, "public_html")}
 
 use Rack::Session::Cookie, :secret => 'better secret needeQ!'
-#use Rack::Flash
+
+use Rack::Flash
 
 class SequelUser
   String :name
@@ -54,7 +54,12 @@ dna_columns = [:dna_sequences__dna_sequence, :reads]
 
 
 get '/' do
-  haml :login
+  login_required
+  @sequel_user = SequelUser.where(:id => 1)
+  @dataset = Library.where(:library_name => "lib1").first
+  @library = Library.where(:sequel_users => @sequel_user, :library_name => "lib1")
+  puts can_access?(:libraries, "lib2")
+  haml :main
 end
 
 get '/*style.css' do
@@ -117,7 +122,7 @@ get '/show-info' do
     @column = :dataset_name
   elsif params['ref'] == "Sequencing Dataset"
     @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
-    @peptide_dna = Peptide.join(DNAFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DNASequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
+    @peptide_dna = Peptide.join(DNAFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
@@ -446,6 +451,8 @@ post '/validate-data' do
 end
 
 get '/edit-data' do
+  login_required
+  puts current_user.db_instance.name
   haml :edit_data
 end
 
@@ -523,3 +530,60 @@ get '/datatables' do
   get_datatable_json(params, request.referer)
 end
 
+###### Sinatra Authentication ######
+
+set :sinatra_authentication_view_path, Pathname(__FILE__).dirname.expand_path + "views/"
+
+get '/login' do
+  puts "flash?"
+  puts  flash[:error].nil?
+  puts "notice?"
+  puts  flash[:notice].empty?
+  haml :login, :layout => false
+end
+
+get '/logout' do
+  haml :logout
+end
+
+get '/show' do
+  haml :show
+end
+
+get '/signup' do
+  haml :signup
+end
+
+get '/edit' do
+  haml :edit
+end
+
+get '/user-management' do
+  @selections = Selection.all
+  @users = SequelUser.all
+  haml :user_management
+end
+=begin
+post '/login/?' do
+  if user = User.authenticate(params[:email], params[:password])
+    session[:user] = user.id
+
+    #if Rack.const_defined?('Flash')
+      flash[:notice] = "Login successful."
+    #end
+
+    if session[:return_to]
+      redirect_url = session[:return_to]
+      session[:return_to] = false
+      redirect redirect_url
+    else
+      redirect '/'
+    end
+  else
+    #if Rack.const_defined?('Flash')
+      flash[:error] = "The email or password you entered is incorrect."
+    #end
+    redirect '/login'
+  end
+end
+=end

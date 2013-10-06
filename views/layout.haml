@@ -9,10 +9,11 @@
   %body
     #topbar
       = image_tag("/images/pepdb_logo.png", :id => "logo")
-      #datalinks
-        = link_to("add data", "/add-data", :class => "optbut")
-        = link_to("edit data", "/edit-data", :class => "optbut")
-        = link_to("user management", "/users", :class => "optbut")
+      - if current_user.admin?
+        #datalinks
+          = link_to("add data", "/add-data", :class => "optbut")
+          = link_to("edit data", "/edit-data", :class => "optbut")
+          = link_to("user management", "/user-management", :class => "optbut")
     #content
       #left
         %ul{:id=>'navigation'}
@@ -44,5 +45,8 @@
             = link_to("Peptide Sequence Search", "/cluster-search")
           %li
             = link_to("Comparative Search", "/comparative-cluster-search")
+        %p 
+          logged in as 
+          = current_user.username
         = link_to("Logout", "/logout", :class => "optbut")
       #right= yield

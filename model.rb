@@ -14,6 +14,7 @@ class Library < Sequel::Model
   one_to_many :selections, :key => :selection_name
   one_to_many :sequencing_datasets, :key => :dataset_name
   one_to_many :clusters
+  many_to_many :sequel_users, :left_key => :library_name, :right_key => :id
 end
 
 class Selection < Sequel::Model
@@ -22,6 +23,7 @@ class Selection < Sequel::Model
 
   one_to_many :sequencing_datasets, :key => :dataset_name
   one_to_many :clusters
+  many_to_many :sequel_users, :left_key => :selection_name, :right_key => :id
 end
 
 class SequencingDataset < Sequel::Model
@@ -36,6 +38,7 @@ class SequencingDataset < Sequel::Model
   one_to_many :dnafindings
   many_to_many :dnapeptides, :class => :Peptide,:join_table=>:dnafindings, :key => :peptide_sequence
   many_to_many :dna_sequences, :join_table=>:dnafindings, :key => :dna_sequence
+  many_to_many :sequel_users, :left_key => :dataset_name ,:right_key => :id
 end
 
 class Peptide < Sequel::Model
@@ -56,7 +59,7 @@ class Cluster < Sequel::Model
   many_to_many :peptides, :key => :peptide_sequence
 end
 
-class DNASequence < Sequel::Model
+class DnaSequence < Sequel::Model
   one_to_many :dnafindings
   many_to_many :peptides, :join_table=>:dnafindings, :key => :peptide_sequence
   many_to_many :sequencing_datasets, :join_table => :dnafindings, :key => :dataset_name
@@ -73,7 +76,7 @@ class Target < Sequel::Model
   one_to_many :results 
 end
 
-class DNAFinding < Sequel::Model(:dna_sequences_peptides_sequencing_datasets)
+class DnaFinding < Sequel::Model(:dna_sequences_peptides_sequencing_datasets)
   many_to_one :dna_sequence, :key => :dna_sequence
   many_to_one :peptide, :key => :peptide_sequence
   many_to_one :sequencing_dataset, :key => :dataset_name
@@ -91,6 +94,13 @@ end
 
 class MotifList < Sequel::Model
   many_to_many :motifs, :key => :motif_sequence
+end
+
+class SequelUser < Sequel::Model
+  many_to_many :libraries, :left_key => :id, :right_key => :library_name
+  many_to_many :selections, :left_key => :id,:right_key => :selection_name
+  many_to_many :sequencing_datasets, :left_key => :id, :right_key => :dataset_name
+
 end
 
 #require './fill_db'
