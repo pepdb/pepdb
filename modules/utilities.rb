@@ -15,9 +15,8 @@ module Sinatra
       end
 
       return datatype, columnname
-    end
-
-  end
+    end #choose_data
+  end #module
 
   helpers Utilities
-end
+end #module
