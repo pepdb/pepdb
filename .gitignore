@@ -10,3 +10,4 @@ pepdb/
 public_html/.directory
 .viminfo
 .gitconfig
+pep_clean_w_admin.db
