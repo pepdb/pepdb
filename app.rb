@@ -255,30 +255,28 @@ end
 
 get '/systemic-search' do
   login_required
-  @libraries = Library.all
-  @datasets = SequencingDataset.all
-  @selections = Selection.all
+  if current_user.admin?
+    @libraries = Library.all
+    @selections = Selection.all
+    @datasets = SequencingDataset.all
+  else
+    @allowed_lib = []
+    @allowed_sel = []
+    @allowed_ds = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @allowed_ds.insert(-1, ds[:dataset_name])}
+    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| @allowed_lib.insert(-1, ds[:library_name])}
+    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| @allowed_sel.insert(-1, ds[:selection_name])}
+    @libraries = Library.where(:library_name => @allowed_lib).all
+    @selections = Selection.where(:selection_name => @allowed_sel).all
+    @datasets = SequencingDataset.where(:dataset_name => @allowed_ds).all
+  end
   haml :sys_search
 end
 
-get '/systemic-search/:pep_seq' do
+get '/systemic-results' do
   login_required
-  @libraries = Library.all
-  @datasets = SequencingDataset
-  @selections = Selection
-  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*sys_peptide_columns)
-  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
-  haml :sys_search
-end
-
-post '/sys-search' do
-  login_required
-  @libraries = Library.all
-  @datasets = SequencingDataset
-  @selections = Selection
-  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*sys_peptide_columns)
-  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
-  haml :sys_search
+  @peptides = Observation.select(:peptide_sequence,:dataset_name,:rank, :reads, :dominance).where(:dataset_name => params['sysDS'])
+  haml :peptide_results, :layout => false
 end
 
 get '/property-search' do
@@ -320,14 +318,29 @@ end
 
 post '/checklist' do
   login_required
-  @data_to_display, @column, @section = choose_data(params)
-  @section = params['sec']
-  haml :checklist, :layout => false
+  case params[:selector]
+  when "sel"
+    table = :libraries
+  when "ds"
+    table = :selections
+  end
+  if params[:checkedElem].nil?
+  elsif current_user.admin? || can_access?(table, params[:checkedElem])
+    @data_to_display, @column = choose_data(params)
+    @section = params['sec']
+    haml :checklist, :layout => false
+  else
+    redirect '/empty'
+  end
 end
 
 post '/radiolist' do
   login_required
-  @data_to_display = SequencingDataset.select(:dataset_name).where(:selection_name => params['checkedElem'])
+  if current_user.admin? || can_access?(:sequencing_datasets, params[:checkedElem])
+    @data_to_display = SequencingDataset.select(:dataset_name).where(:selection_name => params['checkedElem'])
+  else
+    redirect '/empty'
+  end
   @column = :dataset_name
   haml :radiolist, :layout => false
 end
@@ -338,12 +351,6 @@ post '/comparative-results' do
   @ds_qry, @ds_placeh = build_cdom_string(params)
   @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
   
-  haml :peptide_results, :layout => false
-end
-
-post '/systemic-results' do
-  login_required
-  @peptides = Observation.select(:peptide_sequence,:dataset_name,:rank, :reads, :dominance).where(:dataset_name => params['sysDS'])
   haml :peptide_results, :layout => false
 end
 
@@ -659,10 +666,14 @@ end
 
 get '/datatables' do
   login_required
+  puts params
   content_type :json
   get_datatable_json(params, request.referer)
 end
 
+get '/empty' do
+  haml :empty, :layout => false
+end
 ###### Sinatra Authentication ######
 
 set :sinatra_authentication_view_path, Pathname(__FILE__).dirname.expand_path + "views/"

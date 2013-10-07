@@ -18,7 +18,9 @@
 #comp-buttons    
   %input{:type => "button", :id => "search", :value => "search"}
   %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+  = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
 
-#sysresults
+
+#sysresults{:hidden => true}
 
 #infos
