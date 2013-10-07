@@ -59,7 +59,6 @@ get '/' do
   @dataset = Library.where(:library_name => "lib1").first
   @library = Library.where(:sequel_users => @sequel_user, :library_name => "lib1")
   @sequel_user.remove_all_selections
-  puts can_access?(:libraries, "lib2")
   haml :main
 end
 
@@ -166,7 +165,13 @@ end
 
 get '/clusters' do
   login_required
-  @clusters = Cluster
+  unless current_user.admin?
+    @datasets = []
+    DB[:sequel_user_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @clusters = Cluster.where(:dataset_name => @dataset_name)
+  else
+    @clusters = Cluster
+  end
   haml :clusters
 end
 
@@ -227,8 +232,6 @@ get '/property-search' do
   rescue ArgumentError => e
     @error = e.message
   end
-  puts @querystring
-  puts @placeholders
   haml :prop_search
 end
 
@@ -364,7 +367,6 @@ get '/motif-search-results' do
     @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence).where(:list_name => params[:checked_motl])
     
     search_peptide_motif_matches(@motlists, @peptides, @datasets, @table)
-    puts "fertisch"
     @results = DB[@table].distinct.select(:motif_sequence, :peptides_sequencing_datasets__peptide_sequence___peptide, :peptides_sequencing_datasets__dataset_name___dataset, :rank).left_join(:peptides_sequencing_datasets, :peptide_sequence => :peptide_sequence)
     haml :mot_search_res, :layout => false
   else
@@ -382,7 +384,6 @@ get '/comparative-cluster-results' do
   login_required
   @errors = {}
   if params[:ref_ds].nil? || params[:ref_ds].size < 2
-    puts "empty"
     @errors[:ds] = "select two or more datasets!"
   elsif params[:comptype].nil?
     @errors[:type] = "no search type selected!" 
@@ -397,18 +398,19 @@ get '/comparative-cluster-results' do
     @clusters = Cluster.select(:dataset_name, :dominance_sum)
     haml :comparative_cluster_results, :layout => false
   else
-    puts "errors"
     haml :validation_errors, :layout => false, locals:{errors:@errors}
   end
 end
 
 get '/add-data' do
   login_required
+  redirect "/" unless current_user.admin?
   haml :add_data
 end
 
 get '/addlibrary' do
   login_required
+  redirect "/" unless current_user.admin?
   @schemes = Library.distinct.select(:encoding_scheme)
   @carriers = Library.distinct.select(:carrier)
   @producers = Library.distinct.select(:produced_by)
@@ -416,6 +418,7 @@ get '/addlibrary' do
 end
 get '/addselection' do
   login_required
+  redirect "/" unless current_user.admin?
   @libraries = Library.distinct.select(:library_name)
   @performs = Selection.distinct.select(:performed_by)
   @species = Target.distinct.select(:species)
@@ -423,6 +426,7 @@ get '/addselection' do
 end
 get '/adddataset' do
   login_required
+  redirect "/" unless current_user.admin?
   @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
   @libraries = Library
   @selections = Selection
@@ -431,12 +435,14 @@ get '/adddataset' do
 end
 get '/addresult' do
   login_required
+  redirect "/" unless current_user.admin?
   @datasets = SequencingDataset
   @species = Target.distinct.select(:species)
   haml :result_form, :layout => false
 end
 get '/addtarget' do
   login_required
+  redirect "/" unless current_user.admin?
   @species = Target.distinct.select(:species)
   @tissues = Target.distinct.select(:tissue)
   @cells = Target.distinct.select(:cell)
@@ -445,6 +451,7 @@ end
 
 get '/addcluster' do
   login_required
+  redirect "/" unless current_user.admin?
   @libraries = Library
   @selection = Selection
   @datasets = SequencingDataset
@@ -453,6 +460,7 @@ end
 
 get '/addmotif' do
   login_required
+  redirect "/" unless current_user.admin?
   haml :motif_form, :layout => false
 end
 
@@ -474,6 +482,7 @@ end
 
 post '/validate-data' do
   login_required
+  redirect "/" unless current_user.admin?
   @errors = validate(params)
   @values = params
   if @errors.empty?
@@ -496,12 +505,13 @@ end
 
 get '/edit-data' do
   login_required
-  puts current_user.db_instance.name
+  redirect "/" unless current_user.admin?
   haml :edit_data
 end
 
 get '/editdrop' do
   login_required
+  redirect "/" unless current_user.admin?
   @column = find_id_column(params[:table].to_s) 
   @data = DB[params[:table].to_sym].distinct.select(@column)
   haml :editdrop, :layout => false
@@ -509,6 +519,7 @@ end
 
 get '/editlibraries' do
   login_required
+  redirect "/" unless current_user.admin?
   @schemes = Library.distinct.select(:encoding_scheme)
   @carriers = Library.distinct.select(:carrier)
   @producers = Library.distinct.select(:produced_by)
@@ -518,6 +529,7 @@ end
 
 get '/editselections' do
   login_required
+  redirect "/" unless current_user.admin?
   @species = Target.distinct.select(:species)
   @performs = Selection.distinct.select(:performed_by)
   @selection = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
@@ -527,6 +539,7 @@ end
 
 get '/editsequencing-datasets' do
   login_required
+  redirect "/" unless current_user.admin?
   @dataset = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
   @libraries = Library
   @selections = Selection
@@ -537,6 +550,7 @@ end
 
 get '/edittargets' do
   login_required
+  redirect "/" unless current_user.admin?
   @target = Target.select(:species, :tissue, :cell).where(:target_id => params[:selElem].to_i).first
   @species = Target.distinct.select(:species)
   @tissues = Target.distinct.select(:tissue)
@@ -545,6 +559,7 @@ get '/edittargets' do
 end
 get '/editresults' do
   login_required
+  redirect "/" unless current_user.admin?
   @result = Result.select(:performance, :species, :tissue, :cell, :dataset_name___dataset, :peptide_sequence).join(Target, :target_id => :target_id).left_join(Observation, :results__result_id => :peptides_sequencing_datasets__result_id).where(:results__result_id => params[:selElem].to_i).first
   @datasets = SequencingDataset
   @species = Target.distinct.select(:species)
@@ -553,12 +568,14 @@ end
 
 get '/editmotif-lists' do
   login_required
+  redirect "/" unless current_user.admin?
   @motlist = DB[:motifs_motif_lists].select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:selElem].to_s)
   haml :edit_motiflists, :layout => false
 end
 
 get '/editclusters' do
   login_required
+  redirect "/" unless current_user.admin?
   @datasets = SequencingDataset.all
   @cluster = Cluster.select(:parameters, :dataset_name, :cluster_id).where(:cluster_id => params[:selElem]).first
   @peptides = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => params[:selElem])
@@ -573,6 +590,7 @@ end
 
 delete '/delete-entry' do
   login_required
+  redirect "/" unless current_user.admin?
   delete_entry(params)
   @message = "Entry deleted!"
   haml :success_wo_header, :layout => false
@@ -581,7 +599,6 @@ end
 get '/datatables' do
   login_required
   content_type :json
-  puts params[:route]
   get_datatable_json(params, request.referer)
 end
 
@@ -590,10 +607,6 @@ end
 set :sinatra_authentication_view_path, Pathname(__FILE__).dirname.expand_path + "views/"
 
 get '/login' do
-  puts "flash?"
-  puts  flash[:error].nil?
-  puts "notice?"
-  puts  flash[:notice].empty?
   haml :login, :layout => false
 end
 =begin
@@ -614,6 +627,8 @@ get '/edit' do
 end
 =end
 get '/user-management' do
+  login_required
+  redirect "/" unless current_user.admin?
   @selections = Selection.all
   @users = SequelUser.all
   haml :user_management

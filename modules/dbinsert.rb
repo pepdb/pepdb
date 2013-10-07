@@ -77,15 +77,21 @@ module Sinatra
         mots_mot_lists = []
         motifs = []
         line_counter = 1
+        puts @file.inspect
         CSV.foreach(@file, :col_sep => ';', :row_sep => :auto ) do |row|
+          puts row[0]
+          if row[0].nil?
+            raise ArgumentError, "No motif given on line #{line_counter}"
+          end
           row[0].gsub!(/\s+/, "")
           if row[0].match(/[^\[\]\w]/)
-            raise ArgumentError, "invalid motif character on line #{line_counter}"
+            raise ArgumentError, "invalid motif character (only [,] or characters allowed) on line #{line_counter}"
           end
           motif = [row[0].upcase]
           list = [@dataset, row[0].upcase, row[1], row[2], row[3]]
           mots_mot_lists.insert(-1,list)
           motifs.insert(-1, motif)
+          line_counter += 1
         end
         return motifs, mots_mot_lists
       end
