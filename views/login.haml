@@ -6,19 +6,27 @@
       =link_favicon_tag
       %title pepDB Login
   %body
-    .login-box
+    .login-box.ui-corner-all
+      #loginlogo
+        = image_tag("/images/pepdb_logo.png")
       .login-text
-        %h1.page_title pepDB Login 
+        %h2.page_title Login 
         %form{:action => "/login", :method => "post"}
           .field
             .label
               %label{:for => "user_user_name"} Username
 
-            %input{:id => "user_username", :name => "username", :size => 30, :type => "text"}
+            %input.ui-corner-all{:id => "user_username", :name => "username", :size => 30, :type => "text"}
           .field
             .label
               %label{:for => "user_password"} Password
-            %input{:id => "user_password", :name => "password", :size => 30, :type => "password"}
-          .buttons
-            %input{:value => "Login", :type => "submit"}
-          = flash[:error]
+            %input.ui-corner-all{:id => "user_password", :name => "password", :size => 30, :type => "password"}
+            .buttons
+              %input{:value => "Login", :type => "submit"}
+          -if !flash[:error].nil?
+            .ui-widget
+              %div{:class => "ui-state-error ui-corner-all", :id => "errorbox"}
+                %p
+                  %span{:class => "ui-icon ui-icon-alert", :id => "errorspan"}
+                    %p
+                      = flash[:error]

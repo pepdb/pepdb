@@ -54,11 +54,28 @@ img#logo {
   top:50%;
   z-index:100;
  
-  height:400px;
+  height:250px;
   margin-top:-200px;
 
   width:600px;
   margin-left:-300px; 
+}
+
+.login-text {
+  width:70%;
+  margin:0 auto; 
+}
+
+#loginlogo{
+  float:left;
+  height: 100%;
+  width:30%;
+  img {
+    margin-left:0.8em;
+    margin-top: 6em;
+    height:50px;
+    width:150px;
+  }
 }
 
 /***** User management  ********/
