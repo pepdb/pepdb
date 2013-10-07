@@ -11,12 +11,12 @@ module Sinatra
         @total_disp_rec = 0 
         @placeholder_args = []
         @params = params
-        @dataset = params['selElem']
-        @columns = [:peptide_sequence, :rank, :reads, :dominance]      
+        @dataset = params['selElem'].split(",")
+        @columns = get_columns      
         @indexcolumn = :peptide_sequence
         @table = :peptides_sequencing_datasets
-        @placeholder_args.insert(-1, *@columns, @table, @dataset)
-        @select = "SELECT ?, ?, ?, ? FROM ? WHERE dataset_name = ? "
+        @placeholder_args.insert(-1, *@columns, @table, *@dataset)
+        @select = build_select_string
         @total_rec = Observation.where(:dataset_name => @dataset).count
         @where = build_where_string
         qry_string = "" << @select << @where 
@@ -37,6 +37,20 @@ module Sinatra
       end #json_result
         
       private
+
+      def build_select_string
+        select = "SELECT "
+        (0...@columns.size).each do |index|
+          select << "?, "
+        end
+        select.chop!.chop!
+        select << " FROM ? WHERE dataset_name IN ("
+        (0...@dataset.size).each do |index|
+          select << "?, "
+        end
+        select.chop.chop << ") "
+      end
+
       def build_order_string
         order = ""
         if @params[:iSortCol_0] != "" && @params[:iSortingCols].to_i > 0
@@ -81,6 +95,14 @@ module Sinatra
         end #each
         rows
       end #get_result
+      
+      def get_columns
+        if @referer.include?("datasets")
+          [:peptide_sequence, :rank, :reads, :dominance]      
+        elsif @referer.include?("systemic-search")
+          [:peptide_sequence, :dataset_name,:rank, :reads, :dominance]      
+        end
+      end
   
     end #end class
     

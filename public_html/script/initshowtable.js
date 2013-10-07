@@ -39,9 +39,19 @@ $(document).ready(function(){
         }]
     },
   });
-  var elem = $('#refelem1').val();
   var route = document.location.pathname;
-
+  if(route == url+'/datasets'){ 
+    var elem = $('#refelem1').val();
+  } else if (route == url+'/systemic-search'){
+    var checkedDS = [];
+    $('#ref-dataset input:checkbox').closest('fieldset').find(':checkbox').each(function(){
+      var elemVal = $(this).attr('value');
+      if(this.checked && elemVal != "all_ds"){
+        checkedDS.push(elemVal);
+      }
+    });
+    var elem = checkedDS;
+  }
   var pTable = $('#pep_table').dataTable({
     "bJQueryUI": true,
     "bProcessing": true,

@@ -22,6 +22,12 @@ $(document).ready(function(){
     return;
   }
   $('#search').click(function(){
+    if($('#sysresults').is(':visible')){
+      $('#sysresults').toggle();
+    }
+    if($('.loading').is(':hidden')){
+      $('.loading').toggle();
+    }
     var checkedDS = [];
     $('#ref-dataset input:checkbox:checked').each(function(){
       var elemVal = this.value;
@@ -29,8 +35,12 @@ $(document).ready(function(){
         checkedDS.push(elemVal);
       }
     });
-    $('#sysresults').load(url +'/systemic-results', {sysDS: checkedDS}, function(){
-      $.getScript(url +"/script/tableinit.js")
+    $.get(url+'/systemic-results',{sysDS: checkedDS}, function(data){
+      $('#sysresults').html(data);
+      $.getScript(url +"/script/initshowtable.js", function(){
+        $('.loading').toggle();
+        $('#sysresults').toggle();
+      });
     });
   });
 
