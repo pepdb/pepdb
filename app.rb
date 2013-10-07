@@ -55,10 +55,6 @@ dna_columns = [:dna_sequences__dna_sequence, :reads]
 
 get '/' do
   login_required
-  @sequel_user = SequelUser.where(:id => 1).first
-  @dataset = Library.where(:library_name => "lib1").first
-  @library = Library.where(:sequel_users => @sequel_user, :library_name => "lib1")
-  @sequel_user.remove_all_selections
   haml :main
 end
 
@@ -66,19 +62,139 @@ get '/*style.css' do
   scss :style
 end
 
+########## Data Browsing #############
 get '/libraries' do
   login_required
-  @libraries = Library.select(*library_columns)
+  if current_user.admin?
+    @libraries = Library.select(*library_columns)
+  else
+    @allowed = []
+    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:library_name])}
+    @libraries = Library.select(*library_columns).where(:library_name => @allowed)
+  end
   haml :libraries
 end
 
 get '/libraries/:lib_name' do
   login_required
-  @libraries = Library.select(*library_columns)
+  if current_user.admin?
+    @libraries = Library.select(*library_columns)
+  elsif can_access?(:libraries, params[:lib_name])
+    @allowed = []
+    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:library_name])}
+    @libraries = Library.select(*library_columns).where(:library_name => @allowed)
+  else
+    redirect '/libraries'
+  end
+    @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_columns)
   @infodata = Library.select(*library_all)
-  @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_columns)
   haml :libraries
 end
+
+get '/selections' do
+  login_required
+  if current_user.admin?
+    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
+  else
+    @allowed = []
+    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:selection_name])}
+    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => @allowed)
+  end
+  haml :selections
+end
+
+get '/selections/:sel_name' do
+  login_required
+  if current_user.admin?
+    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
+  elsif can_access?(:selections, params[:sel_name])
+    @allowed = []
+    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:selection_name])}
+    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => @allowed)
+  else
+    redirect '/selections'
+  end
+  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
+  @infodata = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:sel_name])
+  haml :selections
+end
+
+get '/datasets' do
+  login_required
+  if current_user.admin?
+    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns)
+  else
+    @allowed = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:dataset_name])}
+    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => @allowed)
+  end
+  haml :datasets
+end
+
+get '/datasets/:set_name' do
+  login_required
+  if current_user.admin?
+    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
+  elsif can_access?(:selections, params[:sel_name])
+    @allowed = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:dataset_name])}
+    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => @allowed)
+  else
+    redirect '/datasets'
+  end
+  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
+  @infodata = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
+  haml :datasets
+end
+
+get '/clusters' do
+  login_required
+  unless current_user.admin?
+    @datasets = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @clusters = Cluster.where(:dataset_name => @datasets)
+  else
+    @clusters = Cluster
+  end
+  haml :clusters
+end
+
+get '/clusters/:sel_cluster' do
+  login_required
+  ds = Cluster.select(:dataset_name).where(:cluster_id => params[:sel_cluster].to_i).first 
+  if current_user.admin?  
+    @clusters = Cluster
+  elsif can_access?(:sequencing_datasets, ds[:dataset_name])
+    @datasets = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @clusters = Cluster.where(:dataset_name => @datasets)
+  else
+    redirect "/clusters"
+  end
+    @cluster_info = Cluster.select(:consensus_sequence, :dominance_sum, :reads_sum)
+    @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
+  haml :clusters
+end
+
+get '/clusters/:sel_cluster/:pep_seq' do
+  login_required
+  ds = Cluster.select(:dataset_name).where(:cluster_id => params[:sel_cluster].to_i).first 
+  if current_user.admin?  
+    @clusters = Cluster
+  elsif can_access?(:sequencing_datasets, ds[:dataset_name])
+    @datasets = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @clusters = Cluster.where(:dataset_name => @datasets)
+  else
+    redirect "/clusters"
+  end
+  @cluster_info = Cluster.select(:consensus_sequence, :dominance, :parameters)
+ @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
+  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
+  haml :clusters
+end
+
+####### Data Browsing Helper Routes ####################
 
 get '/show_sn_table' do
   login_required
@@ -135,80 +251,7 @@ get '/show-info' do
   haml :show_info, :layout => false
 end
 
-get '/selections' do
-  login_required
-  @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
-  haml :selections
-end
-
-get '/selections/:sel_name' do
-  login_required
-  @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
-  @infodata = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:sel_name])
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
-  haml :selections
-end
-
-get '/datasets' do
-  login_required
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns)
-  haml :datasets
-end
-
-get '/datasets/:set_name' do
-  login_required
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
-  @infodata = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
-  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
-  haml :datasets
-end
-
-get '/clusters' do
-  login_required
-  unless current_user.admin?
-    @datasets = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
-    @clusters = Cluster.where(:dataset_name => @datasets)
-  else
-    @clusters = Cluster
-  end
-  haml :clusters
-end
-
-get '/clusters/:sel_cluster' do
-  login_required
-  ds = Cluster.select(:dataset_name).where(:cluster_id => params[:sel_cluster].to_i).first 
-  if current_user.admin?  
-    @clusters = Cluster
-  elsif can_access?(:sequencing_datasets, ds[:dataset_name])
-    @datasets = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
-    @clusters = Cluster.where(:dataset_name => @datasets)
-  else
-    redirect "/clusters"
-  end
-    @cluster_info = Cluster.select(:consensus_sequence, :dominance_sum, :reads_sum)
-    @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
-  haml :clusters
-end
-
-get '/clusters/:sel_cluster/:pep_seq' do
-  login_required
-  ds = Cluster.select(:dataset_name).where(:cluster_id => params[:sel_cluster].to_i).first 
-  if current_user.admin?  
-    @clusters = Cluster
-  elsif can_access?(:sequencing_datasets, ds[:dataset_name])
-    @datasets = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
-    @clusters = Cluster.where(:dataset_name => @datasets)
-  else
-    redirect "/clusters"
-  end
-  @cluster_info = Cluster.select(:consensus_sequence, :dominance, :parameters)
- @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
-  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
-  haml :clusters
-end
+######## Peptide Search #################
 
 get '/systemic-search' do
   login_required
