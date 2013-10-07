@@ -55,9 +55,10 @@ dna_columns = [:dna_sequences__dna_sequence, :reads]
 
 get '/' do
   login_required
-  @sequel_user = SequelUser.where(:id => 1)
+  @sequel_user = SequelUser.where(:id => 1).first
   @dataset = Library.where(:library_name => "lib1").first
   @library = Library.where(:sequel_users => @sequel_user, :library_name => "lib1")
+  @sequel_user.remove_all_selections
   puts can_access?(:libraries, "lib2")
   haml :main
 end
@@ -67,11 +68,13 @@ get '/*style.css' do
 end
 
 get '/libraries' do
+  login_required
   @libraries = Library.select(*library_columns)
   haml :libraries
 end
 
 get '/libraries/:lib_name' do
+  login_required
   @libraries = Library.select(*library_columns)
   @infodata = Library.select(*library_all)
   @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_columns)
@@ -79,6 +82,7 @@ get '/libraries/:lib_name' do
 end
 
 get '/show_sn_table' do
+  login_required
   if params['ref'] == "Library" 
     @column = :library_name
     @eletype = "Selections"
@@ -99,6 +103,7 @@ get '/show_sn_table' do
 end
 
 get '/info-tables' do
+  login_required
   if request.referer.include?("libraries")
     @infodata = Library.select(*library_all).where(:library_name => params[:infoElem])
   elsif request.referer.include?("selection")
@@ -110,6 +115,7 @@ get '/info-tables' do
 end
 
 get '/show-info' do
+  login_required
   if params['ref'] == "Library"
     @info_data = Selection.join(Target, :target_id=>:target_id).select(*selection_info_columns)
     @eletype = "Selection"
@@ -131,11 +137,13 @@ get '/show-info' do
 end
 
 get '/selections' do
+  login_required
   @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
   haml :selections
 end
 
 get '/selections/:sel_name' do
+  login_required
   @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
   @infodata = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:sel_name])
   @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
@@ -143,11 +151,13 @@ get '/selections/:sel_name' do
 end
 
 get '/datasets' do
+  login_required
   @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns)
   haml :datasets
 end
 
 get '/datasets/:set_name' do
+  login_required
   @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
   @infodata = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
   @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
@@ -155,11 +165,13 @@ get '/datasets/:set_name' do
 end
 
 get '/clusters' do
+  login_required
   @clusters = Cluster
   haml :clusters
 end
 
 get '/clusters/:sel_cluster' do
+  login_required
   @clusters = Cluster
   @cluster_info = Cluster.select(:consensus_sequence, :dominance_sum, :reads_sum)
  @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
@@ -167,6 +179,7 @@ get '/clusters/:sel_cluster' do
 end
 
 get '/clusters/:sel_cluster/:pep_seq' do
+  login_required
   @clusters = Cluster
   @cluster_info = Cluster.select(:consensus_sequence, :dominance, :parameters)
  @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
@@ -175,6 +188,7 @@ get '/clusters/:sel_cluster/:pep_seq' do
 end
 
 get '/systemic-search' do
+  login_required
   @libraries = Library.all
   @datasets = SequencingDataset.all
   @selections = Selection.all
@@ -182,6 +196,7 @@ get '/systemic-search' do
 end
 
 get '/systemic-search/:pep_seq' do
+  login_required
   @libraries = Library.all
   @datasets = SequencingDataset
   @selections = Selection
@@ -191,6 +206,7 @@ get '/systemic-search/:pep_seq' do
 end
 
 post '/sys-search' do
+  login_required
   @libraries = Library.all
   @datasets = SequencingDataset
   @selections = Selection
@@ -200,6 +216,7 @@ post '/sys-search' do
 end
 
 get '/property-search' do
+  login_required
   @libraries = Library
   @datasets = SequencingDataset
   @selections = Selection
@@ -216,6 +233,7 @@ get '/property-search' do
 end
 
 get '/property-results' do
+  login_required
   @results = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).join(:targets___sel_target, :selections__target_id => :sel_target__target_id).join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
   begin
     @querystring, @placeholders = build_property_array(params)
@@ -226,6 +244,7 @@ get '/property-results' do
 end
 
 get '/comparative-search' do
+  login_required
   @libraries = Library.all
   @datasets = SequencingDataset
   @selections = Selection
@@ -236,18 +255,21 @@ get '/comparative-search' do
 end
 
 post '/checklist' do
+  login_required
   @data_to_display, @column, @section = choose_data(params)
   @section = params['sec']
   haml :checklist, :layout => false
 end
 
 post '/radiolist' do
+  login_required
   @data_to_display = SequencingDataset.select(:dataset_name).where(:selection_name => params['checkedElem'])
   @column = :dataset_name
   haml :radiolist, :layout => false
 end
 
 post '/comparative-results' do
+  login_required
   @ref_qry, @ref_placeh = build_rdom_string(params)
   @ds_qry, @ds_placeh = build_cdom_string(params)
   @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
@@ -256,38 +278,45 @@ post '/comparative-results' do
 end
 
 post '/systemic-results' do
+  login_required
   @peptides = Observation.select(:peptide_sequence,:dataset_name,:rank, :reads, :dominance).where(:dataset_name => params['sysDS'])
   haml :peptide_results, :layout => false
 end
 
 post '/peptide-infos' do
+  login_required
   @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :peptide_infos, :layout => false
 end
 
 get '/cluster-search' do
+  login_required
   @peptides = Peptide.select(:peptide_sequence)
   haml :cluster_search
 end
 
 post '/cluster-results' do
+  login_required
   @cluster = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(:clusters__cluster_id___id ,:consensus_sequence___consensus, :library_name___library, :selection_name___selection, :dataset_name___dataset )
   haml :peptide_results, :layout => false
 end
 
 post '/cluster-infos' do
+  login_required
   @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}")
   @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}")
   haml :cluster_infos, :layout => false
 end
 
 get '/motif-search' do
+  login_required
   @libraries = Library
   @motiflists = MotifList
   haml :motif_search
 end
 
 post '/motif-search' do
+  login_required
   @libraries = Library.all
   @datasets = SequencingDataset
   @selections = Selection
@@ -295,11 +324,13 @@ post '/motif-search' do
 end
 
 get '/mot-checklist' do
+  login_required
   @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:checkedElem])
   haml :mot_checklist, :layout => false
 end
 
 get '/motif-search-results' do
+  login_required
   @errors = {}
   if params[:searchtype].nil?
     @errors[:type] = "no search type selected!"
@@ -342,11 +373,13 @@ get '/motif-search-results' do
 end
 
 get '/comparative-cluster-search' do
+  login_required
   @libraries = Library
   haml :comparative_cluster_search
 end
 
 get '/comparative-cluster-results' do
+  login_required
   @errors = {}
   if params[:ref_ds].nil? || params[:ref_ds].size < 2
     puts "empty"
@@ -370,22 +403,26 @@ get '/comparative-cluster-results' do
 end
 
 get '/add-data' do
+  login_required
   haml :add_data
 end
 
 get '/addlibrary' do
+  login_required
   @schemes = Library.distinct.select(:encoding_scheme)
   @carriers = Library.distinct.select(:carrier)
   @producers = Library.distinct.select(:produced_by)
   haml :library_form, :layout => false
 end
 get '/addselection' do
+  login_required
   @libraries = Library.distinct.select(:library_name)
   @performs = Selection.distinct.select(:performed_by)
   @species = Target.distinct.select(:species)
   haml :selection_form, :layout => false
 end
 get '/adddataset' do
+  login_required
   @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
   @libraries = Library
   @selections = Selection
@@ -393,11 +430,13 @@ get '/adddataset' do
   haml :dataset_form, :layout => false
 end
 get '/addresult' do
+  login_required
   @datasets = SequencingDataset
   @species = Target.distinct.select(:species)
   haml :result_form, :layout => false
 end
 get '/addtarget' do
+  login_required
   @species = Target.distinct.select(:species)
   @tissues = Target.distinct.select(:tissue)
   @cells = Target.distinct.select(:cell)
@@ -405,6 +444,7 @@ get '/addtarget' do
 end
 
 get '/addcluster' do
+  login_required
   @libraries = Library
   @selection = Selection
   @datasets = SequencingDataset
@@ -412,10 +452,12 @@ get '/addcluster' do
 end
 
 get '/addmotif' do
+  login_required
   haml :motif_form, :layout => false
 end
 
 get '/formdrop' do
+  login_required
   @querystring, @placeholders = build_formdrop_string(params)
   req = !params[:required].nil? ? true : false
   @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
@@ -423,6 +465,7 @@ get '/formdrop' do
 end
 
 get '/datalist' do
+  login_required
   @querystring, @placeholders = build_formdrop_string(params)
   val = !params[:required].nil? ? true : false
   @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
@@ -430,6 +473,7 @@ get '/datalist' do
 end
 
 post '/validate-data' do
+  login_required
   @errors = validate(params)
   @values = params
   if @errors.empty?
@@ -457,12 +501,14 @@ get '/edit-data' do
 end
 
 get '/editdrop' do
+  login_required
   @column = find_id_column(params[:table].to_s) 
   @data = DB[params[:table].to_sym].distinct.select(@column)
   haml :editdrop, :layout => false
 end
 
 get '/editlibraries' do
+  login_required
   @schemes = Library.distinct.select(:encoding_scheme)
   @carriers = Library.distinct.select(:carrier)
   @producers = Library.distinct.select(:produced_by)
@@ -471,6 +517,7 @@ get '/editlibraries' do
 end
 
 get '/editselections' do
+  login_required
   @species = Target.distinct.select(:species)
   @performs = Selection.distinct.select(:performed_by)
   @selection = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
@@ -479,6 +526,7 @@ get '/editselections' do
 end
 
 get '/editsequencing-datasets' do
+  login_required
   @dataset = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
   @libraries = Library
   @selections = Selection
@@ -488,6 +536,7 @@ get '/editsequencing-datasets' do
 end
 
 get '/edittargets' do
+  login_required
   @target = Target.select(:species, :tissue, :cell).where(:target_id => params[:selElem].to_i).first
   @species = Target.distinct.select(:species)
   @tissues = Target.distinct.select(:tissue)
@@ -495,6 +544,7 @@ get '/edittargets' do
   haml :edit_targets, :layout => false
 end
 get '/editresults' do
+  login_required
   @result = Result.select(:performance, :species, :tissue, :cell, :dataset_name___dataset, :peptide_sequence).join(Target, :target_id => :target_id).left_join(Observation, :results__result_id => :peptides_sequencing_datasets__result_id).where(:results__result_id => params[:selElem].to_i).first
   @datasets = SequencingDataset
   @species = Target.distinct.select(:species)
@@ -502,11 +552,13 @@ get '/editresults' do
 end
 
 get '/editmotif-lists' do
+  login_required
   @motlist = DB[:motifs_motif_lists].select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:selElem].to_s)
   haml :edit_motiflists, :layout => false
 end
 
 get '/editclusters' do
+  login_required
   @datasets = SequencingDataset.all
   @cluster = Cluster.select(:parameters, :dataset_name, :cluster_id).where(:cluster_id => params[:selElem]).first
   @peptides = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => params[:selElem])
@@ -514,17 +566,20 @@ get '/editclusters' do
 end
 
 get '/clusterdrop' do
+  login_required
   @clusters = Cluster.select(:cluster_id, :consensus_sequence).where(:dataset_name => params[:selElem].to_s) 
   haml :clusterdrop, :layout => false
 end
 
 delete '/delete-entry' do
+  login_required
   delete_entry(params)
   @message = "Entry deleted!"
   haml :success_wo_header, :layout => false
 end
 
 get '/datatables' do
+  login_required
   content_type :json
   puts params[:route]
   get_datatable_json(params, request.referer)
@@ -541,7 +596,7 @@ get '/login' do
   puts  flash[:notice].empty?
   haml :login, :layout => false
 end
-
+=begin
 get '/logout' do
   haml :logout
 end
@@ -557,7 +612,7 @@ end
 get '/edit' do
   haml :edit
 end
-
+=end
 get '/user-management' do
   @selections = Selection.all
   @users = SequelUser.all

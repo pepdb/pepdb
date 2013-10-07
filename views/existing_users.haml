@@ -13,8 +13,6 @@
             "user #{user.id}"
         - if current_user.admin?
           %td= user.permission_level
-        %td
-          %a{:href => "/users/#{user.id}"} show
         - if current_user.admin?
           %td
             %a{:href => "/users/#{user.id}/edit", :class => "editlink"} edit
