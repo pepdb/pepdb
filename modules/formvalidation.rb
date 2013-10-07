@@ -100,6 +100,8 @@ module Sinatra
       def validate_result
         if given? @params[:ddsname] 
           @errors[:pseq] = "Field peptide sequence is required" unless given? @params[:pseq]
+          pep_ds = Observation.select(:peptide_sequence).where(:dataset_name => @params[:ddsname].to_s, :peptide_sequence => @params[:pseq].to_s).count
+          @errors[:seqds] = "Given peptide #{@params[:pseq]} not found in sequencing dataset #{@params[:ddsname]}" if pep_ds == 0
         else
           @errors[:ddsname] = "Field sequencing dataset is required"
         end

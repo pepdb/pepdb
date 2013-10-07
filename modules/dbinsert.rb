@@ -236,9 +236,9 @@ module Sinatra
           DB[:peptides_sequencing_datasets].where(:dataset_name => @values[:ddsname], :peptide_sequence => @values[:pseq]).update(:result_id => id)
         rescue Sequel::Error => e
           if e.message.include? "unique"
-            @errors[:tar] = "Given name not unique"
+            @errors[:result] = "Given name not unique"
           else
-           @errors[:tar] = e.message 
+           @errors[:result] = e.message 
           end
         end
       end #result
