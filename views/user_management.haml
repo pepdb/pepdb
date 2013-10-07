@@ -1,0 +1,10 @@
+#overview
+  #existing
+    %h2 existing users
+    #allusers
+      = partial :existing_users, locals:{users:@users}
+    #editusers
+  #newusers
+    %h2 add new user
+    = partial :add_user, locals:{selections:@selections}
+

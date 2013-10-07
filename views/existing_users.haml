@@ -1,0 +1,24 @@
+#sinatra_authentication
+  %table
+    %tr
+      %th
+      - if current_user.admin?
+        %th permission level
+    - users.each do |user|
+      %tr
+        %td
+          - if user.username
+            = user.username
+          - else
+            "user #{user.id}"
+        - if current_user.admin?
+          %td= user.permission_level
+        - if current_user.admin?
+          %td
+            %a{:href => "/users/#{user.id}/edit", :class => "editlink"} edit
+          %td
+            -# this doesn't work for tk
+            - if !user.site_admin?
+              %a{:href => "/users/#{user.id}/delete", :onclick => "return confirm('Are you sure?')"} delete
+            - else
+              site admin

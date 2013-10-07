@@ -1,0 +1,14 @@
+%table{:id=>"#{table_id}",:class => "ui-widget", :data=>{:first_choice => "#{choice}"}}
+  %thead.ui-widget-header
+    %tr
+      - first_data_to_display.first.each do |column_name|
+        %th
+          = column_name[0].to_s.tr('_', ' ')
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+  %tbody.ui-widget-content
+    - second_data_to_display.each do |data_element|
+      - if can_access?(db_table, data_element[0][1])
+        %tr
+          - data_element.each do |cell_data|
+            %td= cell_data[1]

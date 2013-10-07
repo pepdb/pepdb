@@ -1,7 +1,7 @@
 %h3 Browse by Library
 %input{:type => "hidden", :id => "reftype", :value => "Library"}
 #selectdata
-  = partial :tables, locals: {table_class:"display", table_id:"select_table", choice:"#{params[:infoElem]}", first_data_to_display:@libraries, second_data_to_display:@libraries}
+  = partial :restrictable_tables, locals: {table_class:"display", table_id:"select_table", choice:"#{params[:infoElem]}", first_data_to_display:@libraries, second_data_to_display:@libraries, db_table: :libraries}
 
 #showdata
   #selectedinfo
@@ -14,6 +14,6 @@
         %input{:type => "hidden", :id => "refelem1", :value => "#{params[:ele_name]}"}
         Selections in Library
         = params[:lib_name] 
-        = partial :tables, locals: {table_class:"display", table_id:"show_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections.where(:library_name => "#{params[:lib_name]}")}    
+        = partial :restrictable_tables, locals: {table_class:"display", table_id:"show_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections.where(:library_name => "#{params[:lib_name]}"), db_table: :selections}    
 
 #datainfo

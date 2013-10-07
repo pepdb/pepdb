@@ -345,6 +345,14 @@ $(document).ready(function(){
         callback($(this).prop('title').replace(/\|/g, '<br />'));
       }
     });
+    
+    $('.editlink').click(function(e){
+      e.preventDefault();
+      var link = $(this).attr('href');
+      $.get(link, function(response){
+        $('#editusers').html(response);
+      });
+    })
 
 
     /* -----------jsTree configuration------------------- */  
