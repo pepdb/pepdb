@@ -44,7 +44,7 @@
           accessible selections
           %p.checklist
             - @selections.each do |sel|
-              %input{:type => "checkbox", :id => "sel_access", :name => "user[selections[]]", :value => sel[:selection_name].to_s, :checked => @access_selections.include?(sel[:selection_name])}
+              %input{:type => "checkbox", :id => "sel_access", :name => "selections[]", :value => sel[:selection_name].to_s, :checked => @access_selections.include?(sel[:selection_name])}
               = sel[:selection_name]
               %br
     .buttons
