@@ -167,8 +167,8 @@ get '/clusters' do
   login_required
   unless current_user.admin?
     @datasets = []
-    DB[:sequel_user_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
-    @clusters = Cluster.where(:dataset_name => @dataset_name)
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @clusters = Cluster.where(:dataset_name => @datasets)
   else
     @clusters = Cluster
   end
@@ -177,15 +177,33 @@ end
 
 get '/clusters/:sel_cluster' do
   login_required
-  @clusters = Cluster
-  @cluster_info = Cluster.select(:consensus_sequence, :dominance_sum, :reads_sum)
- @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
+  ds = Cluster.select(:dataset_name).where(:cluster_id => params[:sel_cluster].to_i).first 
+  if current_user.admin?  
+    @clusters = Cluster
+  elsif can_access?(:sequencing_datasets, ds[:dataset_name])
+    @datasets = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @clusters = Cluster.where(:dataset_name => @datasets)
+  else
+    redirect "/clusters"
+  end
+    @cluster_info = Cluster.select(:consensus_sequence, :dominance_sum, :reads_sum)
+    @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
   haml :clusters
 end
 
 get '/clusters/:sel_cluster/:pep_seq' do
   login_required
-  @clusters = Cluster
+  ds = Cluster.select(:dataset_name).where(:cluster_id => params[:sel_cluster].to_i).first 
+  if current_user.admin?  
+    @clusters = Cluster
+  elsif can_access?(:sequencing_datasets, ds[:dataset_name])
+    @datasets = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @clusters = Cluster.where(:dataset_name => @datasets)
+  else
+    redirect "/clusters"
+  end
   @cluster_info = Cluster.select(:consensus_sequence, :dominance, :parameters)
  @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
   @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
