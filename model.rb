@@ -102,5 +102,3 @@ class SequelUser < Sequel::Model
   many_to_many :sequencing_datasets, :left_key => :id, :right_key => :dataset_name
 
 end
-
-#require './fill_db'

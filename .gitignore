@@ -11,3 +11,4 @@ public_html/.directory
 .viminfo
 .gitconfig
 pep_clean_w_admin.db
+pep_w_test_data_admin.db
