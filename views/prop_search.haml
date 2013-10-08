@@ -28,10 +28,6 @@
         %label{:for => "ds"}
           sequencing dataset
           = partial :formdrop, locals:{para: "ds", values:@datasets, column: :dataset_name, required: false}
-      %p
-        %label{:for => "c"}
-          carrier
-          = partial :formdrop, locals:{para: "c", values:@libraries.distinct.select(:carrier), column: :carrier, required: false}
 
     %fieldset#third.ui-widget-content
       %legend selection target

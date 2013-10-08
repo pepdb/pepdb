@@ -244,14 +244,6 @@ $(document).ready(function(){
     if($('.loading').is(':hidden')){
       $('.loading').toggle();
     }
-    $.each(propInput, function(index,value){
-      if($(value).val() == ""){
-        if(value == '#seq'){
-          $('#type').attr('name', '');
-        }
-        $(value).attr('name', '');
-      }
-    });
     $.ajax({
       data: $(this).serialize(),
       type: $(this).attr('method'),
@@ -295,7 +287,6 @@ $(document).ready(function(){
         $('#s').prop('selectedIndex', -1);
         $('#ds').html('');
       });
-      $('#c').prop('disabled', true);
     });
     $('#s').change(function(){
       var valSel1 = $('#l').children("option:selected").text();

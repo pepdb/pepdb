@@ -86,60 +86,60 @@ module Sinatra
       end      
 
 
-      if !params['ts'].nil?
+      if option_selected?(params['ts'])
         querystring << 'AND sel_target.species = ? ' if querystring.length > 0
         querystring << 'sel_target.species = ? ' if querystring.length == 0
         placeholders.insert(-1, params['ts'].to_s)
       end
-      if !params['tt'].nil?
+      if option_selected?(params['tt'])
         querystring << 'AND sel_target.tissue = ? ' if querystring.length > 0
         querystring << 'sel_target.tissue = ? ' if querystring.length == 0
         placeholders.insert(-1, params['tt'].to_s)
       end
 
-      if !params['tc'].nil?
+      if option_selected?(params['tc'])
         querystring << 'AND sel_target.cell = ? ' if querystring.length > 0
         querystring << 'sel_target.cell = ? ' if querystring.length == 0
         placeholders.insert(-1, params['tc'].to_s)
       end
       
-      if !params['ss'].nil?
+      if option_selected?(params['ss'])
         querystring << 'AND seq_target.species = ? ' if querystring.length > 0
         querystring << 'seq_target.species = ? ' if querystring.length == 0
         placeholders.insert(-1, params['ss'].to_s)
       end 
 
-      if !params['st'].nil?
+      if option_selected?(params['st'])
         querystring << 'AND seq_target.tissue = ? ' if querystring.length > 0
         querystring << 'seq_target.tissue = ? ' if querystring.length == 0
         placeholders.insert(-1, params['st'].to_s)
       end 
 
-      if !params['sc'].nil?
+      if option_selected?(params['sc'])
         querystring << 'AND seq_target.cell = ? ' if querystring.length > 0
         querystring << 'seq_target.cell = ? ' if querystring.length == 0
         placeholders.insert(-1, params['sc'].to_s)
       end 
 
-      if !params['ralt'].nil?
+      if option_selected?(params['ralt'])
         querystring << 'AND rank < ? ' if querystring.length > 0
         querystring << 'rank < ? ' if querystring.length == 0
         placeholders.insert(-1, params['ralt'].to_i)
       end
 
-      if !params['regt'].nil?
+      if option_selected?(params['regt'])
         querystring << 'AND reads > ? ' if querystring.length > 0
         querystring << 'reads > ? ' if querystring.length == 0
         placeholders.insert(-1, params['regt'].to_i)
       end
 
-      if !params['dgt'].nil?
+      if option_selected?(params['dgt'])
         querystring << 'AND dominance > ? ' if querystring.length > 0
         querystring << 'dominance > ? ' if querystring.length == 0
         placeholders.insert(-1, params['dgt'].to_f)
       end
 
-      if !params['tp'].nil?
+      if option_selected?(params['tp'])
         querystring << 'AND results.result_id NOT NULL ' if querystring.length > 0
         querystring << 'results.result_id NOT NULL ' if querystring.length == 0
       end
