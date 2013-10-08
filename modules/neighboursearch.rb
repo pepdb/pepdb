@@ -4,7 +4,7 @@ module Sinatra
   module  NeighbourSearch 
     class BlosumSearch
       def initialize(sequence, neighbours)
-        @sequence = sequence
+        @sequence = sequence.to_s
         @num_neighbours = neighbours.to_i
         @seq_neighbours = []
         @blosum_hash = {}
@@ -62,6 +62,11 @@ module Sinatra
           length = shorter.size
           (0..diff).each do |index|
             compare_sequence(longer.slice(index, length), shorter, peptide)      
+            puts @seq_neighbours.inspect
+            puts "++++++++++++++++++"
+            puts @curr_min_val
+            puts "++++++++++++++++++"
+            
           end #index
         end #if
       end #compare length
@@ -79,8 +84,8 @@ module Sinatra
           end #if
         elsif curr_val > @curr_min_val
           @seq_neighbours.pop
-          @seq_neighbours.insert(-1,[curr_val, peptide])
-          @seq_neighbours.sort{|x,y| y <=> x}
+          @seq_neighbours.unshift([curr_val, peptide])
+          @seq_neighbours.sort!{|x,y| y <=> x}
           @curr_min_val = @seq_neighbours[-1][0]
         end #if
 

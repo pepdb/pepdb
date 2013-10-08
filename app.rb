@@ -302,8 +302,6 @@ get '/property-results' do
   rescue ArgumentError => e
     @error = e.message
   end
-  puts @querystring
-  puts @placeholders
   haml :prop_results, :layout => false
 end
 

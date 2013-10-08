@@ -65,7 +65,6 @@ module Sinatra
         querystring << 'selections.selection_name = ? ' if querystring.length == 0
         placeholders.insert(-1, params['s'].to_s)
       elsif option_selected?(params['ds'])
-        puts "dsds"
         querystring << 'AND sequencing_datasets.dataset_name = ? ' if querystring.length > 0
         querystring << 'sequencing_datasets.dataset_name = ? ' if querystring.length == 0
         placeholders.insert(-1, params['ds'].to_s)
