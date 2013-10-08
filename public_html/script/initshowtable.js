@@ -51,6 +51,8 @@ $(document).ready(function(){
       }
     });
     var elem = checkedDS;
+  } else if (route == url+'/property-search'){
+    var elem = $('#qry_id').val();
   }
   var pTable = $('#pep_table').dataTable({
     "bJQueryUI": true,

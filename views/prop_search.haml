@@ -64,22 +64,20 @@
     %fieldset#fifth.ui-widget-content
       %legend peptide properties
       %p
-        %label min rank
-        %input.ui-corner-all{:type => "text", :id => "ragt", :size => 5, :name => "ragt", :value => "#{params['ragt']}"}
+        %label max rank
+        %input.ui-corner-all{:type => "text", :id => "ralt", :size => 5, :name => "ralt"}
       %p
         %label min reads 
-        %input.ui-corner-all{:type => "text", :size => 5, :id => "regt",:name => "regt", :value => "#{params['regt']}"}
+        %input.ui-corner-all{:type => "text", :size => 5, :id => "regt", :name => "regt"}
       %p
         %label min dominance 
-        %input.ui-corner-all{:type => "text", :size => 5, :id => "dgt",:name => "dgt", :value => "#{params['dgt']}"}
+        %input.ui-corner-all{:type => "text", :size => 5, :id => "dgt", :name => "dgt"}
 
     #bottom
       %p
         %input{:type => "checkbox", :id => "tp",:name => "tp", :checked => params['tp']}
         %label only tested peptides
         %br
-        %label max. number of results:
-        %input.ui-corner-all{:type => "text", :size => 5, :id => "lim",:name => "lim", :value => 100}
       %input{:type => "submit", :value => "search"}
       = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
 

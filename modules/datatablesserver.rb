@@ -11,18 +11,31 @@ module Sinatra
         @total_disp_rec = 0 
         @placeholder_args = []
         @params = params
-        @dataset = params['selElem'].split(",")
         @columns = get_columns      
         @indexcolumn = :peptide_sequence
         @table = :peptides_sequencing_datasets
-        @placeholder_args.insert(-1, *@columns, @table, *@dataset)
-        @select = build_select_string
-        @total_rec = Observation.where(:dataset_name => @dataset).count
-        @where = build_where_string
-        qry_string = "" << @select << @where 
+
+        unless @referer.include?("property-search")
+          @dataset = params['selElem'].split(",")
+          @placeholder_args.insert(-1, *@columns, @table, *@dataset)
+          @select = build_select_string
+          @total_rec = Observation.where(:dataset_name => @dataset).count
+          @where = build_where_string
+          qry_string = "" << @select << @where 
+        else
+          query = DB[:propqry].select(:qry_string, :placeholder).where(:qry_id => params[:selElem].to_i).first
+          ph_array = query[:placeholder].split(",")
+          @placeholder_args.insert(-1, *ph_array)
+          @select = "SELECT `peptides`.`peptide_sequence`, `sequencing_datasets`.`dataset_name` AS 'dataset', `rank`, `reads`, `dominance` FROM `peptides` INNER JOIN `peptides_sequencing_datasets` ON (`peptides_sequencing_datasets`.`peptide_sequence` = `peptides`.`peptide_sequence`) INNER JOIN `sequencing_datasets` ON (`sequencing_datasets`.`dataset_name` = `peptides_sequencing_datasets`.`dataset_name`) INNER JOIN `selections` ON (`selections`.`selection_name` = `sequencing_datasets`.`selection_name`) INNER JOIN `libraries` ON (`sequencing_datasets`.`library_name` = `libraries`.`library_name`) LEFT JOIN `results` ON (`peptides_sequencing_datasets`.`result_id` = `results`.`result_id`) INNER JOIN `targets` AS 'sel_target' ON (`selections`.`target_id` = `sel_target`.`target_id`) INNER JOIN `targets` AS 'seq_target' ON (`sequencing_datasets`.`target_id` = `seq_target`.`target_id`) WHERE " << query[:qry_string].to_s  
+          qry_string = "SELECT `peptides`.`peptide_sequence`, `sequencing_datasets`.`dataset_name` AS 'dataset', `rank`, `reads`, `dominance` FROM `peptides` INNER JOIN `peptides_sequencing_datasets` ON (`peptides_sequencing_datasets`.`peptide_sequence` = `peptides`.`peptide_sequence`) INNER JOIN `sequencing_datasets` ON (`sequencing_datasets`.`dataset_name` = `peptides_sequencing_datasets`.`dataset_name`) INNER JOIN `selections` ON (`selections`.`selection_name` = `sequencing_datasets`.`selection_name`) INNER JOIN `libraries` ON (`sequencing_datasets`.`library_name` = `libraries`.`library_name`) LEFT JOIN `results` ON (`peptides_sequencing_datasets`.`result_id` = `results`.`result_id`) INNER JOIN `targets` AS 'sel_target' ON (`selections`.`target_id` = `sel_target`.`target_id`) INNER JOIN `targets` AS 'seq_target' ON (`sequencing_datasets`.`target_id` = `seq_target`.`target_id`) WHERE " << query[:qry_string].to_s    
+          qry_string.slice!(qry_string.size-6, qry_string.size) if query[:qry_string].empty?
+          @select.slice!(@select.size-6, @select.size) if query[:qry_string].empty?
+          @total_rec = DB.fetch(qry_string, *@placeholder_args).count
+          @where = build_where_string
+          qry_string << @where
+        end
         @total_disp_rec = DB.fetch(qry_string, *@placeholder_args).count
         @order = build_order_string
-        
         @limit = build_limit_string
         @result_array = get_result
         @secho = params[:sEcho].to_i      
@@ -85,7 +98,9 @@ module Sinatra
         
       def get_result
         qry_string = "" << @select << @where << @order << @limit 
+        @columns= [:peptide_sequence, :dataset,:rank, :reads, :dominance] if @referer.include?("property-search")      
         rows = []
+        
         DB.fetch(qry_string, *@placeholder_args) do |row|
           row_array = []
           @columns.each do |cell|
@@ -101,6 +116,8 @@ module Sinatra
           [:peptide_sequence, :rank, :reads, :dominance]      
         elsif @referer.include?("systemic-search")
           [:peptide_sequence, :dataset_name,:rank, :reads, :dominance]      
+        elsif @referer.include?("property-search")
+          [:peptides__peptide_sequence, :sequencing_datasets__dataset_name,:rank, :reads, :dominance]      
         end
       end
   
