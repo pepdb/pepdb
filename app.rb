@@ -425,6 +425,13 @@ end
 
 post '/cluster-results' do
   login_required
+  if current_user.admin?
+    @datasets = SequencingDataset.select(:dataset_name).map(:dataset_name)
+  else
+    allowed = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
+    @datasets = SequencingDataset.select(:dataset_name).where(:dataset_name => allowed).map(:dataset_name)
+  end
   @cluster = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(:clusters__cluster_id___id ,:consensus_sequence___consensus, :library_name___library, :selection_name___selection, :dataset_name___dataset )
   haml :peptide_results, :layout => false
 end
@@ -437,11 +444,15 @@ post '/cluster-infos' do
 end
 
 #------- Comparative Cluster Search ------------#
-
-
 get '/comparative-cluster-search' do
   login_required
-  @libraries = Library
+  if current_user.admin?
+    @libraries = Library
+  else
+    allowed = []
+    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:library_name])}
+    @libraries = Library.where(:library_name => allowed)
+  end
   haml :comparative_cluster_search
 end
 

@@ -23,5 +23,5 @@
       - else
         %p no matches found
 - else
-  = partial :tables, locals: {table_class:"test" , table_id: "select_table", choice:"", first_data_to_display:@cluster, second_data_to_display:@cluster.where(:peptide_sequence => "#{params['pep-seq']}")}
+  = partial :tables, locals: {table_class:"test" , table_id: "select_table", choice:"", first_data_to_display:@cluster, second_data_to_display:@cluster.where(:peptide_sequence => "#{params['pep-seq']}", :dataset_name => @datasets)}
   
