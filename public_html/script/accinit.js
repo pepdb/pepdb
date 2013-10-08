@@ -33,14 +33,14 @@ $(document).ready(function(){
     }
   });
 
-    $('.mot_table thead input').click( function(e){
-      stopTableSorting(e);
-    });
+  $('.mot_table thead input').click( function(e){
+    stopTableSorting(e);
+  });
     
-     $('.mot_table thead input').keyup( function(e){
+  $('.mot_table thead input').keyup( function(e){
     stopTableSorting(e);
     oTable.fnFilter(this.value, $(".mot_table thead input").index(this));
-    });
+  });
 
   $('.mot_table thead input').each( function (i) {
     asInitVals[i] = this.value;

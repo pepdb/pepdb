@@ -3,11 +3,11 @@
   = @eletype 
   information
   - if @eletype == "Peptide"
-    = partial :info_tables, locals: {data_to_display:@info_data.where(@column1 => "#{params[:ele_name]}", @column2 => "#{params[:ele_name2]}")}
+    = partial :info_tables, locals: {element:params[:ele_name], data_to_display:@info_data.where(@column1 => "#{params[:ele_name]}", @column2 => "#{params[:ele_name2]}")}
     All found DNA Sequences encoding Peptide 
     = params[:ele_name]
     = partial :dna_table, locals: {dna:@peptide_dna.where(@column1 => "#{params[:ele_name]}", @column2 => "#{params[:ele_name2]}"), seq: "#{params['ele_name']}", ds: "#{params['ele_name2']}"}
   - else
-    = partial :info_tables, locals: {data_to_display:@info_data.where(@column => "#{params[:ele_name]}"), element:"#{h params[:ele_name]}"}
+    = partial :info_tables, locals: {element: params[:ele_name], data_to_display:@info_data.where(@column => "#{params[:ele_name]}"), element:"#{h params[:ele_name]}"}
   - if !@next.nil?
     %input{:id => "continue",:type => "button", :action => "#{url '/'}" + @next ,:method => "get", :value => "continue with "+ @eletype}

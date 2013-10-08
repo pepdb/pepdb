@@ -7,5 +7,5 @@
         = @error
 -else
   %input{:type => "hidden", :id=> "qry_id",:value => @qry_id}
-  = partial :tables, locals: {table_id:"pep_table", choice:"",first_data_to_display:@results, second_data_to_display:@results.where(Sequel.lit(@querystring, *@placeholders)).limit(30)}
+  = partial :tables, locals: {table_id:"pep_table", choice:"",first_data_to_display:@results, second_data_to_display:@results.where(Sequel.lit(@querystring, *@placeholders)).limit(10)}
 

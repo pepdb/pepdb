@@ -22,23 +22,7 @@ $(document).ready(function(){
 
   var url = baseDir();
 
-/* initialize second table with searchable columns*/
-  var qTable = $('#show_table').dataTable({
-    "bJQueryUI": true,
-    "bInfo": true,
-    "sPaginationType": "full_numbers",
-    "bPaginate": true,
-    "sDom": '<"H"lfrT>t<"F"ip>',
-    "oTableTools":{
-      "sSwfPath": url+"/copy_csv_xls_pdf.swf",
-      "aButtons": [
-      {
-        "sExtends": "collection",
-        "sButtonText": "save as",
-        "aButtons": ["csv", "pdf"],
-        }]
-    },
-  });
+  /* setup and function for datatables using server-side data, used with large tables (e.g. dataset-peptides browsing)  */
   var route = document.location.pathname;
   var datasetURL = /\/datasets.*/;
   if(route.match(datasetURL) != null){ 
@@ -108,49 +92,17 @@ $(document).ready(function(){
     }
   });
 
-  $('#show_table thead input').click( function(e){
-    stopTableSorting(e);
-  });
-  $('#show_table thead input').keyup( function(){
-    qTable.fnFilter(this.value, $("#show_table thead input").index(this));
-  });
-
-  $('#show_table thead input').each( function (i) {
-    asInitVals[i] = this.value;
-  } );
-
-  $('#show_table thead input').focus( function () {
-    if ( this.className == "search_init" )
-    {
-      this.className = "text_filter";
-      this.value = "";
-    }
-  } );
-
-  $('#show_table thead input').blur( function (i) {
-    if ( this.value == "" )
-    {
-      $(this).addClass("search_init");
-      this.value = asInitVals[$("#show_table thead input").index(this)];
-    }
-  });
-
-  
-  $('#pep_table tr').hover(function(){
+  $('#pep_table').on('mouseenter mouseleave', 'tr', function(){
     $(this).toggleClass('highlight');
   });
 
-  $('#show_table tr').hover(function(){
-    $(this).toggleClass('highlight');
-  });
-  $('#pep_table tr:has(td)').click(function(){
+  $('#pep_table').on('click', 'tr:has(td)', function(){
     var selectedID = $(this).find("td:first").html();
     var selectedDS = $(this).find("td:nth-child(2)").html();
     var route = document.location.pathname;
     var dataType = $('#reftype').val();
     var firstChoice = $('#refelem1').val();
-   // var first_choice =  $('#select_table').data('first-choice');
-    if (route == url+"/comparative-search" || route == url +"/systemic-search"){
+    if (route == url+"/comparative-search" || route == url +"/systemic-search" || route == url+"/property-search"){
       $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
     } else if (route == url+"/cluster-search"){
     /*  if($('#clsearch').is(':visible')){
@@ -172,6 +124,55 @@ $(document).ready(function(){
     }     
   });
 
+
+/* initialize second table on data browsing pages with searchable columns*/
+  var qTable = $('#show_table').dataTable({
+    "bJQueryUI": true,
+    "bInfo": true,
+    "sPaginationType": "full_numbers",
+    "bPaginate": true,
+    "sDom": '<"H"lfrT>t<"F"ip>',
+    "oTableTools":{
+      "sSwfPath": url+"/copy_csv_xls_pdf.swf",
+      "aButtons": [
+      {
+        "sExtends": "collection",
+        "sButtonText": "save as",
+        "aButtons": ["csv", "pdf"],
+        }]
+    },
+  });
+  var route = document.location.pathname;
+
+  $('#show_table tr').hover(function(){
+    $(this).toggleClass('highlight');
+  });
+
+  $('#show_table thead input').blur( function (i) {
+    if ( this.value == "" )
+    {
+      $(this).addClass("search_init");
+      this.value = asInitVals[$("#show_table thead input").index(this)];
+    }
+  });
+  $('#show_table thead input').click( function(e){
+    stopTableSorting(e);
+  });
+  $('#show_table thead input').keyup( function(){
+    qTable.fnFilter(this.value, $("#show_table thead input").index(this));
+  });
+
+  $('#show_table thead input').each( function (i) {
+    asInitVals[i] = this.value;
+  } );
+
+  $('#show_table thead input').focus( function () {
+    if ( this.className == "search_init" )
+    {
+      this.className = "text_filter";
+      this.value = "";
+    }
+  });
   $('#show_table tr:has(td)').click(function(){
     var selectedID = $(this).find("td:first").html();
     var selectedDS = $(this).find("td:nth-child(2)").html();
@@ -201,6 +202,7 @@ $(document).ready(function(){
     }     
   });
 
+  /* setup for table with collapsible rows in motif list table  */
   var nCloneTh = document.createElement('th');
   var nCloneTd = document.createElement('td');
   var imgurl = url + '/images/details_open.png';

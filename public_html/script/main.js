@@ -258,7 +258,7 @@ $(document).ready(function(){
       url: $(this).attr('action'),
       success: function(response){
         $('#propresults').html(response);
-        $.getScript(url+'/script/tableinit.js', function(){
+        $.getScript(url+'/script/initshowtable.js', function(){
           $('#propresults').toggle();
           $('.loading').toggle();
         });
