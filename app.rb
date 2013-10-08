@@ -67,9 +67,9 @@ get '/libraries' do
   if current_user.admin?
     @libraries = Library.select(*library_columns)
   else
-    @allowed = []
-    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:library_name])}
-    @libraries = Library.select(*library_columns).where(:library_name => @allowed)
+    allowed = []
+    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:library_name])}
+    @libraries = Library.select(*library_columns).where(:library_name => allowed)
   end
   haml :libraries
 end
@@ -79,9 +79,9 @@ get '/libraries/:lib_name' do
   if current_user.admin?
     @libraries = Library.select(*library_columns)
   elsif can_access?(:libraries, params[:lib_name])
-    @allowed = []
-    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:library_name])}
-    @libraries = Library.select(*library_columns).where(:library_name => @allowed)
+    allowed = []
+    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:library_name])}
+    @libraries = Library.select(*library_columns).where(:library_name => allowed)
   else
     redirect '/libraries'
   end
@@ -95,9 +95,9 @@ get '/selections' do
   if current_user.admin?
     @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
   else
-    @allowed = []
-    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:selection_name])}
-    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => @allowed)
+    allowed = []
+    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:selection_name])}
+    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => allowed)
   end
   haml :selections
 end
@@ -107,9 +107,9 @@ get '/selections/:sel_name' do
   if current_user.admin?
     @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
   elsif can_access?(:selections, params[:sel_name])
-    @allowed = []
-    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:selection_name])}
-    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => @allowed)
+    allowed = []
+    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:selection_name])}
+    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => allowed)
   else
     redirect '/selections'
   end
@@ -123,9 +123,9 @@ get '/datasets' do
   if current_user.admin?
     @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns)
   else
-    @allowed = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:dataset_name])}
-    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => @allowed)
+    allowed = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
+    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
   end
   haml :datasets
 end
@@ -135,9 +135,9 @@ get '/datasets/:set_name' do
   if current_user.admin?
     @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
   elsif can_access?(:selections, params[:sel_name])
-    @allowed = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @allowed.insert(-1, ds[:dataset_name])}
-    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => @allowed)
+    allowed = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
+    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
   else
     redirect '/datasets'
   end
@@ -259,15 +259,7 @@ get '/systemic-search' do
     @selections = Selection.all
     @datasets = SequencingDataset.all
   else
-    allowed_lib = []
-    allowed_sel = []
-    allowed_ds = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed_ds.insert(-1, ds[:dataset_name])}
-    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed_lib.insert(-1, ds[:library_name])}
-    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed_sel.insert(-1, ds[:selection_name])}
-    @libraries = Library.where(:library_name => allowed_lib).all
-    @selections = Selection.where(:selection_name => allowed_sel).all
-    @datasets = SequencingDataset.where(:dataset_name => allowed_ds).all
+    @libraries, @selections, @datasets = get_allowed_lib_sel_ds(current_user) 
   end
   haml :sys_search
 end
@@ -286,15 +278,7 @@ get '/property-search' do
     @datasets = SequencingDataset
     @selections = Selection
   else
-    allowed_lib = []
-    allowed_sel = []
-    allowed_ds = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed_ds.insert(-1, ds[:dataset_name])}
-    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed_lib.insert(-1, ds[:library_name])}
-    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed_sel.insert(-1, ds[:selection_name])}
-    @libraries = Library.where(:library_name => allowed_lib)
-    @selections = Selection.where(:selection_name => allowed_sel)
-    @datasets = SequencingDataset.where(:dataset_name => allowed_ds)
+    @libraries, @selections, @datasets = get_allowed_lib_sel_ds(current_user) 
   end
   @targets = Target
   haml :prop_search
@@ -323,9 +307,13 @@ end
 
 get '/comparative-search' do
   login_required
-  @libraries = Library.all
-  @datasets = SequencingDataset
-  @selections = Selection
+  if current_user.admin?
+    @libraries = Library.all
+    @datasets = SequencingDataset
+    @selections = Selection
+  else
+    @libraries, @selections, @datasets = get_allowed_lib_sel_ds(current_user) 
+  end
   @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*sys_peptide_columns)
   @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :comp_search
@@ -339,35 +327,6 @@ post '/comparative-results' do
   @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
   
   haml :peptide_results, :layout => false
-end
-
-post '/checklist' do
-  login_required
-  case params[:selector]
-  when "sel"
-    table = :libraries
-  when "ds"
-    table = :selections
-  end
-  if params[:checkedElem].nil?
-  elsif current_user.admin? || can_access?(table, params[:checkedElem])
-    @data_to_display, @column = choose_data(params)
-    @section = params['sec']
-    haml :checklist, :layout => false
-  else
-    redirect '/empty'
-  end
-end
-
-post '/radiolist' do
-  login_required
-  if current_user.admin? || can_access?(:sequencing_datasets, params[:checkedElem])
-    @data_to_display = SequencingDataset.select(:dataset_name).where(:selection_name => params['checkedElem'])
-  else
-    redirect '/empty'
-  end
-  @column = :dataset_name
-  haml :radiolist, :layout => false
 end
 
 post '/peptide-infos' do
@@ -428,6 +387,36 @@ get '/motif-search-results' do
   end
 end
 
+#----------- Peptide Search Helper Routes -----------#
+post '/checklist' do
+  login_required
+  case params[:selector]
+  when "sel"
+    table = :libraries
+  when "ds"
+    table = :selections
+  end
+  if params[:checkedElem].nil?
+  elsif current_user.admin? || can_access?(table, params[:checkedElem])
+    @data_to_display, @column = choose_data(params)
+    @section = params['sec']
+    haml :checklist, :layout => false
+  else
+    redirect '/empty'
+  end
+end
+
+post '/radiolist' do
+  login_required
+  if params[:checkedElem].nil?
+  elsif current_user.admin? || can_access?(:selections, params[:checkedElem])
+    @data_to_display = SequencingDataset.select(:dataset_name).where(:selection_name => params['checkedElem'])
+  else
+    redirect '/empty'
+  end
+  @column = :dataset_name
+  haml :radiolist, :layout => false
+end
 ######## Cluster Search ###############
 #----------- Sequence Search ----------#
 get '/cluster-search' do

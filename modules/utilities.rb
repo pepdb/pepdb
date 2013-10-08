@@ -25,6 +25,19 @@ module Sinatra
       !field.nil? && not_just_nbsp?(field)
     end
   
+    def get_allowed_lib_sel_ds(user)
+      allowed_lib = []
+      allowed_sel = []
+      allowed_ds = []
+      DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => user.id).each {|ds| allowed_ds.insert(-1, ds[:dataset_name])}
+      DB[:libraries_sequel_users].select(:library_name).where(:id => user.id).each {|ds| allowed_lib.insert(-1, ds[:library_name])}
+      DB[:selections_sequel_users].select(:selection_name).where(:id => user.id).each {|ds| allowed_sel.insert(-1, ds[:selection_name])}
+      libraries = Library.where(:library_name => allowed_lib)
+      selections = Selection.where(:selection_name => allowed_sel)
+      datasets = SequencingDataset.where(:dataset_name => allowed_ds)
+      
+      return libraries, selections, datasets
+    end
 
   end #module
 
