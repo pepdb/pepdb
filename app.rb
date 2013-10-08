@@ -2,7 +2,6 @@
 require 'sinatra'
 require 'sinatra/partial'
 require 'sinatra/static_assets'
-require 'sinatra/flash'
 require './modules/querystringbuilder'
 require './modules/formvalidation'
 require './modules/utilities'
