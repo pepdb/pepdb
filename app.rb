@@ -419,33 +419,20 @@ end
 get '/motif-search-results' do
   login_required
   @errors = {}
-  if params[:searchtype].nil?
-    @errors[:type] = "no search type selected!"
-  elsif params[:ref_ds].nil?
+  if params[:ref_ds].nil?
     @errors[:dataset] = "no dataset selected!" 
   elsif params[:checked_motl].nil?
     @errors[:motl] = "no motif list selected!" 
   end
   if @errors.empty?
-    if params[:searchtype] == "hits"
-      DB.create_table?(:mot_matches, :temp => true) do
-        String :motif_sequence
-        String :dataset_name
-        String :peptide_sequence
-        primary_key [:motif_sequence, :peptide_sequence, :dataset_name]
-        index [:motif_sequence, :peptide_sequence, :dataset_name]
-      end
-      @table = :mot_matches
-    else
-      DB.create_table?(:mot_non_matches, :temp => true) do
-        String :motif_sequence
-        String :dataset_name
-        String :peptide_sequence
-        primary_key [:motif_sequence, :pepdb_peptide_sequence, :dataset_name]
-        index [:motif_sequence, :peptide_sequence, :dataset_name]
-      end
-      @table = :mot_non_matches
+    DB.create_table?(:mot_matches, :temp => true) do
+      String :motif_sequence
+      String :dataset_name
+      String :peptide_sequence
+      primary_key [:motif_sequence, :peptide_sequence, :dataset_name]
+      index [:motif_sequence, :peptide_sequence, :dataset_name]
     end
+    @table = :mot_matches
     @datasets = params[:ref_ds]
     @peptides = Observation.distinct.select(:peptide_sequence).where(:dataset_name => @datasets)
     @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence).where(:list_name => params[:checked_motl])
