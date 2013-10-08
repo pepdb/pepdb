@@ -252,7 +252,7 @@ get '/show-info' do
 end
 
 ######## Peptide Search #################
-
+#------- Systemic Search -------------#
 get '/systemic-search' do
   login_required
   if current_user.admin?
@@ -260,15 +260,15 @@ get '/systemic-search' do
     @selections = Selection.all
     @datasets = SequencingDataset.all
   else
-    @allowed_lib = []
-    @allowed_sel = []
-    @allowed_ds = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @allowed_ds.insert(-1, ds[:dataset_name])}
-    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| @allowed_lib.insert(-1, ds[:library_name])}
-    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| @allowed_sel.insert(-1, ds[:selection_name])}
-    @libraries = Library.where(:library_name => @allowed_lib).all
-    @selections = Selection.where(:selection_name => @allowed_sel).all
-    @datasets = SequencingDataset.where(:dataset_name => @allowed_ds).all
+    allowed_lib = []
+    allowed_sel = []
+    allowed_ds = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed_ds.insert(-1, ds[:dataset_name])}
+    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed_lib.insert(-1, ds[:library_name])}
+    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed_sel.insert(-1, ds[:selection_name])}
+    @libraries = Library.where(:library_name => allowed_lib).all
+    @selections = Selection.where(:selection_name => allowed_sel).all
+    @datasets = SequencingDataset.where(:dataset_name => allowed_ds).all
   end
   haml :sys_search
 end
@@ -279,18 +279,25 @@ get '/systemic-results' do
   haml :peptide_results, :layout => false
 end
 
+#------- Property Search -------------#
 get '/property-search' do
   login_required
-  @libraries = Library
-  @datasets = SequencingDataset
-  @selections = Selection
-  @targets = Target
-  @results = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).join(:targets___sel_target, :selections__target_id => :sel_target__target_id).join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
-  begin
-    @querystring, @placeholders = build_property_array(params)
-  rescue ArgumentError => e
-    @error = e.message
+  if current_user.admin?
+    @libraries = Library
+    @datasets = SequencingDataset
+    @selections = Selection
+  else
+    allowed_lib = []
+    allowed_sel = []
+    allowed_ds = []
+    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed_ds.insert(-1, ds[:dataset_name])}
+    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed_lib.insert(-1, ds[:library_name])}
+    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed_sel.insert(-1, ds[:selection_name])}
+    @libraries = Library.where(:library_name => allowed_lib)
+    @selections = Selection.where(:selection_name => allowed_sel)
+    @datasets = SequencingDataset.where(:dataset_name => allowed_ds)
   end
+  @targets = Target
   haml :prop_search
 end
 
@@ -299,11 +306,21 @@ get '/property-results' do
   @results = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).join(:targets___sel_target, :selections__target_id => :sel_target__target_id).join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
   begin
     @querystring, @placeholders = build_property_array(params)
+    DB.create_table?(:propqry) do
+      primary_key :qry_id
+      Text :qry_string
+      Text :placeholder
+      index :qry_id
+    end
+    @qry_id = DB[:propqry].insert(:qry_string => @querystring.to_s, :placeholder => @placeholders.join(","))
   rescue ArgumentError => e
     @error = e.message
   end
   haml :prop_results, :layout => false
 end
+
+
+#--------- Comparative Peptide Search --------------#
 
 get '/comparative-search' do
   login_required
@@ -666,7 +683,6 @@ end
 
 get '/datatables' do
   login_required
-  puts params
   content_type :json
   get_datatable_json(params, request.referer)
 end
