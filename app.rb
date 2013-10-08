@@ -339,16 +339,14 @@ end
 
 get '/motif-search' do
   login_required
-  @libraries = Library
+  if current_user.admin?
+    @libraries = Library
+  else
+    allowed = []
+    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:library_name])}
+    @libraries = Library.where(:library_name => allowed)
+  end
   @motiflists = MotifList
-  haml :motif_search
-end
-
-post '/motif-search' do
-  login_required
-  @libraries = Library.all
-  @datasets = SequencingDataset
-  @selections = Selection
   haml :motif_search
 end
 
