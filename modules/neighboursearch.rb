@@ -3,7 +3,8 @@ require 'sinatra/base'
 module Sinatra
   module  NeighbourSearch 
     class BlosumSearch
-      def initialize(sequence, neighbours)
+      def initialize(sequence, neighbours, peptides)
+        @peptides = peptides
         @sequence = sequence.to_s
         @num_neighbours = neighbours.to_i
         @seq_neighbours = []
@@ -33,8 +34,8 @@ module Sinatra
       
       def get_neighbours
         read_blosum_file
-        sim_val = 0
-        Peptide.all.each do |pep|
+        @peptides = Peptide.all if @peptides.nil?
+        @peptides.each do |pep|
           peptide = pep[:peptide_sequence]
           if peptide == @sequence
             next
@@ -62,10 +63,6 @@ module Sinatra
           length = shorter.size
           (0..diff).each do |index|
             compare_sequence(longer.slice(index, length), shorter, peptide)      
-            puts @seq_neighbours.inspect
-            puts "++++++++++++++++++"
-            puts @curr_min_val
-            puts "++++++++++++++++++"
             
           end #index
         end #if
@@ -94,11 +91,22 @@ module Sinatra
     end #class
   
 
-    def find_neighbours(seq, number_of_neighbours)
-      bs = BlosumSearch.new(seq, number_of_neighbours)
+    def find_neighbours(seq, number_of_neighbours, qry, placeholder)
+      if qry.length > 0
+        peptides = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).distinct.select(:peptides__peptide_sequence).where(Sequel.lit(qry, *placeholder)).all
+      end
+      bs = BlosumSearch.new(seq, number_of_neighbours, peptides)
       sequences = bs.get_neighbours
-      puts sequences
-      sequences
+      querystring = ""
+      querystring << 'peptides.peptide_sequence IN (' if qry.length == 0
+      querystring << 'AND peptides.peptide_sequence IN (' if qry.length > 0
+      (0...sequences.size).each do |neighbour_seq|
+        querystring << '?, '
+      end
+      querystring.chop!.chop!
+      querystring << ') '
+      qry << querystring
+      placeholder.insert(-1, *sequences)
     end #find_neigh
   end #module
 

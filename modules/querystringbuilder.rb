@@ -15,19 +15,10 @@ module Sinatra
       querystring = ''
       placeholders = Array.new
 
-      if !params['type'].nil?
-        if params['type'] == "complete sequence" && params[:blos].nil?
+      if option_selected?(params['type'])
+        if params['type'] == "complete sequence" && !option_selected?(params[:blos])
           querystring << 'peptides.peptide_sequence = ? '
           placeholders.insert(-1, params['seq'].to_s.upcase)
-        elsif params['type'] == "complete sequence" && !params[:blos].nil?
-          in_clause = find_neighbours(params[:seq], params[:blos])
-          querystring << 'peptides.peptide_sequence IN ('
-          (0...in_clause.size).each do |neighbour_seq|
-            querystring << '?, '
-          end
-          querystring.chop!.chop!
-          querystring << ') '
-          placeholders.insert(-1, *in_clause)
         elsif params['type'] == "partial sequence"
           querystring << 'peptides.peptide_sequence LIKE ? '
           likestr = '%' << params['seq'].to_s.upcase << '%'
