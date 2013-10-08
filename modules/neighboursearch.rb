@@ -14,7 +14,7 @@ module Sinatra
 
       def read_blosum_file
         toplinematch = []
-        bf = File.new("./public/BLOSUM62")
+        bf = File.new("./public_html/BLOSUM62")
         lines = bf.readlines
         lines.each do |line|
           if line[0].match(/[#\*]/)
