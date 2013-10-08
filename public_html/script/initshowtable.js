@@ -40,7 +40,8 @@ $(document).ready(function(){
     },
   });
   var route = document.location.pathname;
-  if(route == url+'/datasets'){ 
+  var datasetURL = /\/datasets.*/;
+  if(route.match(datasetURL) != null){ 
     var elem = $('#refelem1').val();
   } else if (route == url+'/systemic-search'){
     var checkedDS = [];

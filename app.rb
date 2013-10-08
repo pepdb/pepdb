@@ -12,6 +12,7 @@ require './modules/motifsearch'
 require './modules/compclustersearch'
 require './modules/columnfinder'
 require './modules/dbdelete'
+require './modules/aminoaciddistr'
 require 'digest/sha1'
 require 'date'
 require 'sass'
@@ -134,7 +135,7 @@ get '/datasets/:set_name' do
   login_required
   if current_user.admin?
     @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
-  elsif can_access?(:selections, params[:sel_name])
+  elsif can_access?(:sequencing_datasets, params[:set_name])
     allowed = []
     DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
     @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
