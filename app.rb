@@ -189,7 +189,7 @@ get '/clusters/:sel_cluster/:pep_seq' do
   else
     redirect "/clusters"
   end
-  @cluster_info = Cluster.select(:consensus_sequence, :dominance, :parameters)
+  @cluster_info = Cluster.select(:consensus_sequence, :dominance_sum, :parameters)
  @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
   @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :clusters
@@ -248,7 +248,16 @@ get '/show-info' do
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
+  elsif params[:ref] == "Clusters"
+    dataset = Cluster.select(:dataset_name).where(:cluster_id => params[:ele_name2].to_i).first
+    params['ele_name2'] = dataset[:dataset_name]
+    @eletype = "Peptide"
+    @column1 = :peptides__peptide_sequence
+    @column2 = :sequencing_datasets__dataset_name
+    @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
+    @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
   end
+  puts params.inspect
   haml :show_info, :layout => false
 end
 

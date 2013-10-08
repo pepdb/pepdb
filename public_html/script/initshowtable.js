@@ -104,16 +104,6 @@ $(document).ready(function(){
     var firstChoice = $('#refelem1').val();
     if (route == url+"/comparative-search" || route == url +"/systemic-search" || route == url+"/property-search"){
       $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
-    } else if (route == url+"/cluster-search"){
-    /*  if($('#clsearch').is(':visible')){
-        $('#clsearch').toggle();
-      }
-      $('#pepprop').load('/peptide-infos', {selCl: selectedID}, function(){
-        $.getScript('/script/initshowtable.js', function(){
-          $('#clsearch').toggle();
-        });
-        
-      });*/
     } else {
       $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
         $('#datainfo').html(data);
@@ -182,16 +172,11 @@ $(document).ready(function(){
    // var first_choice =  $('#select_table').data('first-choice');
     if (route == url+"/comparative-search" || route == url+"/systemic-search"){
       $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
-    } else if (route == url+"/cluster-search"){
-    /*  if($('#clsearch').is(':visible')){
-        $('#clsearch').toggle();
-      }
-      $('#pepprop').load('/peptide-infos', {selCl: selectedID}, function(){
-        $.getScript('/script/initshowtable.js', function(){
-          $('#clsearch').toggle();
-        });
-        
-      });*/
+    } else if (route.match(/clusters/) != null){
+      $.get(url+'/show-info', {ele_name: selectedID, ref:"Clusters", ele_name2: firstChoice}, function(data){
+        $('#clusterlist_pep').html(data);
+      });
+      
     } else {
       $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
         $('#datainfo').html(data);

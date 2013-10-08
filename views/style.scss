@@ -223,17 +223,25 @@ div {
 ul {
   list-style-type:none;
 }
+
+/* cluster browsing */
 #clusterlist {
   border:none;
   float:left;
   width:25%;
 }
+#clbrresults {
+  float:left;
+  width:75%;
+}
+
 #clusterlist_sel{
   float:left;
-  width:50%;
+  width:65%;
 }
 #clusterlist_pep {
   overflow-x:scroll;  
+  clear:both;
 }
 
 ul#navigation{
@@ -411,4 +419,5 @@ iframe#propresults {
   border:0;
   width:100%;
 }
+/* cluster browsing */
 
