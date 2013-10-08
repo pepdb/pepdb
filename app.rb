@@ -332,6 +332,15 @@ get '/comparative-search' do
 
 end
 
+post '/comparative-results' do
+  login_required
+  @ref_qry, @ref_placeh = build_rdom_string(params)
+  @ds_qry, @ds_placeh = build_cdom_string(params)
+  @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
+  
+  haml :peptide_results, :layout => false
+end
+
 post '/checklist' do
   login_required
   case params[:selector]
@@ -361,39 +370,13 @@ post '/radiolist' do
   haml :radiolist, :layout => false
 end
 
-post '/comparative-results' do
-  login_required
-  @ref_qry, @ref_placeh = build_rdom_string(params)
-  @ds_qry, @ds_placeh = build_cdom_string(params)
-  @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
-  
-  haml :peptide_results, :layout => false
-end
-
 post '/peptide-infos' do
   login_required
   @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :peptide_infos, :layout => false
 end
 
-get '/cluster-search' do
-  login_required
-  @peptides = Peptide.select(:peptide_sequence)
-  haml :cluster_search
-end
-
-post '/cluster-results' do
-  login_required
-  @cluster = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(:clusters__cluster_id___id ,:consensus_sequence___consensus, :library_name___library, :selection_name___selection, :dataset_name___dataset )
-  haml :peptide_results, :layout => false
-end
-
-post '/cluster-infos' do
-  login_required
-  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}")
-  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}")
-  haml :cluster_infos, :layout => false
-end
+# -------- Motif Search ----------- #
 
 get '/motif-search' do
   login_required
@@ -445,6 +428,30 @@ get '/motif-search-results' do
   end
 end
 
+######## Cluster Search ###############
+#----------- Sequence Search ----------#
+get '/cluster-search' do
+  login_required
+  @peptides = Peptide.select(:peptide_sequence)
+  haml :cluster_search
+end
+
+post '/cluster-results' do
+  login_required
+  @cluster = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(:clusters__cluster_id___id ,:consensus_sequence___consensus, :library_name___library, :selection_name___selection, :dataset_name___dataset )
+  haml :peptide_results, :layout => false
+end
+
+post '/cluster-infos' do
+  login_required
+  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}")
+  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}")
+  haml :cluster_infos, :layout => false
+end
+
+#------- Comparative Cluster Search ------------#
+
+
 get '/comparative-cluster-search' do
   login_required
   @libraries = Library
@@ -472,6 +479,9 @@ get '/comparative-cluster-results' do
     haml :validation_errors, :layout => false, locals:{errors:@errors}
   end
 end
+
+
+############ Add Data ################
 
 get '/add-data' do
   login_required
@@ -535,57 +545,11 @@ get '/addmotif' do
   haml :motif_form, :layout => false
 end
 
-get '/formdrop' do
-  login_required
-  @querystring, @placeholders = build_formdrop_string(params)
-  req = !params[:required].nil? ? true : false
-  @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
-  haml :formdrop, :layout => false, locals:{values:@data, column:params[:columnname].to_sym, para:params['boxID'].to_sym, required:req }
-end
-
-get '/datalist' do
-  login_required
-  @querystring, @placeholders = build_formdrop_string(params)
-  val = !params[:required].nil? ? true : false
-  @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
-  haml :datalist, :layout => false, locals:{req: val,label: params[:label].to_s, fieldname: params[:fieldname].to_s,listname: params[:listname].to_s , listlabel:params[:listlabel].to_s, dbdata:@data, columnname:params[:columnname].to_sym  }
-end
-
-post '/validate-data' do
-  login_required
-  redirect "/" unless current_user.admin?
-  @errors = validate(params)
-  @values = params
-  if @errors.empty?
-    if params[:tab].nil?
-      @dberrors = insert_data(@values)
-      @message = "All data inserted successfully!"
-    else
-      @dberrors = update_data(@values)
-      @message = "Update successfull!"
-    end
-    if @dberrors.empty?
-      haml :success, :layout => false
-    else
-      haml :validation_errors, :layout => false, locals:{errors: @dberrors}
-    end
-  else
-    haml :validation_errors, :layout => false, locals:{errors: @errors}
-  end
-end
-
+######### Edit Data ##################
 get '/edit-data' do
   login_required
   redirect "/" unless current_user.admin?
   haml :edit_data
-end
-
-get '/editdrop' do
-  login_required
-  redirect "/" unless current_user.admin?
-  @column = find_id_column(params[:table].to_s) 
-  @data = DB[params[:table].to_sym].distinct.select(@column)
-  haml :editdrop, :layout => false
 end
 
 get '/editlibraries' do
@@ -653,12 +617,6 @@ get '/editclusters' do
   haml :edit_clusters, :layout => false
 end
 
-get '/clusterdrop' do
-  login_required
-  @clusters = Cluster.select(:cluster_id, :consensus_sequence).where(:dataset_name => params[:selElem].to_s) 
-  haml :clusterdrop, :layout => false
-end
-
 delete '/delete-entry' do
   login_required
   redirect "/" unless current_user.admin?
@@ -667,6 +625,60 @@ delete '/delete-entry' do
   haml :success_wo_header, :layout => false
 end
 
+##########  Add/Edit Helper Routes ################
+get '/clusterdrop' do
+  login_required
+  @clusters = Cluster.select(:cluster_id, :consensus_sequence).where(:dataset_name => params[:selElem].to_s) 
+  haml :clusterdrop, :layout => false
+end
+
+get '/editdrop' do
+  login_required
+  redirect "/" unless current_user.admin?
+  @column = find_id_column(params[:table].to_s) 
+  @data = DB[params[:table].to_sym].distinct.select(@column)
+  haml :editdrop, :layout => false
+end
+
+post '/validate-data' do
+  login_required
+  redirect "/" unless current_user.admin?
+  @errors = validate(params)
+  @values = params
+  if @errors.empty?
+    if params[:tab].nil?
+      @dberrors = insert_data(@values)
+      @message = "All data inserted successfully!"
+    else
+      @dberrors = update_data(@values)
+      @message = "Update successfull!"
+    end
+    if @dberrors.empty?
+      haml :success, :layout => false
+    else
+      haml :validation_errors, :layout => false, locals:{errors: @dberrors}
+    end
+  else
+    haml :validation_errors, :layout => false, locals:{errors: @errors}
+  end
+end
+
+get '/formdrop' do
+  login_required
+  @querystring, @placeholders = build_formdrop_string(params)
+  req = !params[:required].nil? ? true : false
+  @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
+  haml :formdrop, :layout => false, locals:{values:@data, column:params[:columnname].to_sym, para:params['boxID'].to_sym, required:req }
+end
+
+get '/datalist' do
+  login_required
+  @querystring, @placeholders = build_formdrop_string(params)
+  val = !params[:required].nil? ? true : false
+  @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
+  haml :datalist, :layout => false, locals:{req: val,label: params[:label].to_s, fieldname: params[:fieldname].to_s,listname: params[:listname].to_s , listlabel:params[:listlabel].to_s, dbdata:@data, columnname:params[:columnname].to_sym  }
+end
+####### Misc. Routes #############
 get '/datatables' do
   login_required
   content_type :json
@@ -683,23 +695,7 @@ set :sinatra_authentication_view_path, Pathname(__FILE__).dirname.expand_path + 
 get '/login' do
   haml :login, :layout => false
 end
-=begin
-get '/logout' do
-  haml :logout
-end
 
-get '/show' do
-  haml :show
-end
-
-get '/signup' do
-  haml :signup
-end
-
-get '/edit' do
-  haml :edit
-end
-=end
 get '/user-management' do
   login_required
   redirect "/" unless current_user.admin?
@@ -707,27 +703,3 @@ get '/user-management' do
   @users = SequelUser.all
   haml :user_management
 end
-=begin
-post '/login/?' do
-  if user = User.authenticate(params[:email], params[:password])
-    session[:user] = user.id
-
-    #if Rack.const_defined?('Flash')
-      flash[:notice] = "Login successful."
-    #end
-
-    if session[:return_to]
-      redirect_url = session[:return_to]
-      session[:return_to] = false
-      redirect redirect_url
-    else
-      redirect '/'
-    end
-  else
-    #if Rack.const_defined?('Flash')
-      flash[:error] = "The email or password you entered is incorrect."
-    #end
-    redirect '/login'
-  end
-end
-=end
