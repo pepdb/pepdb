@@ -354,8 +354,12 @@ end
 
 get '/mot-checklist' do
   login_required
-  @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:checkedElem])
-  haml :mot_checklist, :layout => false
+  if params[:checkedElem].nil?
+    haml :empty, :layout => false
+  else
+    @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:checkedElem])
+    haml :mot_checklist, :layout => false
+  end
 end
 
 get '/motif-search-results' do
