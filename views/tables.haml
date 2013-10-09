@@ -10,4 +10,7 @@
     - second_data_to_display.each do |data_element|
       %tr
         - data_element.each do |cell_data|
-          %td= cell_data[1]
+          - if align_right?(cell_data[0])
+            %td.alnright= cell_data[1]
+          -else
+            %td= cell_data[1]

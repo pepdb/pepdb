@@ -4,6 +4,11 @@ module Sinatra
   module Utilities
     include Rack::Utils
     alias_method :h, :escape_html
+
+    def align_right?(column)
+      numeric_columns = [:date, :insert_length, :distinct_peptides, :peptide_diversity, :selection_round, :sequence_length, :reads_sum, :dominance_sum, :rank, :reads, :dominance]
+      numeric_columns.include?(column)
+    end
   
     def choose_data(params)
       if params['selector'] == "sel"
