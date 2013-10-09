@@ -1,0 +1,9 @@
+%p
+  = @eletype 
+  information
+  - @datasets.each do |ds|
+    .ref_ds_pep
+      = partial :info_tables, locals: {dataset: ds, element:params[:ele_name], data_to_display:@info_data.where(@column1 => "#{params[:ele_name]}", @column2 => ds.to_s)}
+      All found DNA Sequences encoding Peptide 
+      = params[:ele_name]
+      = partial :dna_table, locals: {dna:@peptide_dna.where(@column1 => "#{params[:ele_name]}", @column2 => ds.to_s), seq: "#{params['ele_name']}", ds: ds.to_s}

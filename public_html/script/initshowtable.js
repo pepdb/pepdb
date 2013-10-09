@@ -169,8 +169,21 @@ $(document).ready(function(){
     var route = document.location.pathname;
     var dataType = $('#reftype').val();
     var firstChoice = $('#refelem1').val();
-   // var first_choice =  $('#select_table').data('first-choice');
-    if (route == url+"/comparative-search" || route == url+"/systemic-search"){
+    if (route == url+"/comparative-search"){
+      var checkedDS = [];
+      $('#r_all_ds').closest('fieldset').find(':checkbox').each(function(){
+        var elemVal = $(this).attr('value');
+        if(this.checked && elemVal != "all_ds"){
+          checkedDS.push(elemVal);
+        }
+      });
+      var radioDS = $("#comp-dataset input[type='radio']:checked").val();
+      var radioType = $("#comp-buttons input[type='radio']:checked").val();
+      checkedDS.push(radioDS);
+      $.get(url+'/show-info', {comptype: radioType, selRow:checkedDS, ele_name: selectedID, ref:dataType, ele_name2: selectedDS}, function(data){
+        $('#compinfos').html(data);
+      });
+    } else if (route == url+"/systemic-search"){
       $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
     } else if (route.match(/clusters/) != null){
       $.get(url+'/show-info', {ele_name: selectedID, ref:"Clusters", ele_name2: firstChoice}, function(data){

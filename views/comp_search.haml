@@ -1,7 +1,8 @@
 %h3 comparative peptide search
 #comp-data
   %p dataset to compare against
-  %form{:id => "compdata", :action => "#{url '/comparative-results'}", :method => 'post'}
+  %input{:type =>"hidden", :value => "comparative", :id => "reftype"}
+  %form{:id => "compdata", :action => "#{url '/comparative-results'}", :method => 'get'}
     .comp-select#comp-library
       %fieldset.checklist
         %input{:type => "checkbox", :id => "c_all_lib",:value => "all_lib"}/ 
@@ -58,6 +59,9 @@
             %label{:for => "ref_and_ds"} show peptides included in both selections 
       %input{:type => "submit", :id => "compare", :value => "compare selected"}
       %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+      = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
 
-#results{:hidden => true}
-#infos
+
+#comppepresults{:hidden => true}
+
+#compinfos

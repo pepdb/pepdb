@@ -24,7 +24,6 @@ require 'rack-flash'
 
 Haml::Options.defaults[:format] = :xhtml
 
-set :environment, :development
 set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 set :public_folder, Proc.new {File.join(root, "public_html")}
@@ -245,17 +244,20 @@ get '/show-info' do
     @eletype = "Selection"
     @next = "selections"
     @column = :selection_name
+    haml :show_info, :layout => false
   elsif params['ref'] == "Selection"
     @info_data = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_all_columns)
     @eletype = "Sequencing Dataset"
     @next = "datasets"
     @column = :dataset_name
+    haml :show_info, :layout => false
   elsif params['ref'] == "Sequencing Dataset"
     @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
     @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
+    haml :show_info, :layout => false
   elsif params[:ref] == "Clusters"
     dataset = Cluster.select(:dataset_name).where(:cluster_id => params[:ele_name2].to_i).first
     params['ele_name2'] = dataset[:dataset_name]
@@ -264,9 +266,21 @@ get '/show-info' do
     @column2 = :sequencing_datasets__dataset_name
     @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
     @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
+    haml :show_info, :layout => false
+  elsif params['ref'] == "comparative"
+    @datasets = params['selRow'].to_set
+    puts @datasets
+    @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
+    @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
+    @eletype = "Peptide"
+    @column1 = :peptides__peptide_sequence
+    @column2 = :sequencing_datasets__dataset_name
+    if params[:comptype] == "ref_and_ds"
+      haml :ref_ds_comp, :layout => false
+    else
+      haml :show_info, :layout => false
+    end
   end
-  puts params.inspect
-  haml :show_info, :layout => false
 end
 
 ######## Peptide Search #################
@@ -345,20 +359,32 @@ get '/comparative-search' do
 
 end
 
-post '/comparative-results' do
+get '/comparative-results' do
   login_required
-  @ref_qry, @ref_placeh = build_rdom_string(params)
-  @ds_qry, @ds_placeh = build_cdom_string(params)
-  @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
-  
-  haml :peptide_results, :layout => false
+  @errors = {}
+  if params[:radio_ds].nil? || params[:ref_ds].nil?
+    @errors[:ds] = "at least one dataset selection per section needed!"
+  elsif (params[:ref_dom_max].empty? && params[:ref_dom_min].empty?) || (params[:ds_dom_max].empty? && params[:ds_dom_min].empty?)
+    @errors[:dom] = "at least one dominance limit needs to be selected per section!"
+  elsif params[:comp_type].nil?
+    @errors[:type] = "choose a search method!"
+  end
+  if @errors.empty?
+    @datasets = [params[:radio_ds], *params[:ref_ds]].to_set
+    @ref_qry, @ref_placeh = build_rdom_string(params)
+    @ds_qry, @ds_placeh = build_cdom_string(params)
+    @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
+    haml :peptide_results, :layout => false
+  else
+    haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
+  end
 end
 
-post '/peptide-infos' do
-  login_required
-  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
-  haml :peptide_infos, :layout => false
-end
+#post '/peptide-infos' do
+#  login_required
+#  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
+#  haml :peptide_infos, :layout => false
+#end
 
 # -------- Motif Search ----------- #
 

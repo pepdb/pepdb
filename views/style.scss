@@ -224,6 +224,19 @@ ul {
   list-style-type:none;
 }
 
+/* comparative peptide search */
+#comppepresults{
+  width:100%;
+  overflow-y:auto;
+}
+#compinfos {
+  width:100%;
+}
+.ref_ds_pep {
+  float:left;
+  margin-right:10px;
+}
+
 /* cluster browsing */
 #clusterlist {
   border:none;

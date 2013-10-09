@@ -1,0 +1,28 @@
+%table{:id=>"#{table_id}",:class => "ui-widget", :data=>{:first_choice => "#{choice}"}}<
+  %thead.ui-widget-header
+    %tr
+      %th<>
+        peptide
+        %br
+        %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+      - @datasets.each do
+        %th<>
+          dataset
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        %th<>
+          dominance 
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+  %tbody.ui-widget-content
+    - @peptides.each do |row|
+      %tr
+        %td<>
+          =row[:peptide_sequence]
+          - @datasets.each do |ds|
+            - @peptides.where(:dataset_name => ds, :peptide_sequence => row[:peptide_sequence] ).each do |cell|
+              %td<>
+                = cell[:dataset_name]
+              %td<>
+                = cell[:dominance]
+      

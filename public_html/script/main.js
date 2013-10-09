@@ -1,6 +1,11 @@
 // define namespace to prevent loading js files multiple times
 var pepdb = pepdb || {};
 
+$.ajaxSetup ({
+    // Disable caching of AJAX responses
+    cache: false 
+});
+
 var isFirstLoad = function(namesp, jsFile) {
   var isFirst = namesp.firstLoad === undefined;
   namesp.firstLoad = false;
@@ -104,20 +109,22 @@ $(document).ready(function(){
   });
 
    $('#compdata').submit(function(){
-    if($('#results').is(':visible')){
-      $('#results').toggle();
+    if($('#comppepresults').is(':visible')){
+      $('#comppepresults').toggle();
     }
     if($('.loading').is(':hidden')){
       $('.loading').toggle();
     }
+    $('#compinfos').html("");
     $.ajax({
       data: $(this).serialize(),
       type: $(this).attr('method'),
       url: $(this).attr('action'),
       success: function(response){
-        $('#results').html(response);
-        $.getScript(url+'/script/tableinit.js', function(){
-          $('#results').toggle();
+        $('#comppepresults').html(response);
+        $.getScript(url+'/script/initshowtable.js', function(){
+          $('#comppepresults').toggle();
+          $('.loading').toggle();
         });
       }
     });

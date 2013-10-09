@@ -1,6 +1,9 @@
 %p 
   All data on
   = element
+  - unless dataset.nil?
+    in dataset
+    = dataset
 %table.ui-widget
   %thead.ui-widget-header
   %tbody.ui-widget-content
