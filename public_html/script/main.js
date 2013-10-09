@@ -160,6 +160,8 @@ $(document).ready(function(){
     if($('#clsearch').is(':visible')){
       $('#clsearch').toggle();
     }
+    $('#results').html("");
+    $('#clsearchpeps').html("");
     $.ajax({
       data: $(this).serialize(),
       type: $(this).attr('method'),

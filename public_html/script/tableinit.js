@@ -65,11 +65,11 @@ $(document).ready(function(){
       if($('#clsearch').is(':visible')){
         $('#clsearch').toggle();
       }
-      $('#clprop').load(url+'/cluster-infos', {selCl: selectedID}, function(){
+      $.get(url+'/cluster-infos', {selCl:selectedID}, function(data){
+        $('#clprop').html(data);
         $.getScript(url+'/script/initshowtable.js', function(){
           $('#clsearch').toggle();
         });
-
       });
     } else {
     if ($('#selecteddata').is(':visible')){

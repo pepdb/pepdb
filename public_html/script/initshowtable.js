@@ -185,7 +185,7 @@ $(document).ready(function(){
       });
     } else if (route == url+"/systemic-search"){
       $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
-    } else if (route.match(/clusters/) != null){
+    } else if (route.match(/clusters/) != null || route == url+"/cluster-search"){
       $.get(url+'/show-info', {ele_name: selectedID, ref:"Clusters", ele_name2: firstChoice}, function(data){
         $('#clusterlist_pep').html(data);
       });
