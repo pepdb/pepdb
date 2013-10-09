@@ -1,7 +1,7 @@
 %p 
   All data on
   = element
-  - unless dataset.nil?
+  - if defined? dataset
     in dataset
     = dataset
 %table.ui-widget
