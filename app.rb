@@ -483,7 +483,7 @@ get '/cluster-search' do
   haml :cluster_search
 end
 
-post '/cluster-results' do
+get '/cluster-results' do
   login_required
   if current_user.admin?
     @datasets = SequencingDataset.select(:dataset_name).map(:dataset_name)
@@ -496,7 +496,7 @@ post '/cluster-results' do
   haml :peptide_results, :layout => false
 end
 
-post '/cluster-infos' do
+get '/cluster-infos' do
   login_required
   @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}")
   @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}")

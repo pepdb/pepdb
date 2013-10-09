@@ -10,12 +10,12 @@ $(document).ready(function(){
       return '';
     }
   };
-
   var url = baseDir();
   $('#motacc').accordion({ heightStyle: "content" },
                           {collapsible:true } );  
   $('#compacc').accordion({ heightStyle: "content" },
                           {collapsible:true } );  
+  
     var oTable = $('.mot_table').dataTable({
     "bPaginate": "true",
     "sPaginationType": "full_numbers",
@@ -30,8 +30,8 @@ $(document).ready(function(){
         "sButtonText": "save as",
         "aButtons": ["csv", "pdf"],
         }]
-    }
-  });
+      }
+    });
 
   $('.mot_table thead input').click( function(e){
     stopTableSorting(e);
@@ -41,7 +41,6 @@ $(document).ready(function(){
     stopTableSorting(e);
     oTable.fnFilter(this.value, $(".mot_table thead input").index(this));
   });
-
   $('.mot_table thead input').each( function (i) {
     asInitVals[i] = this.value;
   } );
