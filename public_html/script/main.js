@@ -312,16 +312,25 @@ $(document).ready(function(){
     if($('.loading').is(':hidden')){
       $('.loading').toggle();
     }
+    var radioType = $("#comp-buttons input[type='radio']:checked").val();
     $.ajax({
       data: $(this).serialize(),
       type: $(this).attr('method'),
       url: $(this).attr('action'),
       success: function(response){
         $('#compclresults').html(response);
-        $.getScript(url+'/script/accinit.js', function(){
-          $('#compclresults').toggle();
-          $('.loading').toggle();
-        });
+        if (radioType == "threshold"){
+          $.getScript(url+'/script/initshowtable.js', function(){
+            $('#compclresults').toggle();
+            $('.loading').toggle();
+          });
+          
+        } else {
+          $.getScript(url+'/script/accinit.js', function(){
+            $('#compclresults').toggle();
+            $('.loading').toggle();
+          });
+        }
       }
     });
     return false;
