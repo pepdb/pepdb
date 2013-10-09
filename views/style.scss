@@ -5,6 +5,9 @@ html{
   height:100%;
   width:100%;
 }
+#logoutbox{
+  margin-left:0.5em;
+}
 
 .ui-button-text {
 #  background-color:#1bf011;
@@ -31,8 +34,12 @@ body {
 
 }
 
+.alnright {
+  text-align:right;
+}
+
 li.ui-state-disabled{
-  background-color:#069df4;
+  background-color:#dfffff;
 }
 
 a.ui-corner-all {
@@ -195,7 +202,7 @@ div {
     position: relative;
     border: 1px solid #ccc;
     width: 6em;
-    height: 4em;
+    height: 6.5em;
     overflow-y: scroll;
   }
 }
@@ -216,7 +223,7 @@ div {
 }
 
 .highlight td{
-  background-color: green;
+  background-color: #b3ffb3;
   cursor: pointer;
 }
 

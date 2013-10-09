@@ -45,8 +45,9 @@
             = link_to("Peptide Sequence Search", "/cluster-search")
           %li
             = link_to("Comparative Search", "/comparative-cluster-search")
-        %p 
-          logged in as 
-          = current_user.username
-        = link_to("Logout", "/logout", :class => "optbut")
+        #logoutbox
+          %p 
+            logged in as 
+            = current_user.username
+          = link_to("Logout", "/logout", :class => "optbut")
       #right= yield
