@@ -20,10 +20,10 @@
                     = cell[1]
 - else
   #commoncl
-    %table.mot_table
+    %table#show_table
       %thead.ui-widget-header
         %tr
-          %th
+          %th<>
             consensus sequence
             %br
             %input{:type => "text", :class => "text_filter", :placeholder => "filter"}  
@@ -39,11 +39,11 @@
       %tbody.ui-widget-content
         - @results.each do |seq|
           %tr
-            %td 
+            %td<> 
               = seq
             - @datasets.each do |ds|
               - @clusters.where(:consensus_sequence => seq, :dataset_name => ds).each do |cell|
-                %td
+                %td<>
                   = cell[:dataset_name]
-                %td 
+                %td<> 
                   = cell[:dominance_sum] 
