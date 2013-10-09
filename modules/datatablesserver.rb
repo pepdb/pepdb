@@ -104,7 +104,12 @@ module Sinatra
         DB.fetch(qry_string, *@placeholder_args) do |row|
           row_array = []
           @columns.each do |cell|
-            row_array.insert(-1, row[cell])
+            if cell == :dominance
+              formated_dominance = format_dominance(row[cell])
+              row_array.insert(-1, formated_dominance)
+            else
+              row_array.insert(-1, row[cell])
+            end
           end #each
           rows.insert(-1, row_array)
         end #each
@@ -119,6 +124,11 @@ module Sinatra
         elsif @referer.include?("property-search")
           [:peptides__peptide_sequence, :sequencing_datasets__dataset_name,:rank, :reads, :dominance]      
         end
+      end
+      
+      def format_dominance(value)
+        dom = value * 100
+        "%E" % dom
       end
   
     end #end class
