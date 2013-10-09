@@ -28,14 +28,9 @@ set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 set :public_folder, Proc.new {File.join(root, "public_html")}
 
-use Rack::Session::Cookie, :secret => 'better secret needeQ!'
+use Rack::Session::Cookie, :expire_after => 86400, :secret => 'Gh6hh91uhMEsmq05h01ec2b4i9BRVj39' 
 
 use Rack::Flash
-
-class SequelUser
-  String :name
-end
-
 
 library_columns = [:library_name___name, :carrier, :encoding_scheme, :insert_length]
 library_all = [:library_name___name, :encoding_scheme, :carrier, :produced_by, :date, :insert_length, :distinct_peptides, :peptide_diversity]
@@ -441,7 +436,7 @@ get '/motif-search-results' do
     @results = DB[@table].distinct.select(:motif_sequence, :peptides_sequencing_datasets__peptide_sequence___peptide, :peptides_sequencing_datasets__dataset_name___dataset, :rank).left_join(:peptides_sequencing_datasets, :peptide_sequence => :peptide_sequence)
     haml :mot_search_res, :layout => false
   else
-    haml :validation_errors, :layout => false, locals:{errors:@errors}
+    haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
   end
 end
 
@@ -534,7 +529,7 @@ get '/comparative-cluster-results' do
     @clusters = Cluster.select(:dataset_name, :dominance_sum)
     haml :comparative_cluster_results, :layout => false
   else
-    haml :validation_errors, :layout => false, locals:{errors:@errors}
+    haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
   end
 end
 
