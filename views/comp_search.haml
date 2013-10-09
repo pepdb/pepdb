@@ -1,7 +1,6 @@
 %h3 comparative peptide search
 #comp-data
-  %p dataset
-  %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+  %p dataset to compare against
   %form{:id => "compdata", :action => "#{url '/comparative-results'}", :method => 'post'}
     .comp-select#comp-library
       %fieldset.checklist
@@ -25,7 +24,7 @@
 
 
     #ref-data
-      %p reference dataset
+      %p reference datasets
       .ref-select#ref-library
         %fieldset.checklist
           %input{:type => "checkbox", :id => "r_all_lib",:value => "all_lib"}/ 
@@ -53,11 +52,12 @@
         %ul
           %li
             %input{:type => "radio", :name => "comp_type",:id=>"ds_only", :value => "ds_only"}
-            %label{:for => "ds_only"} show peptides included only in dataset 
+            %label{:for => "ds_only"} show peptides included only in first dataset 
           %li
             %input{:type => "radio", :name => "comp_type",:id=>"ref_and_ds", :value => "ref_and_ds"}
             %label{:for => "ref_and_ds"} show peptides included in both selections 
       %input{:type => "submit", :id => "compare", :value => "compare selected"}
+      %input{:type => "button", :id => "clear-button",:value => "clear selection"}
 
 #results{:hidden => true}
 #infos

@@ -14,7 +14,7 @@
                   %a{:href=>"#"}
                     = ds[:dataset_name]
                   %ul
-                    - clusters.distinct.select(:cluster_id, :consensus_sequence).where(:library_name => "#{lib[:library_name]}", :selection_name => "#{sel[:selection_name]}", :dataset_name => "#{ds[:dataset_name]}").order(:dominance_sum).each do |cluster|
+                    - clusters.distinct.select(:cluster_id, :consensus_sequence).where(:library_name => "#{lib[:library_name]}", :selection_name => "#{sel[:selection_name]}", :dataset_name => "#{ds[:dataset_name]}").order(Sequel.desc(:dominance_sum)).each do |cluster|
                       %li{:id=>"#{cluster[:cluster_id]}"}
                         %a{:href=>"/clusters/"+"#{cluster[:cluster_id]}"}
                           = cluster[:consensus_sequence]

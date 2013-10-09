@@ -370,6 +370,20 @@ $(document).ready(function(){
                                 "item_open":false  },
                 "plugins" : ["html_data",  "themeroller"],})
       .delegate("a", "click", function(event, data){
+        if($('#clusterlist_sel').is(':visible')){
+          $('#clusterlist_sel').toggle();
+        }
+        if($('#clusterlist_pep').is(':visible')){
+          $('#clusterlist_pep').html("");
+        }
+        var cluster = $(this).attr('href').split('/')[2];
+        $.get(url+'/cluster-infos',{selCl:cluster}, function(data){
+          $('#clusterlist_sel').html(data);
+          $.getScript(url+'/script/initshowtable.js', function(){
+            $('#clusterlist_sel').toggle();
+          });
+        }); 
+        return false;
      } );
     
     $('#disp-res').bind("loaded.jstree", function(){

@@ -1,8 +1,9 @@
-#clinfos
-  %p infos on selected cluster
-  = partial :info_tables, locals: {data_to_display:@cluster_infos , element:@cluster_info[:consensus_sequence]}
+%input{:type => "hidden", :id => "refelem1", :value=> params[:selCl].to_s}
+%p 
+  infos on selected cluster
+  = partial :info_tables, locals: {data_to_display:@cluster_infos , element:@cluster_infos[:consensus_sequence]}
 
-#clpeps
-  %p all peptides in this cluster
+%p 
+  all peptides in this cluster
   = partial :tables, locals: {table_class: "display", table_id:"show_table", choice:"", first_data_to_display:@cluster_peps, second_data_to_display:@cluster_peps }
 

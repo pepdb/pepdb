@@ -196,6 +196,14 @@ get '/clusters/:sel_cluster/:pep_seq' do
 end
 
 ####### Data Browsing Helper Routes ####################
+get '/cluster-infos' do
+  login_required
+  puts params.inspect
+  puts Cluster.where(:cluster_id => "#{params[:selCl]}").inspect
+  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}")
+  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}")
+  haml :cluster_infos, :layout => false
+end
 
 get '/show_sn_table' do
   login_required
