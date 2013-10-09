@@ -374,6 +374,11 @@ get '/comparative-results' do
     @ref_qry, @ref_placeh = build_rdom_string(params)
     @ds_qry, @ds_placeh = build_cdom_string(params)
     @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
+    if params[:comp_type] == "ref_and_ds"
+      puts @peptides.inspect
+      @results = Observation.select(:peptide_sequence, :dataset_name, :dominance).where(:peptide_sequence => @peptides.map(:peptide_sequence))
+      puts @results.inspect
+    end
     haml :peptide_results, :layout => false
   else
     haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}

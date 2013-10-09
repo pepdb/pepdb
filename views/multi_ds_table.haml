@@ -15,12 +15,12 @@
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
   %tbody.ui-widget-content
-    - @peptides.group(:peptide_sequence).each do |row|
+    - @results.group(:peptide_sequence).each do |row|
       %tr
         %td<>
           =row[:peptide_sequence]
           - @datasets.each do |ds|
-            - @peptides.where(:dataset_name => ds, :peptide_sequence => row[:peptide_sequence] ).each do |cell|
+            - @results.where(:dataset_name => ds, :peptide_sequence => row[:peptide_sequence] ).each do |cell|
               %td<>
                 = cell[:dataset_name]
               %td<>
