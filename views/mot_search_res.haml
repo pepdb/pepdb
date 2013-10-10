@@ -30,6 +30,6 @@
                   - @results.where(:peptides_sequencing_datasets__dataset_name => ds, :motif_sequence => motif[:motif_sequence], :peptides_sequencing_datasets__peptide_sequence => row[:peptide]).each do |cell|
                     %td 
                       = cell[:dataset]  
-                    %td
+                    %td.alnright
                       = cell[:rank]
             

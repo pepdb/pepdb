@@ -121,11 +121,12 @@ fieldset.checklist {
 //library browsing
 #selectedinfo{
   float:left;
-  width: 35%;
+  width: 30%;
 }
 #selecteddata{
   float:left;
-  width: 65%;
+  width: 70%;
+  overflow-x:scroll;
 }
 
 
@@ -250,20 +251,19 @@ ul {
   float:left;
   width:25%;
 }
+
 #clbrresults {
   float:left;
   width:75%;
 }
-
 #clusterlist_sel{
-  float:left;
-  width:65%;
+    float:left;
+    width:100%;
 }
 #clusterlist_pep {
-  overflow-x:scroll;  
-  clear:both;
+    overflow-x:scroll;  
+    clear:both;
 }
-
 /* cluster pep-seq search*/
 #clprop {
   width:100%;

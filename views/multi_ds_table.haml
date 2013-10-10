@@ -23,6 +23,6 @@
             - @results.where(:dataset_name => ds, :peptide_sequence => row[:peptide_sequence] ).each do |cell|
               %td<>
                 = cell[:dataset_name]
-              %td<>
-                = cell[:dominance]
+              %td.alnright<>
+                = format_dominance(cell[:dominance])
       

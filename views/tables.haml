@@ -11,6 +11,10 @@
       %tr
         - data_element.each do |cell_data|
           - if align_right?(cell_data[0])
-            %td.alnright= cell_data[1]
+            -if is_dominance?(cell_data[0])
+              %td.alnright= format_dominance(cell_data[1])
+            - else
+              %td.alnright= cell_data[1]
+            
           -else
             %td= cell_data[1]

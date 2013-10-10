@@ -395,11 +395,11 @@ get '/comparative-results' do
   end
 end
 
-#post '/peptide-infos' do
-#  login_required
-#  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
-#  haml :peptide_infos, :layout => false
-#end
+post '/peptide-infos' do
+  login_required
+  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
+  haml :peptide_infos, :layout => false
+end
 
 # -------- Motif Search ----------- #
 

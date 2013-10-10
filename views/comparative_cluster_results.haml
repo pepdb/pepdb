@@ -16,8 +16,15 @@
             - @results[ds.to_sym].each do |row|
               %tr
                 - row.each do |cell|
-                  %td 
-                    = cell[1]
+                  - if align_right?(cell[0])
+                    -if is_dominance?(cell[0])
+                      %td.alnright= format_dominance(cell[1])
+                    - else
+                      %td.alnright= cell[1]
+
+                  -else
+                    %td= cell[1]
+
 - else
   #commoncl
     %table#show_table
@@ -45,5 +52,5 @@
               - @clusters.where(:consensus_sequence => seq, :dataset_name => ds).each do |cell|
                 %td<>
                   = cell[:dataset_name]
-                %td<> 
-                  = cell[:dominance_sum] 
+                %td.alnright<> 
+                  = format_dominance(cell[:dominance_sum])

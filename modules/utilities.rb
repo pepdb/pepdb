@@ -4,6 +4,16 @@ module Sinatra
   module Utilities
     include Rack::Utils
     alias_method :h, :escape_html
+    
+    def format_dominance(value)
+        dom = value * 100
+        "%E" % dom
+    end
+    
+    def is_dominance?(column)
+      column == :dominance
+    end
+
 
     def align_right?(column)
       numeric_columns = [:date, :insert_length, :distinct_peptides, :peptide_diversity, :selection_round, :sequence_length, :reads_sum, :dominance_sum, :rank, :reads, :dominance]
