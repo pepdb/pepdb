@@ -86,7 +86,7 @@ get '/libraries/:lib_name' do
   else
     redirect '/libraries'
   end
-    @selections = Selection.join(Target, :target_id=>:target_id).select(*selection_columns)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns)
   @infodata = Library.select(*library_all)
   haml :libraries
 end
@@ -94,11 +94,11 @@ end
 get '/selections' do
   login_required
   if current_user.admin?
-    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
   else
     allowed = []
     DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:selection_name])}
-    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => allowed)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => allowed)
   end
   if @selections.empty?
     @message = "No selections found in database"
@@ -111,27 +111,27 @@ end
 get '/selections/:sel_name' do
   login_required
   if current_user.admin?
-    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
   elsif can_access?(:selections, params[:sel_name])
     allowed = []
     DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:selection_name])}
-    @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => allowed)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => allowed)
   else
     redirect '/selections'
   end
-  @datasets = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
-  @infodata = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:sel_name])
+  @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns)
+  @infodata = Selection.select(*selection_info_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:sel_name])
   haml :selections
 end
 
 get '/datasets' do
   login_required
   if current_user.admin?
-    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns)
   else
     allowed = []
     DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
-    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
   end
   if @datasets.empty?
     @message = "No sequencing datasets found in database"
@@ -144,16 +144,16 @@ end
 get '/datasets/:set_name' do
   login_required
   if current_user.admin?
-    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
   elsif can_access?(:sequencing_datasets, params[:set_name])
     allowed = []
     DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
-    @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
   else
     redirect '/datasets'
   end
   @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
-  @infodata = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
+  @infodata = SequencingDataset.select(*dataset_all_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
   haml :datasets
 end
 
@@ -220,12 +220,12 @@ get '/show_sn_table' do
     @column = :library_name
     @eletype = "Selections"
     @id = :show_table
-    @data = Selection.join(Target, :target_id=>:target_id).select(*selection_columns)
+    @data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns)
   elsif params['ref'] == "Selection" 
     @column = :selection_name
     @eletype = "Sequencing Datasets"
     @id = :show_table
-    @data = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_columns)
+    @data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns)
   elsif params['ref'] == "Sequencing Dataset" 
     @column = :sequencing_datasets__dataset_name
     @eletype = "Peptides"
@@ -240,9 +240,9 @@ get '/info-tables' do
   if request.referer.include?("libraries")
     @infodata = Library.select(*library_all).where(:library_name => params[:infoElem])
   elsif request.referer.include?("selection")
-    @infodata = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:infoElem])
+    @infodata = Selection.select(*selection_info_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:infoElem])
   elsif request.referer.include?("datasets")
-    @infodata = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:infoElem])
+    @infodata = SequencingDataset.select(*dataset_all_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:infoElem])
   end
   haml :info_tables, :layout => false, locals:{data_to_display:@infodata, element:"#{h params[:infoElem]}"}
 end
@@ -250,13 +250,13 @@ end
 get '/show-info' do
   login_required
   if params['ref'] == "Library"
-    @info_data = Selection.join(Target, :target_id=>:target_id).select(*selection_info_columns)
+    @info_data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_info_columns)
     @eletype = "Selection"
     @next = "selections"
     @column = :selection_name
     haml :show_info, :layout => false
   elsif params['ref'] == "Selection"
-    @info_data = SequencingDataset.join(Target, :target_id=>:target_id).select(*dataset_all_columns)
+    @info_data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_all_columns)
     @eletype = "Sequencing Dataset"
     @next = "datasets"
     @column = :dataset_name
@@ -635,7 +635,7 @@ get '/editselections' do
   redirect "/" unless current_user.admin?
   @species = Target.distinct.select(:species)
   @performs = Selection.distinct.select(:performed_by)
-  @selection = Selection.select(*selection_info_columns).join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
+  @selection = Selection.select(*selection_info_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
   @libraries = Library.all
   haml :edit_selections, :layout => false
 end
@@ -643,7 +643,7 @@ end
 get '/editsequencing-datasets' do
   login_required
   redirect "/" unless current_user.admin?
-  @dataset = SequencingDataset.select(*dataset_all_columns).join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
+  @dataset = SequencingDataset.select(*dataset_all_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
   @libraries = Library
   @selections = Selection
   @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
@@ -663,7 +663,7 @@ end
 get '/editresults' do
   login_required
   redirect "/" unless current_user.admin?
-  @result = Result.select(:performance, :species, :tissue, :cell, :dataset_name___dataset, :peptide_sequence).join(Target, :target_id => :target_id).left_join(Observation, :results__result_id => :peptides_sequencing_datasets__result_id).where(:results__result_id => params[:selElem].to_i).first
+  @result = Result.select(:performance, :species, :tissue, :cell, :dataset_name___dataset, :peptide_sequence).left_join(Target, :target_id => :target_id).left_join(Observation, :results__result_id => :peptides_sequencing_datasets__result_id).where(:results__result_id => params[:selElem].to_i).first
   @datasets = SequencingDataset
   @species = Target.distinct.select(:species)
   haml :edit_results, :layout => false
@@ -711,6 +711,9 @@ end
 post '/validate-data' do
   login_required
   redirect "/" unless current_user.admin?
+  puts params[:dspecies].class
+  puts params[:dspecies].inspect
+  
   @errors = validate(params)
   @values = params
   if @errors.empty?

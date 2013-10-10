@@ -140,7 +140,13 @@ module Sinatra
 
       def into_selection
         begin
-          target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first[:target_id]
+          get_target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).count
+          if get_target > 0
+            target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first[:target_id]
+          else
+            target = nil
+          end  
+      
           DB[:selections].insert(:selection_name => "#{es @values[:selname].to_s}", :performed_by => "#{es @values[:perf].to_s}", :date =>"#{es @values[:date]}", :target_id => target, :library_name => "#{es @values[:dlibname].to_s}")
         rescue Sequel::Error => e
           if e.message.include? "unique"
@@ -157,7 +163,12 @@ module Sinatra
         DB.transaction do
           begin
             library = DB[:selections].select(:library_name).where(:selection_name => @values[:dselname].to_s).first[:library_name]
-            target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first[:target_id]
+            get_target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).count
+            if get_target > 0
+              target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first[:target_id]
+            else
+              target = nil
+            end  
             DB[:sequencing_datasets].insert(:dataset_name => "#{es @values[:dsname].to_s}", :read_type => "#{es @values[:rt].to_s}", :date =>"#{es @values[:date]}", :target_id => target, :library_name => library, :selection_name => "#{es @values[:dselname].to_s}", :used_indices => "#{es @values[:ui].to_s}", :origin => "#{es @values[:or].to_s}", :produced_by => "#{es @values[:prod].to_s}", :sequencer => "#{es @values[:seq].to_s}", :selection_round => "#{es @values[:selr].to_i}", :sequence_length => "#{es @values[:seql]}")
           rescue Sequel::Error => e
             if e.message.include? "unique"
@@ -230,7 +241,12 @@ module Sinatra
       end #target
       
       def into_result
-          target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first[:target_id]
+          get_target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).count
+          if get_target > 0
+            target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first[:target_id]
+          else
+            target = nil
+          end  
         begin
           id = DB[:results].insert(:target_id => target, :performance => "#{es @values[:perf].to_s}")
           DB[:peptides_sequencing_datasets].where(:dataset_name => @values[:ddsname], :peptide_sequence => @values[:pseq]).update(:result_id => id)
@@ -444,9 +460,9 @@ module Sinatra
 
       def find_target
         result = nil
-        unless @values[:dspecies].empty? && @values[:dtissue].empty? && @values[:dcell].empty?
+        unless @values[:dspecies].nil? && @values[:dtissue].nil? && @values[:dcell].nil?
           target = Target.select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first
-          result = target[:target_id]
+          result = target[:target_id] unless target.nil?
         end
         result
       end
