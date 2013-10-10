@@ -110,7 +110,7 @@ module Sinatra
       def validate_motif
         if given? @params[:mlname] 
           if !@params[:motfile].nil?
-            @errors[:filetype] = "Given file type must be csv" unless valid_file_format? @params[:motfile]
+            #@errors[:filetype] = "Given file type must be csv" unless valid_file_format? @params[:motfile]
           elsif @params[:tab].nil?
             @errors[:motfile] = "No motifs file given" 
           end
