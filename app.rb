@@ -67,7 +67,12 @@ get '/libraries' do
     DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:library_name])}
     @libraries = Library.select(*library_columns).where(:library_name => allowed)
   end
-  haml :libraries
+  if @libraries.nil?
+    @message = "No libraries found in database"
+    haml :empty
+  else
+    haml :libraries
+  end
 end
 
 get '/libraries/:lib_name' do
@@ -95,7 +100,12 @@ get '/selections' do
     DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:selection_name])}
     @selections = Selection.join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => allowed)
   end
-  haml :selections
+  if @selections.nil?
+    @message = "No selections found in database"
+    haml :empty
+  else
+    haml :selections
+  end
 end
 
 get '/selections/:sel_name' do
@@ -123,7 +133,12 @@ get '/datasets' do
     DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
     @datasets = SequencingDataset.join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
   end
-  haml :datasets
+  if @datasets.nil?
+    @message = "No sequencing datasets found in database"
+    haml :empty
+  else
+    haml :datasets
+  end
 end
 
 get '/datasets/:set_name' do

@@ -1,0 +1,8 @@
+-if defined? @message
+  .ui-widget
+    %div{:class => "ui-state-highlight ui-corner-all", :id => "highlightbox"}
+      %p
+        %span{:class => "ui-icon ui-icon-info", :id => "highlightspan"}
+          %p
+            = @message
+
