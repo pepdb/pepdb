@@ -46,6 +46,8 @@ $(document).ready(function(){
 
   $('.optbut').button();  
   $('#navigation').menu();
+  $('.editlink').button();
+  $('.deletelink').button();
 
   $('#clear-button').click(function(){
     $('body').load(window.location.pathname);
