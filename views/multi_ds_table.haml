@@ -1,3 +1,4 @@
+= puts "table ds"
 %table{:id=>"#{table_id}",:class => "ui-widget", :data=>{:first_choice => "#{choice}"}}<
   %thead.ui-widget-header
     %tr
@@ -15,12 +16,13 @@
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
   %tbody.ui-widget-content
-    - @results.group(:peptide_sequence).each do |row|
+    - @results.all.each do |row|
+      = puts "loop"
       %tr
         %td<>
           =row[:peptide_sequence]
           - @datasets.each do |ds|
-            - @results.where(:dataset_name => ds, :peptide_sequence => row[:peptide_sequence] ).each do |cell|
+            - Observation.where(:dataset_name => ds, :peptide_sequence => row[:peptide_sequence] ).all.each do |cell|
               %td<>
                 = cell[:dataset_name]
               %td.alnright<>
