@@ -386,7 +386,8 @@ get '/comparative-results' do
     @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
     if params[:comp_type] == "ref_and_ds"
       puts @peptides.inspect
-      @results = Observation.select(:peptide_sequence, :dataset_name, :dominance).where(:peptide_sequence => @peptides.map(:peptide_sequence))
+      @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @peptides.map(:peptide_sequence))
+      #@results = Observation.select(:peptide_sequence, :dataset_name, :dominance).where(:peptide_sequence => @peptides.map(:peptide_sequence))
       puts @results.inspect
     end
     haml :peptide_results, :layout => false

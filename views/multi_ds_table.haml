@@ -17,14 +17,13 @@
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
   %tbody.ui-widget-content
     - @results.all.each do |row|
-      = puts "loop"
       %tr
         %td<>
           =row[:peptide_sequence]
-          - @datasets.each do |ds|
-            - Observation.where(:dataset_name => ds, :peptide_sequence => row[:peptide_sequence] ).all.each do |cell|
-              %td<>
-                = cell[:dataset_name]
-              %td.alnright<>
-                = format_dominance(cell[:dominance])
+          -# @datasets.each do |ds|
+          - Observation.where(:dataset_name => @datasets.to_a, :peptide_sequence => row[:peptide_sequence] ).all.each do |cell|
+            %td<>
+              = cell[:dataset_name]
+            %td.alnright<>
+              = format_dominance(cell[:dominance])
       
