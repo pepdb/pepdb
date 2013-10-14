@@ -156,22 +156,22 @@ $(document).ready(function(){
   });
    
   $('#cl-search').submit(function(){
-    if($('#results').is(':visible')){
-      $('#results').toggle();
+    if($('#clpepresults').is(':visible')){
+      $('#clpepresults').toggle();
     }
     if($('#clsearch').is(':visible')){
       $('#clsearch').toggle();
     }
-    $('#results').html("");
+    $('#clpepresults').html("");
     $('#clsearchpeps').html("");
     $.ajax({
       data: $(this).serialize(),
       type: $(this).attr('method'),
       url: $(this).attr('action'),
       success: function(response){
-        $('#results').html(response);
+        $('#clpepresults').html(response);
         $.getScript(url+'/script/tableinit.js', function(){
-          $('#results').toggle();
+          $('#clpepresults').toggle();
         });
       }
     });
