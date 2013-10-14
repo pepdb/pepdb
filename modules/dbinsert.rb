@@ -65,9 +65,6 @@ module Sinatra
             current_cluster_id += 1
           else
             cluster_data.insert(-1, [current_cluster_id, linematch[1]])
-            if Peptide.select(:peptide_sequence).where(:peptide_sequence => linematch[1]).count == 0 
-              puts linematch[1]
-            end
           end
         end #end line
         return clusters, cluster_data
@@ -77,9 +74,7 @@ module Sinatra
         mots_mot_lists = []
         motifs = []
         line_counter = 1
-        puts @file.inspect
         CSV.foreach(@file, :col_sep => ';', :row_sep => :auto ) do |row|
-          puts row[0]
           if row[0].nil?
             raise ArgumentError, "No motif given on line #{line_counter}"
           end
@@ -98,6 +93,7 @@ module Sinatra
     end #class
 
     class InsertData   
+      include Utilities
       MAX_SQLITE_STATEMENTS = 450
       include Rack::Utils
       alias_method :es, :escape_html
@@ -140,12 +136,7 @@ module Sinatra
 
       def into_selection
         begin
-          get_target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).count
-          if get_target > 0
-            target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first[:target_id]
-          else
-            target = nil
-          end  
+          target = find_target 
       
           DB[:selections].insert(:selection_name => "#{es @values[:selname].to_s}", :performed_by => "#{es @values[:perf].to_s}", :date =>"#{es @values[:date]}", :target_id => target, :library_name => "#{es @values[:dlibname].to_s}")
         rescue Sequel::Error => e
@@ -337,10 +328,21 @@ module Sinatra
         end
         qry_string << string_columns << last_part  
       end
+      def find_target
+        puts @values[:dtar]
+        result = nil
+        if option_selected?(@values[:dtar])
+          target_elements = @values[:dtar].split(/ - /)
+          puts target_elements.inspect
+          result = Target.select(:target_id).where(:species => target_elements[0], :tissue => target_elements[1], :cell => target_elements[2]).first[:target_id]
+        end
+        result
+      end
       
     end #class  
     
     class UpdateData
+      include Utilities
       include ColumnFinder
       include Rack::Utils
       alias_method :es, :escape_html
@@ -357,16 +359,9 @@ module Sinatra
 
       def update
         unless @table == :motifs_motif_lists 
-          puts "clusterdd"
-          puts @table
-          puts @id_column
-          puts @row_id
-          puts @update_hash
           DB[@table].where(@id_column => @row_id).update(@update_hash)
         else
           @mot_updates.each do |upd|
-            puts upd[0]
-            puts upd[1]
             DB[@table].where(upd[0]).update(upd[1])
           end
         end 
@@ -459,10 +454,16 @@ module Sinatra
       end
 
       def find_target
+        puts @values[:dtar]
         result = nil
         unless @values[:dspecies].nil? && @values[:dtissue].nil? && @values[:dcell].nil?
           target = Target.select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first
           result = target[:target_id] unless target.nil?
+        end
+        if option_selected?(@values[:dtar])
+          target_elements = @values[:dtar].split(/ - /)
+          puts target_elements.inspect
+          result = Target.select(:target_id).where(:species => target_elements[0], :tissue => target_elements[1], :cell => target_elements[2])
         end
         result
       end

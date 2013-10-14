@@ -37,6 +37,7 @@ library_all = [:library_name___name, :encoding_scheme, :carrier, :produced_by, :
 selection_columns = [:selection_name___selection, :species, :tissue, :cell]
 selection_all_columns = [:selection_name___name, :selections__library_name___library, :selections__date, :carrier, :performed_by,:species, :tissue, :cell]
 selection_info_columns = [:selection_name___name, :library_name___library, :date, :performed_by,:species, :tissue, :cell]
+selection_edit_columns = [:selection_name___name, :library_name___library, :date, :performed_by,:targets__target_id___target]
 dataset_columns = [:dataset_name___name, :species, :tissue, :cell ]
 dataset_info_columns = [:dataset_name___name, :libraries__library_name___library, :selection_name___selection, :sequencing_datasets__date, :species, :tissue, :cell, :selection_round, :carrier]
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
@@ -388,7 +389,6 @@ get '/comparative-results' do
       puts @peptides.inspect
       @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @peptides.map(:peptide_sequence))
       #@results = Observation.select(:peptide_sequence, :dataset_name, :dominance).where(:peptide_sequence => @peptides.map(:peptide_sequence))
-      puts @results.inspect
     end
     haml :peptide_results, :layout => false
   else
@@ -636,7 +636,8 @@ get '/editselections' do
   redirect "/" unless current_user.admin?
   @species = Target.distinct.select(:species)
   @performs = Selection.distinct.select(:performed_by)
-  @selection = Selection.select(*selection_info_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
+  @selection = Selection.select(*selection_edit_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
+  @target = @selection[:target]
   @libraries = Library.all
   haml :edit_selections, :layout => false
 end
@@ -712,8 +713,7 @@ end
 post '/validate-data' do
   login_required
   redirect "/" unless current_user.admin?
-  puts params[:dspecies].class
-  puts params[:dspecies].inspect
+  puts params[:dtar]
   
   @errors = validate(params)
   @values = params

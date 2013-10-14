@@ -20,24 +20,21 @@
         %input{:type => "text", :name => "date", :id => "date", :value => @selection[:date]} 
     %p
       = partial :editlist, locals: {selected:@selection[:performed_by], label:"perf", fieldname:"performed by:", listname:"perflist", listlabel:"fbperf", dbdata:@performs, columnname: :performed_by}
-  %fieldset.selform
-    %legend target
     %p
-      %label{:for => "dspecies"}
-        %span species:
-        = partial :editformdrop, locals:{selected:@selection[:species], para: "dspecies", values:@species, column: :species, required: false}
-    %p
-      %label{:for => "dtissue"}
-        %span tissue:
-        %select{:name => "dtissue", :id => "dtissue"}
+      %label{:for => "dtar"}
+        %span target:
+        %select{:name => "dtar", :id => "dtar"}
           %option
-            = @selection[:tissue] 
-    %p
-      %label{:for => "dcells"}
-        %span cell:
-        %select{:name => "dcell", :id => "dcell"}
-          %option
-            = @selection[:cell] 
+            &nbsp;
+          - Target.order(:species).all do |tar|
+            - puts @target
+            - puts tar[:target_id]
+            - if @target == tar[:target_id]
+              %option{:selected => true}<
+                = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
+            - else
+              %option<
+                = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
   %fieldset.selform
     %legend
       related entities:

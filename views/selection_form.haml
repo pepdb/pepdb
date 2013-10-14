@@ -15,20 +15,15 @@
         %input{:type => "text", :name => "date", :id => "date", :placeholder => "yyyy-mm-dd"} 
     %p
       = partial :datalist, locals: {req: false, label:"perf", fieldname:"performed by:", listname:"perflist", listlabel:"fbperf", dbdata:@performs, columnname: :performed_by}
-  %fieldset.selform
-    %legend target
     %p
-      %label{:for => "dspecies"}
-        %span species:
-        = partial :formdrop, locals:{para: "dspecies", values:@species, column: :species, required: false}
-    %p
-      %label{:for => "dtissue"}
-        %span tissue:
-        %select{:name => "dtissue", :id => "dtissue"}
-    %p
-      %label{:for => "dcells"}
-        %span cell:
-        %select{:name => "dcell", :id => "dcell"}
+      %label{:for => "dtar"}
+        %span target:
+        %select{:name => "dtar", :id => "dtar"}
+          %option
+            &nbsp;
+          - Target.order(:species).all do |tar|
+            %option<
+              = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
   %fieldset.selform
     %legend
       related entities:
