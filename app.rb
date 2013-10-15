@@ -41,6 +41,7 @@ selection_edit_columns = [:selection_name___name, :library_name___library, :date
 dataset_columns = [:dataset_name___name, :species, :tissue, :cell ]
 dataset_info_columns = [:dataset_name___name, :libraries__library_name___library, :selection_name___selection, :sequencing_datasets__date, :species, :tissue, :cell, :selection_round, :carrier]
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
+dataset_edit_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target]
 peptide_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance]
 peptide_browse_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance, :performance, :species, :tissue, :cell]
 sys_peptide_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name___dataset,:rank, :reads , :dominance]
@@ -645,11 +646,11 @@ end
 get '/editsequencing-datasets' do
   login_required
   redirect "/" unless current_user.admin?
-  @dataset = SequencingDataset.select(*dataset_all_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
+  @dataset = SequencingDataset.select(*dataset_edit_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
   @libraries = Library
   @selections = Selection
   @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
-  @species = Target.distinct.select(:species)
+  @target = @dataset[:target]
   haml :edit_datasets, :layout => false
 end
 
@@ -665,9 +666,9 @@ end
 get '/editresults' do
   login_required
   redirect "/" unless current_user.admin?
-  @result = Result.select(:performance, :species, :tissue, :cell, :dataset_name___dataset, :peptide_sequence).left_join(Target, :target_id => :target_id).left_join(Observation, :results__result_id => :peptides_sequencing_datasets__result_id).where(:results__result_id => params[:selElem].to_i).first
+  @result = Result.select(:performance, :species, :tissue, :cell, :dataset_name___dataset, :peptide_sequence, :targets__target_id___target).left_join(Target, :target_id => :target_id).left_join(Observation, :results__result_id => :peptides_sequencing_datasets__result_id).where(:results__result_id => params[:selElem].to_i).first
   @datasets = SequencingDataset
-  @species = Target.distinct.select(:species)
+  @target = @result[:target]
   haml :edit_results, :layout => false
 end
 

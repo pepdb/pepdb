@@ -10,24 +10,20 @@
         %span performance:
         %textarea{:form => "editdata", :name =>"perf", :id => "perf"}
           = @result[:performance].to_s
-  %fieldset.resform
-    %legend target
     %p
-      %label{:for => "dspecies"}
-        %span species:
-        = partial :editformdrop, locals:{selected:@result[:species],para: "dspecies", values:@species, column: :species,required:false}
-    %p
-      %label{:for => "dtissue"}
-        %span tissue:
-        %select{:name => "dtissue", :id => "dtissue"}
+      %label{:for => "dtar"}
+        %span target:
+        %select{:name => "dtar", :id => "dtar"}
           %option
-            = @result[:tissue]
-    %p
-      %label{:for => "dcells"}
-        %span cell:
-        %select{:name => "dcell", :id => "dcell"}
-          %option
-            = @result[:cell]
+            &nbsp;
+          - Target.order(:species).all do |tar|
+            - if @target == tar[:target_id]
+              %option{:selected => true}<
+                = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
+            - else
+              %option<
+                = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
+
   %fieldset.resform
     %legend
       related entities:

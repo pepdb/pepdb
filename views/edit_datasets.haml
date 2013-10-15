@@ -32,25 +32,20 @@
       = partial :editlist, locals: {selected:@dataset[:selection_round], label:"selr", fieldname:"selection round:", listname:"selrlist", listlabel:"fbselr", dbdata:@ds_infos.group(:selection_round), columnname: :selection_round}
     %p
       = partial :editlist, locals: {selected:@dataset[:sequence_length], label:"seql", fieldname:"sequence length:", listname:"seqllist", listlabel:"fbseql", dbdata:@ds_infos.group(:sequence_length), columnname: :sequence_length}
-  %fieldset.dsform
-    %legend sequencing target:
     %p
-      %label{:for => "dspecies"}
-        %span species:
-        = partial :editformdrop, locals:{selected:@dataset[:species], para: "dspecies", values:@species, column: :species, required: false}
-    %p
-      %label{:for => "dtissue"}
-        %span tissue:
-        %select{:name => "dtissue", :id => "dtissue"}
+      %label{:for => "dtar"}
+        %span sequencing target:
+        %select{:name => "dtar", :id => "dtar"}
           %option
-            = @dataset[:tissue]
+            &nbsp;
+          - Target.order(:species).all do |tar|
+            - if @target == tar[:target_id]
+              %option{:selected => true}<
+                = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
+            - else
+              %option<
+                = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
 
-    %p
-      %label{:for => "dcell"}
-        %span cell:
-        %select{:name => "dcell", :id => "dcell"}
-          %option
-            = @dataset[:cell]
   %fieldset.dsform
     %legend 
       related entities:

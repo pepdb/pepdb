@@ -27,20 +27,16 @@
       = partial :datalist, locals: {req: false, label:"selr", fieldname:"selection round:", listname:"selrlist", listlabel:"fbselr", dbdata:@ds_infos.group(:selection_round), columnname: :selection_round}
     %p
       = partial :datalist, locals: {req: false, label:"seql", fieldname:"sequence length:", listname:"seqllist", listlabel:"fbseql", dbdata:@ds_infos.group(:sequence_length), columnname: :sequence_length}
-  %fieldset.dsform
-    %legend sequencing target:
     %p
-      %label{:for => "dspecies"}
-        %span species:
-        = partial :formdrop, locals:{para: "dspecies", values:@species, column: :species, required: false}
-    %p
-      %label{:for => "dtissue"}
-        %span tissue:
-        %select{:name => "dtissue", :id => "dtissue"}
-    %p
-      %label{:for => "dcell"}
-        %span cell:
-        %select{:name => "dcell", :id => "dcell"}
+      %label{:for => "dtar"}
+        %span sequencing target:
+        %select{:name => "dtar", :id => "dtar"}
+          %option
+            &nbsp;
+          - Target.order(:species).all do |tar|
+            %option<
+              = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
+
   %fieldset.dsform
     %legend 
       related entities:

@@ -27,8 +27,6 @@
           %option
             &nbsp;
           - Target.order(:species).all do |tar|
-            - puts @target
-            - puts tar[:target_id]
             - if @target == tar[:target_id]
               %option{:selected => true}<
                 = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
