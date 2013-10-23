@@ -1,0 +1,14 @@
+!!! 5
+%html
+  %head
+    %meta{:charset=>'UTF-8'}
+    %title pepDB main
+  %body
+    #topbar
+      #datalinks
+    #content
+      #left
+        %ul{:id=>'navigation'}
+          %li.ui-state-disabled 
+            %a{:href =>"#"} Browse by 
+      #right= yield

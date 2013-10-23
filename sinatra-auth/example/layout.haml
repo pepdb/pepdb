@@ -1,0 +1,48 @@
+!!! 5
+%html
+  %head
+    %meta{:charset=>'UTF-8'}
+    = javascript_script_tag("/script/jquery-1.10.2.min.js", "/script/main.js", "/script/jquery.dataTables.min.js", "/script/jquery.dataTables.columnFilter.js", "/script/jquery-ui-1.10.3.custom.min.js", "/script/jquery.jstree.js", "/script/tableinit.js", "/script/TableTools.min.js", "/script/ZeroClipboard.js")
+    = stylesheet_link_tag("/jquery-ui-1.10.3.custom.min.css", "/jquery.dataTables_themeroller.css" , "/TableTools.css", "/style.css") 
+    = link_favicon_tag
+    %title pepDB main
+  %body
+    #topbar
+      = image_tag("/images/pepdb_logo.png", :id => "logo")
+      #datalinks
+        = link_to("add data", "/add-data", :class => "optbut")
+        = link_to("edit data", "/edit-data", :class => "optbut")
+        = link_to("user management", "/users", :class => "optbut")
+    #content
+      #left
+        %ul{:id=>'navigation'}
+          %li.ui-state-disabled 
+            %a{:href =>"#"} Browse by 
+          %li 
+            = link_to("Library", "/libraries")
+          %li 
+            = link_to("Selection", "/selections")
+          %li 
+            = link_to("Sequencing Dataset", "/datasets")
+          %li 
+            = link_to("Cluster", "/clusters")
+          %li -
+          %li.ui-state-disabled 
+            %a{:href =>"#"} Peptide search 
+          %li 
+            = link_to("Systemic Search", "/systemic-search")
+          %li 
+            = link_to("Property Search", "/property-search")
+          %li 
+            = link_to("Comparative Search", "/comparative-search")
+          %li
+            = link_to("Motif Search", "/motif-search")
+          %li -
+          %li.ui-state-disabled 
+            %a{:href =>"#"} Cluster search 
+          %li
+            = link_to("Peptide Sequence Search", "/cluster-search")
+          %li
+            = link_to("Comparative Search", "/comparative-cluster-search")
+        = link_to("Logout", "/logout", :class => "optbut")
+      #right= yield
