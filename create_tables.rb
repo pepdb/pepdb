@@ -1,3 +1,5 @@
+# on first startup create the necessary database tables
+# the methods used come from the sequel gem
 DB.create_table?(:libraries) do
   String :library_name, :primary_key => true
   String :encoding_scheme

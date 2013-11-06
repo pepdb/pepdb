@@ -1,6 +1,7 @@
 ++++ funktionen ++++++
 - form validation
 - blossum berechnung in prop search
+- motivsuche zusätzlich domianz feld einbauen
 
 ++++ toDo ++++++++
 - sequencing datasets auch von dateien nur mit peptide einlesen -> dbinsert anpassen

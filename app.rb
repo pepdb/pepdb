@@ -1,4 +1,7 @@
-#pepdb.rb
+# sinatra main configuration file
+# loads all additional gems/modules, sets some options and 
+# contains all routes served by this application
+# pepdb.rb
 require 'sinatra'
 require 'sinatra/partial'
 require 'sinatra/static_assets'
@@ -29,9 +32,9 @@ set :root, File.dirname(__FILE__)
 set :public_folder, Proc.new {File.join(root, "public_html")}
 
 use Rack::Session::Cookie, :expire_after => 86400, :secret => 'Gh6hh91uhMEsmq05h01ec2b4i9BRVj39' 
-
 use Rack::Flash
 
+# column to select in later database queries to create less clutter in the routes
 library_columns = [:library_name___name, :carrier, :encoding_scheme, :insert_length]
 library_all = [:library_name___name, :encoding_scheme, :carrier, :produced_by, :date, :insert_length, :distinct_peptides, :peptide_diversity]
 selection_columns = [:selection_name___selection, :species, :tissue, :cell]

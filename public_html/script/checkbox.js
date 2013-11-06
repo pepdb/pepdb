@@ -1,5 +1,6 @@
 pepdb.checkbox = pepdb.checkbox || {};
-
+// this file provides checkbox features like loading additional database objects
+// after one checkbox was selected (e.g. systemic search)
 $(document).ready(function(){
   function baseDir(){
     var url = document.location.pathname.split('/')[1];

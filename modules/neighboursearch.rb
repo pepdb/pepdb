@@ -1,4 +1,6 @@
 require 'sinatra/base'
+# this module implements the neighbour search thats offered by 
+# the peptide property search
 
 module Sinatra
   module  NeighbourSearch 
@@ -48,6 +50,9 @@ module Sinatra
         @in_clause
       end #get_neighbours
 
+      # preparations for blosum scoring
+      # if given sequence and current peptid are of equal length just calculate blosum score
+      # if their lengths differ compare each substring of the longer seqence against the shorter one
       def compare_length(peptide, sequence)
         if peptide.size == sequence.size
           compare_sequence(peptide, sequence, peptide)
@@ -70,6 +75,7 @@ module Sinatra
     
       def compare_sequence(seq_a, seq_b, peptide)
         curr_val = 0
+        # calculate blosum score
         seq_a.chars.zip(seq_b.chars).each do |a, b|
           curr_val += @blosum_hash["#{a}#{b}".to_sym]  
         end #zip
@@ -79,6 +85,8 @@ module Sinatra
             @seq_neighbours.sort{|x,y| y <=> x}
             @curr_min_val = @seq_neighbours[-1][0]
           end #if
+        # if we find a sequence with a better blosum score than the current worst 
+        # score in the result, replace it
         elsif curr_val > @curr_min_val
           @seq_neighbours.pop
           @seq_neighbours.unshift([curr_val, peptide])
@@ -92,6 +100,8 @@ module Sinatra
   
 
     def find_neighbours(seq, number_of_neighbours, qry, placeholder)
+      # if other parameters than just the neighbour search where given
+      # get all peptides corresponding to this criteria to reduce search space
       if qry.length > 0
         peptides = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).distinct.select(:peptides__peptide_sequence).where(Sequel.lit(qry, *placeholder)).all
       end

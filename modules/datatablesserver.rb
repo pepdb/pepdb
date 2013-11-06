@@ -1,5 +1,8 @@
 require 'sinatra/base'
-
+# this module implements the server-side datatables processing
+# allows multiple column sorting, individual column filtering
+# inspired by http://datatables.net/development/server-side/ruby_mysql
+# further information on server-side processing: http://datatables.net/usage/server-side
 module Sinatra
   module DataTablesServer 
     
@@ -26,6 +29,7 @@ module Sinatra
           query = DB[:propqry].select(:qry_string, :placeholder).where(:qry_id => params[:selElem].to_i).first
           ph_array = query[:placeholder].split(",")
           @placeholder_args.insert(-1, *ph_array)
+          # following queries probably need some optimization...
           #@select = "SELECT `peptides`.`peptide_sequence`, `sequencing_datasets`.`dataset_name` AS 'dataset', `rank`, `reads`, `dominance` FROM `peptides` INNER JOIN `peptides_sequencing_datasets` ON (`peptides_sequencing_datasets`.`peptide_sequence` = `peptides`.`peptide_sequence`) INNER JOIN `sequencing_datasets` ON (`sequencing_datasets`.`dataset_name` = `peptides_sequencing_datasets`.`dataset_name`) INNER JOIN `selections` ON (`selections`.`selection_name` = `sequencing_datasets`.`selection_name`) INNER JOIN `libraries` ON (`sequencing_datasets`.`library_name` = `libraries`.`library_name`) LEFT JOIN `results` ON (`peptides_sequencing_datasets`.`result_id` = `results`.`result_id`) INNER JOIN `targets` AS 'sel_target' ON (`selections`.`target_id` = `sel_target`.`target_id`) INNER JOIN `targets` AS 'seq_target' ON (`sequencing_datasets`.`target_id` = `seq_target`.`target_id`) WHERE " << query[:qry_string].to_s  
           @select = "SELECT `peptides`.`peptide_sequence`, `sequencing_datasets`.`dataset_name` AS 'dataset', `rank`, `reads`, `dominance` FROM `peptides` INNER JOIN `peptides_sequencing_datasets` ON (`peptides_sequencing_datasets`.`peptide_sequence` = `peptides`.`peptide_sequence`) INNER JOIN `sequencing_datasets` ON (`sequencing_datasets`.`dataset_name` = `peptides_sequencing_datasets`.`dataset_name`) INNER JOIN `selections` ON (`selections`.`selection_name` = `sequencing_datasets`.`selection_name`) INNER JOIN `libraries` ON (`sequencing_datasets`.`library_name` = `libraries`.`library_name`) LEFT JOIN `results` ON (`peptides_sequencing_datasets`.`result_id` = `results`.`result_id`) LEFT JOIN `targets` AS 'sel_target' ON (`selections`.`target_id` = `sel_target`.`target_id`) LEFT JOIN `targets` AS 'seq_target' ON (`sequencing_datasets`.`target_id` = `seq_target`.`target_id`) WHERE " << query[:qry_string].to_s  
           qry_string = "SELECT `peptides`.`peptide_sequence`, `sequencing_datasets`.`dataset_name` AS 'dataset', `rank`, `reads`, `dominance` FROM `peptides` INNER JOIN `peptides_sequencing_datasets` ON (`peptides_sequencing_datasets`.`peptide_sequence` = `peptides`.`peptide_sequence`) INNER JOIN `sequencing_datasets` ON (`sequencing_datasets`.`dataset_name` = `peptides_sequencing_datasets`.`dataset_name`) INNER JOIN `selections` ON (`selections`.`selection_name` = `sequencing_datasets`.`selection_name`) INNER JOIN `libraries` ON (`sequencing_datasets`.`library_name` = `libraries`.`library_name`) LEFT JOIN `results` ON (`peptides_sequencing_datasets`.`result_id` = `results`.`result_id`) LEFT JOIN `targets` AS 'sel_target' ON (`selections`.`target_id` = `sel_target`.`target_id`) LEFT JOIN `targets` AS 'seq_target' ON (`sequencing_datasets`.`target_id` = `seq_target`.`target_id`) WHERE " << query[:qry_string].to_s  
@@ -36,6 +40,7 @@ module Sinatra
           @where = build_where_string
           qry_string << @where
         end
+        # this query (count) can cause extreme query duration (>180 seconds) on some systems
         @total_disp_rec = DB.fetch(qry_string, *@placeholder_args).count
         @order = build_order_string
         @limit = build_limit_string
@@ -53,6 +58,7 @@ module Sinatra
         
       private
 
+      # following methods create the query string for each database query (sorting, filtering, pagination)
       def build_select_string
         select = "SELECT "
         (0...@columns.size).each do |index|
@@ -118,6 +124,7 @@ module Sinatra
         rows
       end #get_result
       
+      # this module is called for different tables, hence different columns are fetched from db
       def get_columns
         if @referer.include?("datasets")
           [:peptide_sequence, :rank, :reads, :dominance]      

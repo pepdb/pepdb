@@ -1,10 +1,12 @@
 require 'sinatra/base'
+# this module adds some convenience methods
 
 module Sinatra
   module Utilities
     include Rack::Utils
     alias_method :h, :escape_html
     
+    # formats domanice in datatables
     def format_dominance(value)
         dom = value * 100
         "%E" % dom
@@ -14,7 +16,7 @@ module Sinatra
       column == :dominance
     end
 
-
+    # align numerical values right 
     def align_right?(column)
       numeric_columns = [:date, :insert_length, :distinct_peptides, :peptide_diversity, :selection_round, :sequence_length, :reads_sum, :dominance_sum, :rank, :reads, :dominance]
       numeric_columns.include?(column)
@@ -32,6 +34,8 @@ module Sinatra
       return datatype, columnname
     end #choose_data
     
+    # nbsp = non-breaking space, tests if a value other than the blank field
+    # in a dropdown-menu was selected
     def not_just_nbsp?(field)
       field.codepoints.to_a.size > 1
     end
@@ -40,6 +44,8 @@ module Sinatra
       !field.nil? && not_just_nbsp?(field)
     end
   
+    # return all libraries, selecions and sequencing datasets that the current user is allowed
+    # to access
     def get_allowed_lib_sel_ds(user)
       allowed_lib = []
       allowed_sel = []

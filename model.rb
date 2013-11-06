@@ -1,13 +1,17 @@
 require 'sequel'
 require 'logger'
 
+# this file realizes the ORM part of sequel
+# all database tables can be accessed via the corresponding ruby classes
+# after this file has been loaded
+
+# create db connection and load the regexp module
 DB = Sequel.sqlite('pep.db', :synchronous => "off", :after_connect => (proc do |db|
   db.enable_load_extension(1) 
   db.execute("SELECT load_extension('./regexp.sqlext')")
   db.enable_load_extension(0) 
 end))
 require './create_tables'
-#DB.loggers << Logger.new($stdout)
 
 
 class Library < Sequel::Model
