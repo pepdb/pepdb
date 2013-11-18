@@ -131,9 +131,9 @@ module Sinatra
         if @referer.include?("datasets")
           [:peptide_sequence, :rank, :reads, :dominance]      
         elsif @referer.include?("systemic-search")
-          [:peptide_sequence, :dataset_name,:rank, :reads, :dominance]      
+          [:peptide_sequence, :rank, :reads, :dominance, :dataset_name]      
         elsif @referer.include?("property-search")
-          [:peptides_sequencing_datasets__peptide_sequence, :sequencing_datasets__dataset_name,:rank, :reads, :dominance]      
+          [:peptides_sequencing_datasets__peptide_sequence,:rank, :reads, :dominance, :sequencing_datasets__dataset_name]      
         end
       end
       

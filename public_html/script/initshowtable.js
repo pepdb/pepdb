@@ -46,7 +46,11 @@ $(document).ready(function(){
     "bSearchable": true,
     "sPaginationType": "full_numbers",
     "bPaginate": true,
-    "aaSorting": [[2, "desc"]],
+    "aaSorting": [[1, "asc"]],
+    "aoColumnDefs":[{"aTargets":[1,2,3],
+                    "sClass": "alignRight"
+    },
+],
     "sDom": '<"H"lfrT>t<"F"ip>',
     "oTableTools":{
       "sSwfPath": url+"/copy_csv_xls_pdf.swf",

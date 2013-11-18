@@ -3,6 +3,8 @@ th, td {
   white-space:nowrap;
 }
 
+.alignRight {text-align: right;}
+
 /*
  * Table
  */

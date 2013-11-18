@@ -315,7 +315,7 @@ end
 
 get '/systemic-results' do
   login_required
-  @peptides = Observation.select(:peptide_sequence,:dataset_name,:rank, :reads, :dominance).where(:dataset_name => params['sysDS'])
+  @peptides = Observation.select(:peptide_sequence,:rank, :reads, :dominance, :dataset_name).where(:dataset_name => params['sysDS'])
   haml :peptide_results, :layout => false
 end
 
