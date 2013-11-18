@@ -1,6 +1,6 @@
 pepdb.accinit = pepdb.accinit || {};
 var asInitVals = new Array();
-
+// this file initializes the jquery accordions used within some search results (e.g. motif search)
 $(document).ready(function(){
   function baseDir(){
     var url = document.location.pathname.split('/')[1];
@@ -16,6 +16,7 @@ $(document).ready(function(){
   $('#compacc').accordion({ heightStyle: "content" },
                           {collapsible:true } );  
   
+  // initialzie datatables table
     var oTable = $('.mot_table').dataTable({
     "bPaginate": "true",
     "sPaginationType": "full_numbers",
@@ -33,10 +34,12 @@ $(document).ready(function(){
       }
     });
 
+  // stop table sorting when clicking on the filter-field  
   $('.mot_table thead input').click( function(e){
     stopTableSorting(e);
   });
     
+  // the following lines are neccessary for the individual column filtering
   $('.mot_table thead input').keyup( function(e){
     stopTableSorting(e);
     oTable.fnFilter(this.value, $(".mot_table thead input").index(this));

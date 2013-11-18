@@ -2,10 +2,12 @@ require 'sinatra/base'
 require 'sqlite3'
 require 'csv'
 require './modules/columnfinder'
-
+# this module is used to insert and update database data
 module Sinatra
   module DBInserter 
-        
+    
+    # this class reads possible datafiles, for further format informations
+    # see the bachelor thesis
     class FileReader
       def initialize(filetype, file, dataset)
         @filetype = filetype
@@ -94,6 +96,7 @@ module Sinatra
 
     class InsertData   
       include Utilities
+      # sqlite can't handle more than ~500 statements at once
       MAX_SQLITE_STATEMENTS = 450
       include Rack::Utils
       alias_method :es, :escape_html
@@ -151,6 +154,7 @@ module Sinatra
       def into_dataset
         pep_ds = []
         dna_pep = []
+        # because a large amount of data is inserted in the following section wrap it in a transaction
         DB.transaction do
           begin
             library = DB[:selections].select(:library_name).where(:selection_name => @values[:dselname].to_s).first[:library_name]
@@ -193,6 +197,7 @@ module Sinatra
         DB[:peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :reads, :dominance, :rank], pep_ds)
         #end # trans
       end
+      # fter inserting a new sequencing dataset update the distinct peptides field of the corresponding library 
       update_distinct_peptides = DB["UPDATE libraries SET distinct_peptides = (SELECT COUNT (DISTINCT peptide_sequence) FROM peptides_sequencing_datasets AS pep_seq INNER JOIN sequencing_datasets AS ds ON pep_seq.dataset_name = ds.dataset_name  WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)) WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)", @values[:dsname].to_s, @values[:dsname].to_s]
       update_distinct_peptides.update
       end #dataset
@@ -265,7 +270,6 @@ module Sinatra
             
             motifs.each_with_index do |entry, index|
               raise ArgumentError, "duplicate motif sequence on line #{index+1}"  if motifs.slice(0, index).include?(entry)    
-        
             end
 
             DB[:motifs_motif_lists].import([:list_name, :motif_sequence, :target, :receptor, :source], motifs_mot_lists)
@@ -283,7 +287,9 @@ module Sinatra
           end #rescue
         end #transaction
       end #motif
-      
+     
+      # sequel's import method currently does not support insert-ignore when using sqlite
+      # so we need to build a sql-string to explicitly use insert-ignore when inserting large amounts of data
       def build_compound_select_string(data, table, *columns)
         qry = []
         placeholder_args = []

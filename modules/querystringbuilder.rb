@@ -2,7 +2,9 @@ require 'sinatra/base'
 require './modules/wcsearch'
 require './modules/utilities'
 require './modules/neighboursearch'
-
+# this module builds larger sql queries that can't be directly projected by sequel
+# so we use raw sql queries via sequel instead
+# these queries are mainly used when using the peptide property search
 module Sinatra
   module QueryStringBuilder
 
@@ -17,18 +19,18 @@ module Sinatra
 
       if option_selected?(params['type'])
         if params['type'] == "complete sequence" && !option_selected?(params[:blos])
-          querystring << 'peptides.peptide_sequence = ? '
+          querystring << 'peptides_sequencing_datasets.peptide_sequence = ? '
           placeholders.insert(-1, params['seq'].to_s.upcase)
         elsif params['type'] == "partial sequence"
-          querystring << 'peptides.peptide_sequence LIKE ? '
+          querystring << 'peptides_sequencing_datasets.peptide_sequence LIKE ? '
           likestr = '%' << params['seq'].to_s.upcase << '%'
           placeholders.insert(-1, likestr)
         elsif params['type'] == "wildcard sequence"
-          querystring << 'peptides.peptide_sequence REGEXP ? '
+          querystring << 'peptides_sequencing_datasets.peptide_sequence REGEXP ? '
           wildcard = wc_search(params[:seq])
           placeholders.insert(-1, wildcard)
         elsif params['type'] == "reverse wildcard sequence"
-          querystring << 'peptides.peptide_sequence REGEXP ? '
+          querystring << 'peptides_sequencing_datasets.peptide_sequence REGEXP ? '
           wildcard = rev_wc_search(params[:seq]) 
           placeholders.insert(-1, wildcard)
         end

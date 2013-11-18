@@ -1,5 +1,5 @@
 require 'sinatra/base'
-
+# this module implements the peptide motif search
 module Sinatra
   module MotifSearch 
   
@@ -19,6 +19,8 @@ module Sinatra
     def find_hits
       @motifs.each do |element|
         motif = element[:motif_sequence]
+        #if motif contains character clases e.g. [AE] substitute them with a placeholder
+        # so we calculate the "correct" motif length where each class counts just for one character
         motif_brackets = motif.scan(/(\[\w+\])/) 
         substitutions = {}
         motif_wo_brackets = motif 
@@ -26,6 +28,10 @@ module Sinatra
           substitutions["#{index}"] = motif_brackets[index][0]
           motif_wo_brackets = motif_wo_brackets.gsub(/#{Regexp.escape(motif_brackets[index][0])}/, "#{index}")
         end
+        # compare each motif with each peptide
+        # if the motif is short than the peptide just regexp match it with the peptide
+        # if the peptide is longer regexp match each motif substring of length |peptide|
+        # with the peptide
         @peptides.each do |element2|
           peptide = element2[:peptide_sequence]
           if  motif_brackets.empty? 
@@ -52,7 +58,9 @@ module Sinatra
         diff = motif.size - peptide.size
         (0..diff).each do |index|
           submotif = motif.slice(index, length)
+          # substitute the placeholders with the correct character classes
           submotif.gsub!(/\d/, substitutions)
+          # substitute the correct regexp wildcard symbol
           submotif.gsub!(/X/, '.')
           regexes.insert(-1, Regexp.new(submotif))              
         end

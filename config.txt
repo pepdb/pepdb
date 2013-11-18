@@ -1,3 +1,4 @@
+# file documenting which packages where installed during the development of pepDB
 gem install haml
 gem install sinatra
 gem install sass

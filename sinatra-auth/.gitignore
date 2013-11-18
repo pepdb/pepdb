@@ -1,0 +1,10 @@
+pkg/
+*.swp
+*.db
+*.tct
+.bundle
+Gemfile.lock
+vendor/bundle
+sinatra-authentication-0.4.2.gem
+sinatra-authentication-0.3.2.gem
+sinatra-authentication-0.4.2.gem

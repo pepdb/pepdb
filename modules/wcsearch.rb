@@ -1,5 +1,5 @@
 require 'sinatra/base'
-
+# this module implements the (reverse) wildcard search when using the peptide property search
 module Sinatra
   module WCSearch 
     class WildcardSearch
@@ -13,6 +13,7 @@ module Sinatra
         @regexp = ''
       end
 
+      # this method builds the regexp from the given wildcard sequence
       def build_string
         bracket_open = false
         bracket_class = ''

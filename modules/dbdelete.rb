@@ -1,5 +1,5 @@
 require 'sinatra/base'
-
+# this module handles database column deletions 
 module Sinatra
   module DBDelete 
     class DBDeleter
@@ -11,10 +11,6 @@ module Sinatra
       end #init
 
       def delete 
-        puts @table.class
-        puts @id_column
-        puts @row_id
-        puts DB[@table].where(Sequel.lit('? = ?', @id_column, @row_id)).inspect
         DB[@table].where(@id_column => @row_id).delete
       end
       
@@ -39,6 +35,7 @@ module Sinatra
       end #set_column
     end #class
 
+    # this method is called from within routes to delete the given column
     def delete_entry(params)
       dd = DBDeleter.new(params)
       dd.delete

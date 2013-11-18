@@ -1,5 +1,6 @@
 pepdb.initbutton = pepdb.initbutton || {};
-
+// this file initializes the continue buttons displayed within the data browsing
+// additionally it hides previous search results when a new search is send
 $(document).ready(function(){
    function baseDir(){
     var url = document.location.pathname.split('/')[1];

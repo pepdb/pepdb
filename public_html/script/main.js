@@ -2,8 +2,7 @@
 var pepdb = pepdb || {};
 
 $.ajaxSetup ({
-    // Disable caching of AJAX responses
-    cache: false 
+    cache: true 
 });
 
 var isFirstLoad = function(namesp, jsFile) {

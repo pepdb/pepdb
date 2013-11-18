@@ -1,5 +1,6 @@
 require 'sinatra/base'
-
+# this module offers some basic formvaldition
+# e.g. test if given date if formatted correctly
 module Sinatra
   module FormValidation
 

@@ -1,4 +1,5 @@
-
+// this file is nearly obsolete since the target selection was changed so now additional
+// data needs to be loaded after one part of the target was selected (e.g. adding a selection)
 $(document).ready(function(){
   function baseDir(){
     var url = document.location.pathname.split('/')[1];
