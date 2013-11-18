@@ -46,6 +46,7 @@ $(document).ready(function(){
     "bSearchable": true,
     "sPaginationType": "full_numbers",
     "bPaginate": true,
+    "aaSorting": [[2, "desc"]],
     "sDom": '<"H"lfrT>t<"F"ip>',
     "oTableTools":{
       "sSwfPath": url+"/copy_csv_xls_pdf.swf",
