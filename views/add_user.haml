@@ -23,7 +23,7 @@
           %br<      
     .buttons
       %input{ :value => "Add user", :type => "submit" }
-- if Rack.const_defined?('Flash') && flash[:notice]
+- if Rack.const_defined?('Flash') && flash[:notice] && !flash[:notice].include?("successful")
   .ui-widget
     %div{:class => "ui-state-highlight ui-corner-all", :id => "highlightbox"}
       %p
