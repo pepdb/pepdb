@@ -46,7 +46,7 @@ dataset_all_columns = [:dataset_name___name, :library_name___library, :selection
 dataset_edit_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target]
 peptide_columns = [:peptide_sequence, :rank, :reads , :dominance]
 peptide_browse_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance, :performance, :species, :tissue, :cell]
-sys_peptide_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name___dataset,:rank, :reads , :dominance]
+sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence, :rank, :reads , :dominance, :sequencing_datasets__dataset_name___dataset]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
 dna_columns = [:dna_sequences__dna_sequence, :reads]
@@ -336,7 +336,7 @@ end
 get '/property-results' do
   login_required
   puts params.inspect
-  @results = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
+  @results = Observation.join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
   begin
     @querystring, @placeholders = build_property_array(params)
     if option_selected?(params[:blos])
