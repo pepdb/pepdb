@@ -15,7 +15,6 @@ require './modules/motifsearch'
 require './modules/compclustersearch'
 require './modules/columnfinder'
 require './modules/dbdelete'
-require './modules/aminoaciddistr'
 require 'digest/sha1'
 require 'date'
 require 'sass'
@@ -46,6 +45,7 @@ dataset_info_columns = [:dataset_name___name, :libraries__library_name___library
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
 dataset_edit_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target]
 peptide_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance]
+peptide_columns_new = [:peptide_sequence, :rank, :reads , :dominance]
 peptide_browse_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance, :performance, :species, :tissue, :cell]
 sys_peptide_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name___dataset,:rank, :reads , :dominance]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
@@ -157,7 +157,8 @@ get '/datasets/:set_name' do
   else
     redirect '/datasets'
   end
-  @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
+  #@peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
+  @peptides = Observation.select(*peptide_columns_new)
   @infodata = SequencingDataset.select(*dataset_all_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
   haml :datasets
 end
@@ -235,7 +236,8 @@ get '/show_sn_table' do
     @column = :sequencing_datasets__dataset_name
     @eletype = "Peptides"
     @id = :pep_table
-    @data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
+    @data = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns_new)
+    #@data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
   end
   haml :show_sn_table, :layout => false
 end
@@ -267,7 +269,8 @@ get '/show-info' do
     @column = :dataset_name
     haml :show_info, :layout => false
   elsif params['ref'] == "Sequencing Dataset"
-    @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
+    #@info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
+    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
     @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
