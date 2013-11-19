@@ -343,7 +343,7 @@ get '/property-results' do
     if option_selected?(params[:blos])
       find_neighbours(params[:seq].to_s.upcase, params[:blos], @querystring, @placeholders)
     end
-    DB.create_table?(:propqry) do
+    DB.create_table?(:propqry, :temp => true) do
       primary_key :qry_id
       Text :qry_string
       Text :placeholder
