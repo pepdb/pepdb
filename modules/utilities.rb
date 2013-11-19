@@ -38,7 +38,7 @@ module Sinatra
     # nbsp = non-breaking space, tests if a value other than the blank field
     # in a dropdown-menu was selected
     def not_just_nbsp?(field)
-      field != ""
+      field != "" && field.match(/^[[:space:]]+$/) == nil
     end
 
     def option_selected?(field)

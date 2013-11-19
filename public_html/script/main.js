@@ -295,14 +295,14 @@ $(document).ready(function(){
       $.get(url+'/formdrop', {columnname: "selection_name", selected1: valSel, table:"selections", where1:"library_name", boxID:"s"}, function(data){
         $('#s').html(data);
         $('#s').prop('selectedIndex', -1);
-        $('#ds').html('');
+        $('#ds').prop('selectedIndex', -1);
       });
     });
     $('#s').change(function(){
-      var valSel1 = $('#l').children("option:selected").text();
-      var valSel2 = $(this).children("option:selected").text();
-      $.get(url+'/formdrop', {columnname: "dataset_name", selected1: valSel1, selected2: valSel2,table:"sequencing_datasets", where2:"selection_name", where1:"library_name",boxID:"ds"}, function(data){
+      var valSel1 = $(this).children("option:selected").text();
+      $.get(url+'/formdrop', {columnname: "dataset_name", selected1: valSel1,table:"sequencing_datasets", where1:"selection_name",boxID:"ds"}, function(data){
         $('#ds').html(data);
+        $('#ds').prop('selectedIndex', -1);
       });
     });
       

@@ -77,9 +77,6 @@ module Sinatra
         curr_val = 0
         # calculate blosum score
         seq_a.chars.zip(seq_b.chars).each do |a, b|
-          puts a
-          puts b
-          puts @blosum_hash["#{a}#{b}".to_sym]  
           curr_val += @blosum_hash["#{a}#{b}".to_sym]  
         end #zip
         if @seq_neighbours.size < @num_neighbours
