@@ -27,11 +27,11 @@ module Sinatra
           placeholders.insert(-1, likestr)
         elsif params['type'] == "wildcard sequence"
           querystring << 'peptides_sequencing_datasets.peptide_sequence REGEXP ? '
-          wildcard = wc_search(params[:seq.to_s.upcase])
+          wildcard = wc_search(params[:seq])
           placeholders.insert(-1, wildcard)
         elsif params['type'] == "reverse wildcard sequence"
           querystring << 'peptides_sequencing_datasets.peptide_sequence REGEXP ? '
-          wildcard = rev_wc_search(params[:seq].to_s.upcase) 
+          wildcard = rev_wc_search(params[:seq]) 
           placeholders.insert(-1, wildcard)
         end
       end
