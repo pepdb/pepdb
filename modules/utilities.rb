@@ -1,3 +1,4 @@
+#encoding=utf-8
 require 'sinatra/base'
 # this module adds some convenience methods
 
@@ -37,7 +38,7 @@ module Sinatra
     # nbsp = non-breaking space, tests if a value other than the blank field
     # in a dropdown-menu was selected
     def not_just_nbsp?(field)
-      field.codepoints.to_a.size > 1
+      field != ""
     end
 
     def option_selected?(field)

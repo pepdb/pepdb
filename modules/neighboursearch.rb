@@ -77,6 +77,9 @@ module Sinatra
         curr_val = 0
         # calculate blosum score
         seq_a.chars.zip(seq_b.chars).each do |a, b|
+          puts a
+          puts b
+          puts @blosum_hash["#{a}#{b}".to_sym]  
           curr_val += @blosum_hash["#{a}#{b}".to_sym]  
         end #zip
         if @seq_neighbours.size < @num_neighbours
@@ -103,13 +106,13 @@ module Sinatra
       # if other parameters than just the neighbour search where given
       # get all peptides corresponding to this criteria to reduce search space
       if qry.length > 0
-        peptides = Peptide.join(Observation, :peptide_sequence => :peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).distinct.select(:peptides__peptide_sequence).where(Sequel.lit(qry, *placeholder)).all
+        peptides = Observation.join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).distinct.select(:peptides_sequencing_datasets__peptide_sequence).where(Sequel.lit(qry, *placeholder)).all
       end
       bs = BlosumSearch.new(seq, number_of_neighbours, peptides)
       sequences = bs.get_neighbours
       querystring = ""
-      querystring << 'peptides.peptide_sequence IN (' if qry.length == 0
-      querystring << 'AND peptides.peptide_sequence IN (' if qry.length > 0
+      querystring << 'peptides_sequencing_datasets.peptide_sequence IN (' if qry.length == 0
+      querystring << 'AND peptides_sequencing_datasets.peptide_sequence IN (' if qry.length > 0
       (0...sequences.size).each do |neighbour_seq|
         querystring << '?, '
       end

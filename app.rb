@@ -29,6 +29,7 @@ Haml::Options.defaults[:format] = :xhtml
 set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 set :public_folder, Proc.new {File.join(root, "public_html")}
+set :default_encoding, "utf-8" 
 
 use Rack::Session::Cookie, :expire_after => 86400, :secret => 'Gh6hh91uhMEsmq05h01ec2b4i9BRVj39' 
 use Rack::Flash
@@ -340,7 +341,7 @@ get '/property-results' do
   begin
     @querystring, @placeholders = build_property_array(params)
     if option_selected?(params[:blos])
-      find_neighbours(params[:seq], params[:blos], @querystring, @placeholders)
+      find_neighbours(params[:seq].to_s.upcase, params[:blos], @querystring, @placeholders)
     end
     DB.create_table?(:propqry) do
       primary_key :qry_id

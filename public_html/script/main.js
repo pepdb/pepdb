@@ -341,16 +341,24 @@ $(document).ready(function(){
       if ($(this).val() == "complete sequence"){ 
         $('#blossum').show();
         $('#wchelp').hide();
+        $('#bshelp').show();
       } else if ($(this).val() == "wildcard sequence"){ 
         $('#blossum').hide();
         $('#wchelp').show();
+        $('#bshelp').hide();
       } else {
         $('#blossum').hide();
         $('#wchelp').hide();
+        $('#bshelp').hide();
       
       }
     });
     $('#wcicon').tooltip({
+      content: function(callback){
+        callback($(this).prop('title').replace(/\|/g, '<br />'));
+      }
+    });
+    $('#bsicon').tooltip({
       content: function(callback){
         callback($(this).prop('title').replace(/\|/g, '<br />'));
       }
