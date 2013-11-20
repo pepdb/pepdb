@@ -15,6 +15,12 @@
     .check-select#ref-selection
 
     .check-select#ref-dataset
+    %fieldset
+      %legend dominance
+      %label max.
+      %input{:type => "text", :size => 5, :name => "ds_dom_max",:id => "ds_dom_max"}
+      %label min.
+      %input{:type => "text", :size => 5, :name => "ds_dom_min", :id => "ds_dom_min", :value => 0.0001}
 
     #motif-select
       %p motifs
