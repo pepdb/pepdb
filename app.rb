@@ -442,23 +442,26 @@ get '/motif-search-results' do
     @errors[:dom] = "at least one dominance limit needs to be selected!"
   end
   if @errors.empty?
-    DB.create_table?(:mot_matches, :temp => true) do
+    DB.create_table!(:mot_matches, :temp => true) do
       String :motif_sequence
       String :dataset_name
       String :peptide_sequence
+      Float :dominance
       primary_key [:motif_sequence, :peptide_sequence, :dataset_name]
       index [:motif_sequence, :peptide_sequence, :dataset_name]
     end
     @table = :mot_matches
     @datasets = params[:ref_ds]
     @ds_qry, @ds_placeh = build_cdom_string(params)
-    puts @ds_qry
-    puts @ds_placeh
-    @peptides = Observation.distinct.select(:peptide_sequence).where(:dataset_name => @datasets)
+    @peptides = Observation.distinct.select(:peptide_sequence).where(:dataset_name => @datasets).where(Sequel.lit(@ds_qry, *@ds_placeh)).all
     @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence).where(:list_name => params[:checked_motl])
-    
+   
     search_peptide_motif_matches(@motlists, @peptides, @datasets, @table)
-    @results = DB[@table].distinct.select(:motif_sequence, :peptides_sequencing_datasets__peptide_sequence___peptide, :peptides_sequencing_datasets__dataset_name___dataset, :rank).left_join(:peptides_sequencing_datasets, :peptide_sequence => :peptide_sequence)
+    @pep_per_mots = DB[@table].select(:motif_sequence, :peptide_sequence).to_hash_groups(:motif_sequence, :peptide_sequence)
+    @uniq_pep_per_mots = DB[@table].distinct.select(:motif_sequence, :peptide_sequence).to_hash_groups(:motif_sequence, :peptide_sequence)
+    @ds_per_peps = DB[@table].distinct.select(:peptide_sequence, :dataset_name).to_hash_groups(:peptide_sequence, :dataset_name)
+    @dom_per_peps = DB[@table].distinct.select(:peptide_sequence, :dataset_name, :dominance).to_hash_groups(:peptide_sequence)
+    @mot_infos = DB[:motifs_motif_lists].select(:motif_sequence, :target, :receptor).where(:list_name => params[:checked_motl]).to_hash(:motif_sequence)
     haml :mot_search_res, :layout => false
   else
     haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}

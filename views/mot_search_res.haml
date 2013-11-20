@@ -1,35 +1,36 @@
 %input{:type => "hidden", :id => "listsize", :value => @motlists.count}
 #motacc
-  - @motlists.each do |motif|
-    %h3 
-      =motif[:motif_sequence]
-    %div
-      %table.mot_table
-        %thead.ui-widget-header
-          %tr
-            %th 
-              peptide
-              %br
-              %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-            
-            - @datasets.each do
+  - if @pep_per_mots.empty?
+    = "No results found."
+  - else
+    - @pep_per_mots.each_key do |motif|
+      %h3 
+        = "#{motif} hits: #{@pep_per_mots[motif].size} <br />target: #{@mot_infos[motif][:target]} <br />receptor: #{@mot_infos[motif][:receptor]}"
+      %div
+        %table.mot_table
+          %thead.ui-widget-header
+            %tr
+              %th 
+                peptide
+                %br
+                %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+              
               %th 
                 dataset
                 %br
                 %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
               %th 
-                rank
+                dominance 
                 %br
                 %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-        %tbody.ui-widget-content
-          - @results.where(:motif_sequence => motif[:motif_sequence]).group(:peptide).each do |row|
-            %tr
-              %td 
-                =row[:peptide]
-                - @datasets.each do |ds|
-                  - @results.where(:peptides_sequencing_datasets__dataset_name => ds, :motif_sequence => motif[:motif_sequence], :peptides_sequencing_datasets__peptide_sequence => row[:peptide]).each do |cell|
-                    %td 
-                      = cell[:dataset]  
-                    %td.alnright
-                      = cell[:rank]
-            
+          %tbody.ui-widget-content
+            - @uniq_pep_per_mots[motif].each do |peptide|
+              - @dom_per_peps[peptide].each do |row|
+                %tr
+                  %td 
+                    = peptide
+                  %td
+                    = row[:dataset_name]
+                  %td.alnright
+                    = format_dominance(row[:dominance])
+                

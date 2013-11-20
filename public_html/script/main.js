@@ -2,7 +2,7 @@
 var pepdb = pepdb || {};
 
 $.ajaxSetup ({
-    cache: true 
+    cache: false 
 });
 
 var isFirstLoad = function(namesp, jsFile) {
@@ -89,18 +89,12 @@ $(document).ready(function(){
       } );
   });
 
-  $('#motif-list input:checkbox').click(function(){
+  $('#motif-list input:radio').click(function(){
     if($('#motifs').is(':visible')){
       $('#motifs').toggle();
     }
-    var checkedLists = [];
-    $(this).closest('fieldset').find(':checkbox').each(function(){
-      var elemVal = $(this).attr('value');
-      if(this.checked && elemVal != "all_motl"){
-        checkedLists.push(elemVal);
-      }
-    });
-    $.get('mot-checklist', {checkedElem: checkedLists},function(data){
+    var checkedList = $(this).val();
+    $.get('mot-checklist', {checkedElem: checkedList},function(data){
       $('#motifs').html(data);
       $.getScript(url+"/script/initshowtable.js", function(){
         $('#motifs').toggle();

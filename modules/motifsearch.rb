@@ -41,7 +41,7 @@ module Sinatra
           end #if
         end #each
         if @match_found
-          DB[@table].import([:dataset_name, :motif_sequence, :peptide_sequence],@matches[motif.to_sym])
+          DB[@table].import([:dataset_name, :motif_sequence, :peptide_sequence, :dominance],@matches[motif.to_sym])
           @match_found = false
         end
       end #each
@@ -68,11 +68,13 @@ module Sinatra
       regexes.each do |regex|
         unless peptide.match(regex).nil? 
           if @dataset.size == 1
-            @matches[real_motif.to_sym].insert(-1, [@dataset, real_motif, peptide]) 
+            dominance = Observation.select(:dominance).where(:dataset_name => @dataset, :peptide_sequence => peptide).first[:dominance]  
+            @matches[real_motif.to_sym].insert(-1, [@dataset, real_motif, peptide, dominance]) 
           else
             @dataset.each do |ds|
               if Observation.select(:peptide_sequence).where(:dataset_name => ds).count != 0
-                @matches[real_motif.to_sym].insert(-1, [ds, real_motif, peptide]) 
+                dominance = Observation.select(:dominance).where(:dataset_name => ds, :peptide_sequence => peptide).first[:dominance]
+                @matches[real_motif.to_sym].insert(-1, [ds, real_motif, peptide, dominance]) 
               end
             end #each
           end #if

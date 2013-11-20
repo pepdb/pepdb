@@ -26,11 +26,8 @@
       %p motifs
       .check-select#motif-list
         %fieldset.checklist
-          %input{:type => "checkbox", :name => "checked_motl[]", :id => "all_motl",:value => "all_motl"}/ 
-          all
-          %br 
           - @motiflists.each do |elem|
-            %input{:type => "checkbox", :name => "checked_motl[]", :id => "#{elem[:list_name]}",:value => "#{elem[:list_name]}"}/
+            %input{:type => "radio", :name => "checked_motl[]", :id => "#{elem[:list_name]}",:value => "#{elem[:list_name]}"}/
             = elem[:list_name]
             %br
       #motifs
