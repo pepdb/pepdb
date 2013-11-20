@@ -29,7 +29,6 @@ module Sinatra
           query = DB[:propqry].select(:qry_string, :placeholder).where(:qry_id => params[:selElem].to_i).first
           ph_array = query[:placeholder].split(",")
           @placeholder_args.insert(-1, *ph_array)
-          # following queries probably need some optimization...
           @select = "SELECT `peptides_sequencing_datasets`.`peptide_sequence`, `rank`, `reads`, `dominance`, `sequencing_datasets`.`dataset_name` AS 'dataset' FROM `peptides_sequencing_datasets` INNER JOIN `sequencing_datasets` ON (`sequencing_datasets`.`dataset_name` = `peptides_sequencing_datasets`.`dataset_name`) INNER JOIN `selections` ON (`selections`.`selection_name` = `sequencing_datasets`.`selection_name`) INNER JOIN `libraries` ON (`sequencing_datasets`.`library_name` = `libraries`.`library_name`) LEFT JOIN `results` ON (`peptides_sequencing_datasets`.`result_id` = `results`.`result_id`) LEFT JOIN `targets` AS 'sel_target' ON (`selections`.`target_id` = `sel_target`.`target_id`) LEFT JOIN `targets` AS 'seq_target' ON (`sequencing_datasets`.`target_id` = `seq_target`.`target_id`) WHERE " << query[:qry_string].to_s  
           qry_string = "SELECT `peptides_sequencing_datasets`.`peptide_sequence`, `rank`, `reads`, `dominance`, `sequencing_datasets`.`dataset_name` AS 'dataset' FROM `peptides_sequencing_datasets` INNER JOIN `sequencing_datasets` ON (`sequencing_datasets`.`dataset_name` = `peptides_sequencing_datasets`.`dataset_name`) INNER JOIN `selections` ON (`selections`.`selection_name` = `sequencing_datasets`.`selection_name`) INNER JOIN `libraries` ON (`sequencing_datasets`.`library_name` = `libraries`.`library_name`) LEFT JOIN `results` ON (`peptides_sequencing_datasets`.`result_id` = `results`.`result_id`) LEFT JOIN `targets` AS 'sel_target' ON (`selections`.`target_id` = `sel_target`.`target_id`) LEFT JOIN `targets` AS 'seq_target' ON (`sequencing_datasets`.`target_id` = `seq_target`.`target_id`) WHERE " << query[:qry_string].to_s  
           qry_string.slice!(qry_string.size-6, qry_string.size) if query[:qry_string].empty?
@@ -38,7 +37,6 @@ module Sinatra
           @where = build_where_string
           qry_string << @where
         end
-        # this query (count) can cause extreme query duration (>180 seconds) on some systems
         @total_disp_rec = DB.fetch(qry_string, *@placeholder_args).count
         @order = build_order_string
         @limit = build_limit_string

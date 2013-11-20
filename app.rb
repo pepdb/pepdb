@@ -31,7 +31,7 @@ set :root, File.dirname(__FILE__)
 set :public_folder, Proc.new {File.join(root, "public_html")}
 set :default_encoding, "utf-8" 
 
-use Rack::Session::Cookie, :expire_after => 86400, :secret => 'Gh6hh91uhMEsmq05h01ec2b4i9BRVj39' 
+use Rack::Session::Cookie, :expire_after => 3600, :secret => 'Gh6hh91uhMEsmq05h01ec2b4i9BRVj39' 
 use Rack::Flash
 
 # column to select in later database queries to create less clutter in the routes
@@ -392,9 +392,7 @@ get '/comparative-results' do
     @ds_qry, @ds_placeh = build_cdom_string(params)
     @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
     if params[:comp_type] == "ref_and_ds"
-      puts @peptides.inspect
       @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @peptides.map(:peptide_sequence))
-      #@results = Observation.select(:peptide_sequence, :dataset_name, :dominance).where(:peptide_sequence => @peptides.map(:peptide_sequence))
     end
     haml :peptide_results, :layout => false
   else
@@ -440,6 +438,8 @@ get '/motif-search-results' do
     @errors[:dataset] = "no dataset selected!" 
   elsif params[:checked_motl].nil?
     @errors[:motl] = "no motif list selected!" 
+  elsif params[:ds_dom_max].empty? && params[:ds_dom_min].empty?
+    @errors[:dom] = "at least one dominance limit needs to be selected!"
   end
   if @errors.empty?
     DB.create_table?(:mot_matches, :temp => true) do
@@ -451,6 +451,9 @@ get '/motif-search-results' do
     end
     @table = :mot_matches
     @datasets = params[:ref_ds]
+    @ds_qry, @ds_placeh = build_cdom_string(params)
+    puts @ds_qry
+    puts @ds_placeh
     @peptides = Observation.distinct.select(:peptide_sequence).where(:dataset_name => @datasets)
     @motlists = DB[:motifs_motif_lists].distinct.select(:motif_sequence).where(:list_name => params[:checked_motl])
     
