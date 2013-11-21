@@ -18,12 +18,25 @@ module Sinatra
         @peps = []
         @pep_ds = []
       end
+      
+      def ds_type
+        dsfile = File.readlines(@file)
+        if dsfile[0].match(/\S+\s+\S*\s*$/)
+          :manual 
+        else
+          :ngs
+        end
+      end
 
       def read_file(*data_args)
         if @filetype == "dataset"
-          read_dataset_file
-          return @dnas, @dna_pep, @peps, @pep_ds
-        elsif @filetype == "cluster"
+          type = read_dataset_file
+          if type == :ngs
+            return @dnas, @dna_pep, @peps, @pep_ds
+          else
+            return @peps, @pep_ds
+          end
+       elsif @filetype == "cluster"
           read_cluster_file(data_args[0], data_args[1], data_args[2])
         elsif @filetype == "motif"
           read_motif_file
@@ -34,6 +47,40 @@ module Sinatra
     
       def read_dataset_file
         dsfile = File.readlines(@file)
+        if dsfile[0].match(/\S+\s+\S*\s*$/)
+          read_manual_file(dsfile)
+          :manual
+        else
+          read_ngs_file(dsfile)
+          :ngs
+        end
+      end
+
+      def read_manual_file(dsfile)
+        total_reads = calc_total_reads(dsfile)
+        dsfile.each_with_index do |line, index|
+          linematch = line.scan(/\S+/)
+          @peps.insert(-1, linematch[0])
+          reads = linematch[1].nil? ? 1 : linematch[1].to_i
+          dominance = reads / total_reads.to_f
+          @pep_ds.insert(-1,[@dataset, linematch[0], reads, dominance, index.next])
+        end #dsfile
+      end #manual_file
+
+      def calc_total_reads(file)
+        total_reads = 0
+        file.each do |line|
+          linematch = line.scan(/\S+/)
+          unless linematch[1].nil?
+            total_reads = total_reads + linematch[1].to_i
+          else
+            total_reads = total_reads + 1
+          end #if match 
+        end #file
+        total_reads
+      end
+
+      def read_ngs_file(dsfile)
         dsfile.each_with_index do |line, index|
           linematch = line.scan(/\S+/)
           @peps.insert(-1, linematch[0])
@@ -48,7 +95,8 @@ module Sinatra
             end #if
           end#each part
         end #each line
-      end
+      end #ngs_file
+
       
       def read_cluster_file(cluster_paras, selection, library)
         if Cluster.all.count > 0
@@ -174,16 +222,24 @@ module Sinatra
             raise Sequel::Rollback 
           end
           fr = FileReader.new(@values[:submittype], @values[:pepfile][:tempfile], @values[:dsname])
-          dnas, dna_pep, peps, pep_ds =  fr.read_file
-          dnas_qry, dnas_placeholder_args = build_compound_select_string(dnas, :dna_sequences, :dna_sequence)
+          dataset_type = fr.ds_type
+         
+          if dataset_type == :ngs 
+            dnas, dna_pep, peps, pep_ds =  fr.read_file
+          else
+            peps, pep_ds =  fr.read_file 
+          end
+          dnas_qry, dnas_placeholder_args = build_compound_select_string(dnas, :dna_sequences, :dna_sequence) if dataset_type == :ngs
           peps_qry, peps_placeholder_args = build_compound_select_string(peps, :peptides, :peptide_sequence)
 
           begin
-            dnas_qry.zip(dnas_placeholder_args).each do |qry, args|
-              new_data= DB[qry, *args]
-              new_data.insert
+            if dataset_type == :ngs
+              dnas_qry.zip(dnas_placeholder_args).each do |qry, args|
+                new_data= DB[qry, *args]
+                new_data.insert
 
-            end #qry,args
+              end #qry,args
+            end #ngs
             peps_qry.zip(peps_placeholder_args).each do |qry, args|
               new_data = DB[qry, *args]
               new_data.insert
@@ -193,7 +249,7 @@ module Sinatra
             @errors[:insert] = e.message #"Inserting data failed. Changes rolled back"
             raise Sequel::Rollback 
           end # resc
-        DB[:dna_sequences_peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :dna_sequence,:reads], dna_pep)
+        DB[:dna_sequences_peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :dna_sequence,:reads], dna_pep) if dataset_type == :ngs
         DB[:peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :reads, :dominance, :rank], pep_ds)
         #end # trans
       end
