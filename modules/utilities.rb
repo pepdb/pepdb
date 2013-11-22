@@ -14,7 +14,7 @@ module Sinatra
     end
     
     def is_dominance?(column)
-      column == :dominance
+      column == :dominance || column == :dominance_sum
     end
 
     # align numerical values right 
