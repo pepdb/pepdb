@@ -58,13 +58,16 @@ module Sinatra
 
       def read_manual_file(dsfile)
         total_reads = calc_total_reads(dsfile)
+        duplicate_peps = []
         dsfile.each_with_index do |line, index|
           linematch = line.scan(/\S+/)
+          duplicate_peps.insert(-1, index.next) if @peps.include?(linematch[0])
           @peps.insert(-1, linematch[0])
           reads = linematch[1].nil? ? 1 : linematch[1].to_i
           dominance = reads / total_reads.to_f
           @pep_ds.insert(-1,[@dataset, linematch[0], reads, dominance, index.next])
         end #dsfile
+        raise ArgumentError, "duplicate peptides on lines #{duplicate_peps.join(", ")}" unless duplicate_peps.empty?
       end #manual_file
 
       def calc_total_reads(file)
@@ -221,13 +224,17 @@ module Sinatra
             end
             raise Sequel::Rollback 
           end
-          fr = FileReader.new(@values[:submittype], @values[:pepfile][:tempfile], @values[:dsname])
-          dataset_type = fr.ds_type
-         
-          if dataset_type == :ngs 
-            dnas, dna_pep, peps, pep_ds =  fr.read_file
-          else
-            peps, pep_ds =  fr.read_file 
+          begin 
+            fr = FileReader.new(@values[:submittype], @values[:pepfile][:tempfile], @values[:dsname])
+            dataset_type = fr.ds_type
+            if dataset_type == :ngs 
+              dnas, dna_pep, peps, pep_ds =  fr.read_file
+            else
+              peps, pep_ds =  fr.read_file 
+            end
+          rescue ArgumentError => e
+            @errors[:ds] = e.message
+            return
           end
           dnas_qry, dnas_placeholder_args = build_compound_select_string(dnas, :dna_sequences, :dna_sequence) if dataset_type == :ngs
           peps_qry, peps_placeholder_args = build_compound_select_string(peps, :peptides, :peptide_sequence)
