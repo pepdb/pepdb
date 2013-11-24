@@ -18,7 +18,7 @@ module Sinatra
           # select clusters that belong to the reference datasets
           other = Cluster.select(:consensus_sequence).where(:dataset_name => filter_ds.to_a.map{|fds| fds.to_s})
           # select all clusters in first dataset minus clusters with a consensus sequence equal to "other"
-          clusters =  Cluster.select(:consensus_sequence, :dominance_sum).where(:dataset_name => ds.to_s).exclude(:consensus_sequence => other) 
+          clusters =  Cluster.select(:consensus_sequence, :dominance_sum).where(:dataset_name => ds.to_s).exclude(:consensus_sequence => other).all 
           @uniq_results[ds.to_sym] = clusters
         end #each
       end #uniq_search
@@ -49,7 +49,7 @@ module Sinatra
         dominances.each_with_index do |ref, index|
           dominances.each do |comp|
             unless (ref - comp).abs < threshold
-              within_thresold = false
+              within_threshold = false
             end #unless
           end #each
         end #each
