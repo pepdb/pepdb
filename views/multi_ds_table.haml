@@ -1,4 +1,3 @@
-= puts "table ds"
 %table{:id=>"#{table_id}",:class => "ui-widget", :data=>{:first_choice => "#{choice}"}}<
   %thead.ui-widget-header
     %tr
@@ -6,7 +5,6 @@
         peptide
         %br
         %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-      - @datasets.each do
         %th<>
           dataset
           %br
@@ -15,15 +13,38 @@
           dominance 
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        %th<>
+          general spec. 
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+      - params[:ref_ds].each do
+        %th<>
+          dataset
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        %th<>
+          dominance 
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        %th<>
+          spec. score 
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
   %tbody.ui-widget-content
-    - @results.all.each do |row|
+    - @results.each do |row|
       %tr
         %td<>
           =row[:peptide_sequence]
-          -# @datasets.each do |ds|
-          - Observation.where(:dataset_name => @datasets.to_a, :peptide_sequence => row[:peptide_sequence] ).all.each do |cell|
-            %td<>
-              = cell[:dataset_name]
-            %td.alnright<>
-              = format_dominance(cell[:dominance])
-      
+        %td<>
+          = params[:radio_ds]
+        %td<>
+          = format_dominance(@first_ds[row[:peptide_sequence]][0])
+        %td.alnright<>
+          = format_spec_score(calc_gen_spec(@first_ds[row[:peptide_sequence]][0], @specs[row[:peptide_sequence]]))
+        - Observation.where(:dataset_name => params[:ref_ds], :peptide_sequence => row[:peptide_sequence] ).all.each do |cell|
+          %td<>
+            = cell[:dataset_name]
+          %td.alnright<>
+            = format_dominance(cell[:dominance])
+          %td.alnright<>
+            = format_spec_score(@first_ds[row[:peptide_sequence]][0]/cell[:dominance])

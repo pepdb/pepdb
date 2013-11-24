@@ -12,6 +12,10 @@ module Sinatra
         dom = value * 100
         "%E" % dom
     end
+
+    def format_spec_score(value)
+        "%E" % value 
+    end
     
     def is_dominance?(column)
       column == :dominance || column == :dominance_sum
@@ -59,6 +63,10 @@ module Sinatra
       datasets = SequencingDataset.where(:dataset_name => allowed_ds)
       
       return libraries, selections, datasets
+    end
+    
+    def calc_gen_spec(spec, ref_specs)
+      ref_specs.inject(1){|gen_spec, pep_dom| gen_spec * (spec/pep_dom) }   
     end
 
   end #module

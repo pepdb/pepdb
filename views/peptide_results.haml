@@ -14,5 +14,5 @@
   %p 
     All clusters containing peptide 
     =h params['pep-seq'].to_s
-  = partial :tables, locals: {table_class:"test" , table_id: "select_table", choice:"", first_data_to_display:@cluster, second_data_to_display:@cluster.where(:peptide_sequence => "#{params['pep-seq']}", :dataset_name => @datasets)}
+  = partial :tables, locals: {table_class:"test" , table_id: "select_table", choice:"", first_data_to_display:@cluster, second_data_to_display:@cluster.where(:peptide_sequence => "#{params['pep-seq'].to_s.upcase}", :dataset_name => @datasets)}
   

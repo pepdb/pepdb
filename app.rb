@@ -392,7 +392,9 @@ get '/comparative-results' do
     @ds_qry, @ds_placeh = build_cdom_string(params)
     @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
     if params[:comp_type] == "ref_and_ds"
-      @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @peptides.map(:peptide_sequence))
+      @first_ds = Observation.select(:dataset_name, :peptide_sequence, :dominance).where(:dataset_name => params[:radio_ds], :peptide_sequence => @peptides.map(:peptide_sequence)).to_hash_groups(:peptide_sequence, :dominance)
+      @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @peptides.map(:peptide_sequence)).all
+      @specs = DB[:peptides_sequencing_datasets].select(:peptide_sequence, :dominance).where(:peptide_sequence => @peptides.map(:peptide_sequence), :dataset_name => params[:ref_ds]).to_hash_groups(:peptide_sequence, :dominance)
     end
     haml :peptide_results, :layout => false
   else
