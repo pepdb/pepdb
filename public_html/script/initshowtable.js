@@ -103,7 +103,7 @@ $(document).ready(function(){
 
   $('#pep_table').on('click', 'tr:has(td)', function(){
     var selectedID = $(this).find("td:first").html();
-    var selectedDS = $(this).find("td:nth-child(2)").html();
+    var selectedDS = $(this).find("td:nth-child(5)").html();
     var route = document.location.pathname;
     var dataType = $('#reftype').val();
     var firstChoice = $('#refelem1').val();
@@ -118,6 +118,82 @@ $(document).ready(function(){
       });
     }     
   });
+
+  // initialzie datatables table
+  var aTable = $('.prop_table').dataTable({
+    "bPaginate": "true",
+    "sPaginationType": "full_numbers",
+    "bInfo": true,
+    "aaSorting": [[5, "desc"]],
+    "aoColumnDefs": [
+      {"iDataSort": 6 , "aTargets":[3]},
+      {"bVisible": false , "aTargets":[6]},
+    ],
+    "bJQueryUI": true,
+    "sDom": '<"H"lfrT>t<"F"ip>',
+    "oTableTools":{
+      "sSwfPath": url+"/copy_csv_xls_pdf.swf",
+      "aButtons": [
+      {
+        "sExtends": "collection",
+        "sButtonText": "save as",
+        "aButtons": ["csv", "pdf"],
+        }]
+      }
+    });
+
+  // stop table sorting when clicking on the filter-field  
+  $('.prop_table thead input').click( function(e){
+    stopTableSorting(e);
+  });
+
+  // the following lines are neccessary for the individual column filtering
+  $('.prop_table thead input').keyup( function(e){
+    stopTableSorting(e);
+    aTable.fnFilter(this.value, $(".prop_table thead input").index(this));
+  });
+  $('.prop_table thead input').each( function (i) {
+    asInitVals[i] = this.value;
+  } );
+
+  $('.prop_table thead input').focus( function () {
+    if ( this.className == "search_init" )
+    {
+      this.className = "text_filter";
+      this.value = "";
+    }
+  } );
+
+  $('.prop_table thead input').blur( function (i) {
+    if ( this.value == "" )
+    {
+      $(this).addClass("search_init");
+      this.value = asInitVals[$(".prop_table thead input").index(this)];
+    }
+  } );
+
+  $('.prop_table').on('mouseenter mouseleave', 'tr', function(){
+    $(this).toggleClass('highlight');
+  });
+
+  $('.prop_table').on('click', 'tr:has(td)', function(){
+    var selectedID = $(this).find("td:first").html();
+    var selectedDS = $(this).find("td:nth-child(5)").html();
+    var route = document.location.pathname;
+    var dataType = $('#reftype').val();
+    var firstChoice = $('#refelem1').val();
+    if (route == url+"/comparative-search" || route == url +"/systemic-search" || route == url+"/property-search"){
+      $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
+    } else {
+      $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
+        $('#datainfo').html(data);
+        $.getScript(url+'/script/initbutton.js', function(){
+          $('#datainfo').show();
+        });
+      });
+    }     
+  });
+
 
 
 /* initialize second table on data browsing pages with searchable columns*/
@@ -241,7 +317,6 @@ $(document).ready(function(){
   });
 
   
-  //$('#motinfos tbody td img').on('click','#motinfos tbody td img' ,function () {
   $('#motinfos').on('click','tbody td img' ,function () {
     var nTr = $(this).parents('tr')[0];
     if ( mTable.fnIsOpen(nTr) )

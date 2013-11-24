@@ -7,5 +7,9 @@
         = @error
 -else
   %input{:type => "hidden", :id=> "qry_id",:value => @qry_id}
-  = partial :tables, locals: {table_id:"pep_table", choice:"",first_data_to_display:@results, second_data_to_display:@results.where(Sequel.lit(@querystring, *@placeholders)).limit(10)}
+  - if option_selected?(params[:blos])
+    = partial :prop_tables, locals: {table_id:"prop_table", choice:"",first_data_to_display:@results, second_data_to_display:@results.where(Sequel.lit(@querystring, *@placeholders))}
+  - else
+    = partial :tables, locals: {table_id:"pep_table", choice:"",first_data_to_display:@results, second_data_to_display:@results.where(Sequel.lit(@querystring, *@placeholders)).limit(10)}
+    
 

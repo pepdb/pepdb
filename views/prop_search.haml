@@ -12,6 +12,8 @@
       #blossum
         %label similiar neighbour sequences 
         %input.ui-corner-all{:type => "text", :id => "blos", :size => 5, :name => "blos"}
+        %label min. similarity quotient 
+        %input.ui-corner-all{:type => "text", :id => "sq", :size => 5, :name => "sq", :value => 0.5}
       #bshelp
         %span{ :class => " ui-icon ui-icon-help", :id => "bsicon", :title => "Calculates for the given sequence the given number of similiar sequences.| Similarity is based on a summarized similarity score using a BLOSUM62 matrix.| Search length scales liniarily with search space."}
       #wchelp{:hidden => true}

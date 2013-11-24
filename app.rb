@@ -336,12 +336,12 @@ end
 
 get '/property-results' do
   login_required
-  puts params.inspect
   @results = Observation.join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
   begin
     @querystring, @placeholders = build_property_array(params)
     if option_selected?(params[:blos])
-      find_neighbours(params[:seq].to_s.upcase, params[:blos], @querystring, @placeholders)
+      raise ArgumentError, "similarity quotient must be between 0 and 1" if (params[:sq].to_f < 0 || params[:sq].to_f > 1)
+      @sim_quots = find_neighbours(params[:seq].to_s.upcase, params[:blos].to_i, params[:sq].to_f,@querystring, @placeholders)
     end
     DB.create_table?(:propqry, :temp => true) do
       primary_key :qry_id
@@ -353,8 +353,6 @@ get '/property-results' do
   rescue ArgumentError => e
     @error = e.message
   end
-  puts @querystring
-  puts @placeholders
   haml :prop_results, :layout => false
 end
 

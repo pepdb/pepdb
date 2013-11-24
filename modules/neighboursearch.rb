@@ -5,7 +5,7 @@ require 'sinatra/base'
 module Sinatra
   module  NeighbourSearch 
     class BlosumSearch
-      def initialize(sequence, neighbours, peptides)
+      def initialize(sequence, neighbours, peptides, sim_quot)
         @peptides = peptides
         @sequence = sequence.to_s
         @num_neighbours = neighbours.to_i
@@ -13,6 +13,9 @@ module Sinatra
         @blosum_hash = {}
         @curr_min_val = 0
         @in_clause = []
+        @min_sim = sim_quot
+        @selfscore = 0
+        @seq_sim_scores = {}
       end #initilize
 
       def read_blosum_file
@@ -37,6 +40,7 @@ module Sinatra
       def get_neighbours
         read_blosum_file
         @peptides = Peptide.all if @peptides.nil?
+        @selfscore = calc_selfscore
         @peptides.each do |pep|
           peptide = pep[:peptide_sequence]
           if peptide == @sequence
@@ -45,10 +49,19 @@ module Sinatra
           compare_length(peptide, @sequence)
         end # peptide
         @seq_neighbours.each do |sequence|
+          @seq_sim_scores[sequence[1]] = sequence[2]
           @in_clause.insert(-1, sequence[1])
         end 
-        @in_clause
+        return @in_clause, @seq_sim_scores
       end #get_neighbours
+
+      def calc_selfscore
+        curr_val = 0
+        @sequence.chars.zip(@sequence.chars).each do |a, b|
+          curr_val += @blosum_hash["#{a}#{b}".to_sym]  
+        end #zip
+        @selfscore = curr_val
+      end
 
       # preparations for blosum scoring
       # if given sequence and current peptid are of equal length just calculate blosum score
@@ -79,34 +92,36 @@ module Sinatra
         seq_a.chars.zip(seq_b.chars).each do |a, b|
           curr_val += @blosum_hash["#{a}#{b}".to_sym]  
         end #zip
-        if @seq_neighbours.size < @num_neighbours
-          @seq_neighbours.insert(-1,[curr_val, peptide])
+        sim_quot = curr_val / @selfscore.to_f
+        if (@seq_neighbours.size < @num_neighbours && sim_quot > @min_sim)
+          @seq_neighbours.insert(-1,[curr_val, peptide, sim_quot])
           if @seq_neighbours.size == @num_neighbours
             @seq_neighbours.sort{|x,y| y <=> x}
             @curr_min_val = @seq_neighbours[-1][0]
           end #if
         # if we find a sequence with a better blosum score than the current worst 
         # score in the result, replace it
-        elsif curr_val > @curr_min_val
+        elsif (curr_val > @curr_min_val && sim_quot > @min_sim )
           @seq_neighbours.pop
-          @seq_neighbours.unshift([curr_val, peptide])
+          @seq_neighbours.unshift([curr_val, peptide, sim_quot])
           @seq_neighbours.sort!{|x,y| y <=> x}
           @curr_min_val = @seq_neighbours[-1][0]
         end #if
-
+        puts @seq_neighbours.inspect
 
       end #compare_sequence
     end #class
   
 
-    def find_neighbours(seq, number_of_neighbours, qry, placeholder)
+    def find_neighbours(seq, number_of_neighbours, quot, qry, placeholder)
       # if other parameters than just the neighbour search where given
       # get all peptides corresponding to this criteria to reduce search space
       if qry.length > 0
         peptides = Observation.join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).distinct.select(:peptides_sequencing_datasets__peptide_sequence).where(Sequel.lit(qry, *placeholder)).all
       end
-      bs = BlosumSearch.new(seq, number_of_neighbours, peptides)
-      sequences = bs.get_neighbours
+      bs = BlosumSearch.new(seq, number_of_neighbours, peptides, quot)
+      sequences, quotients = bs.get_neighbours
+      raise ArgumentError, "no peptide similarity score matches similarity quotient. Try lowering the quotient." if (sequences.empty? || quotients.empty?)
       querystring = ""
       querystring << 'peptides_sequencing_datasets.peptide_sequence IN (' if qry.length == 0
       querystring << 'AND peptides_sequencing_datasets.peptide_sequence IN (' if qry.length > 0
@@ -117,6 +132,7 @@ module Sinatra
       querystring << ') '
       qry << querystring
       placeholder.insert(-1, *sequences)
+      quotients
     end #find_neigh
   end #module
 
