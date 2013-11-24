@@ -1,0 +1,32 @@
+%table{:class => "ui-widget #{table_id}", :data=>{:first_choice => "#{choice}"}}
+  %thead.ui-widget-header
+    %tr
+      - first_data_to_display.first.each do |column_name|
+        %th
+          = column_name[0].to_s.tr('_', ' ')
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+      %th
+        similarity quotient 
+        %br
+        %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+      %th
+        real dom
+        %br
+        %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+  %tbody.ui-widget-content
+    - second_data_to_display.each do |data_element|
+      %tr
+        - data_element.each do |cell_data|
+          - if align_right?(cell_data[0])
+            -if is_dominance?(cell_data[0])
+              %td.alnright= format_dominance(cell_data[1])
+            - else
+              %td.alnright= cell_data[1]
+            
+          -else
+            %td= cell_data[1]
+        %td.alnright 
+          = @sim_quots[data_element[:peptide_sequence]].round(5)
+        %td
+          = data_element[:dominance]
