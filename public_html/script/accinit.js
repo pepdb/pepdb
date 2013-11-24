@@ -117,7 +117,7 @@ $(document).ready(function(){
     $(this).toggleClass('highlight');
   });
   $('.cl_table').on('click', 'tr:has(td)', function(){
-    alert("click");
+    //alert("click");
   });
 
 
