@@ -232,14 +232,9 @@ module Sinatra
             else
               peps, pep_ds =  fr.read_file 
             end
-          rescue ArgumentError => e
-            @errors[:ds] = e.message
-            return
-          end
           dnas_qry, dnas_placeholder_args = build_compound_select_string(dnas, :dna_sequences, :dna_sequence) if dataset_type == :ngs
           peps_qry, peps_placeholder_args = build_compound_select_string(peps, :peptides, :peptide_sequence)
 
-          begin
             if dataset_type == :ngs
               dnas_qry.zip(dnas_placeholder_args).each do |qry, args|
                 new_data= DB[qry, *args]
@@ -255,6 +250,9 @@ module Sinatra
           rescue Sequel::Error => e 
             @errors[:insert] = e.message #"Inserting data failed. Changes rolled back"
             raise Sequel::Rollback 
+          rescue ArgumentError => e
+            @errors[:ds] = e.message
+            raise Sequel::Rollback
           end # resc
         DB[:dna_sequences_peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :dna_sequence,:reads], dna_pep) if dataset_type == :ngs
         DB[:peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :reads, :dominance, :rank], pep_ds)
