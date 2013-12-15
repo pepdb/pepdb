@@ -6,16 +6,18 @@ module Sinatra
   module  NeighbourSearch 
     class BlosumSearch
       def initialize(sequence, neighbours, peptides, sim_quot)
-        @peptides = peptides
-        @sequence = sequence.to_s
+        @references = peptides
+        @sequences = [*sequence].map{|s| s.to_s}
+        @curr_seq = @sequences[0]
         @num_neighbours = neighbours.to_i
-        @seq_neighbours = []
+        @seq_neighbours = {@curr_seq => []}
         @blosum_hash = {}
         @curr_min_val = 0
         @in_clause = []
         @min_sim = sim_quot
-        @selfscore = 0
-        @seq_sim_scores = {}
+        @selfscores = []
+        @score_index = 0
+        @seq_sim_scores = {@curr_seq => {}}
       end #initilize
 
       def read_blosum_file
@@ -39,28 +41,30 @@ module Sinatra
       
       def get_neighbours
         read_blosum_file
-        @peptides = Peptide.all if @peptides.nil?
-        @selfscore = calc_selfscore
-        @peptides.each do |pep|
+        @references = Peptide.all if @references.nil?
+        calc_selfscore
+        @references.each do |pep|
           peptide = pep[:peptide_sequence]
-          if peptide == @sequence
+          if peptide == @sequences[0]
             next
           end
-          compare_length(peptide, @sequence)
+          compare_length(peptide, @sequences[0])
         end # peptide
-        @seq_neighbours.each do |sequence|
-          @seq_sim_scores[sequence[1]] = sequence[2]
+        @seq_neighbours[@curr_seq].each do |sequence|
+          @seq_sim_scores[@curr_seq][sequence[1]] = sequence[2]
           @in_clause.insert(-1, sequence[1])
         end 
-        return @in_clause, @seq_sim_scores
+        return @in_clause, @seq_sim_scores[@curr_seq]
       end #get_neighbours
 
       def calc_selfscore
-        curr_val = 0
-        @sequence.chars.zip(@sequence.chars).each do |a, b|
-          curr_val += @blosum_hash["#{a}#{b}".to_sym]  
-        end #zip
-        @selfscore = curr_val
+        @sequences.each do |seq|
+          curr_val = 0
+          seq.chars.zip(seq.chars).each do |a, b|
+            curr_val += @blosum_hash["#{a}#{b}".to_sym]  
+          end #zip
+          @selfscores.insert(-1, curr_val)
+        end
       end
 
       # preparations for blosum scoring
@@ -81,7 +85,6 @@ module Sinatra
           length = shorter.size
           (0..diff).each do |index|
             compare_sequence(longer.slice(index, length), shorter, peptide)      
-            
           end #index
         end #if
       end #compare length
@@ -92,22 +95,21 @@ module Sinatra
         seq_a.chars.zip(seq_b.chars).each do |a, b|
           curr_val += @blosum_hash["#{a}#{b}".to_sym]  
         end #zip
-        sim_quot = curr_val / @selfscore.to_f
-        if (@seq_neighbours.size < @num_neighbours && sim_quot > @min_sim)
-          @seq_neighbours.insert(-1,[curr_val, peptide, sim_quot])
-          if @seq_neighbours.size == @num_neighbours
-            @seq_neighbours.sort{|x,y| y <=> x}
-            @curr_min_val = @seq_neighbours[-1][0]
+        sim_quot = curr_val / @selfscores[@score_index].to_f
+        if (@seq_neighbours[@curr_seq].size < @num_neighbours && sim_quot > @min_sim)
+          @seq_neighbours[@curr_seq].insert(-1,[curr_val, peptide, sim_quot])
+          if @seq_neighbours[@curr_seq].size == @num_neighbours
+            @seq_neighbours[@curr_seq].sort{|x,y| y <=> x}
+            @curr_min_val = @seq_neighbours[@curr_seq][-1][0]
           end #if
         # if we find a sequence with a better blosum score than the current worst 
         # score in the result, replace it
         elsif (curr_val > @curr_min_val && sim_quot > @min_sim )
-          @seq_neighbours.pop
-          @seq_neighbours.unshift([curr_val, peptide, sim_quot])
-          @seq_neighbours.sort!{|x,y| y <=> x}
-          @curr_min_val = @seq_neighbours[-1][0]
+          @seq_neighbours[@curr_seq].pop
+          @seq_neighbours[@curr_seq].unshift([curr_val, peptide, sim_quot])
+          @seq_neighbours[@curr_seq].sort!{|x,y| y <=> x}
+          @curr_min_val = @seq_neighbours[@curr_seq][-1][0]
         end #if
-        puts @seq_neighbours.inspect
 
       end #compare_sequence
     end #class
@@ -132,6 +134,7 @@ module Sinatra
       querystring << ') '
       qry << querystring
       placeholder.insert(-1, *sequences)
+      puts quotients.inspect
       quotients
     end #find_neigh
   end #module
