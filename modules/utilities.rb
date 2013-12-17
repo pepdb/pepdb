@@ -66,17 +66,20 @@ module Sinatra
     end
     
     def calc_gen_spec(spec, ref_specs)
-      ref_specs.inject(1){|gen_spec, pep_dom| gen_spec * (spec/pep_dom) }   
+      ref_specs.inject(1){|gen_spec, pep_dom| gen_spec * calc_spec_score(spec,pep_dom) }   
+    end
+    def calc_spec_score(spec, ref_dom)
+      score = 1 - (1 /((spec/ref_dom) + 1 ))
+      score
     end
 
-    def get_max_row_length(results)
+		def get_max_row_length(results)
       length =  0
       results.each_value do |row|
         length = row.size if row.size > length
       end
       length
     end
-
   end #module
 
   helpers Utilities

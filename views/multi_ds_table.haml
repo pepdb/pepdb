@@ -47,4 +47,4 @@
           %td.alnright<>
             = format_dominance(cell[:dominance])
           %td.alnright<>
-            = (@first_ds[row[:peptide_sequence]][0]/cell[:dominance]).round(5)
+            = calc_spec_score(@first_ds[row[:peptide_sequence]][0],cell[:dominance]).round(5)

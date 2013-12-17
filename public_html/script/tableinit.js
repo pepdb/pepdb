@@ -53,11 +53,11 @@ $(document).ready(function(){
     }
   } );
   
-  $('#select_table tr').hover(function(){
+  $('#select_table').on('mouseenter mouseleave', 'tr', function(){
     $(this).toggleClass('highlight');
   });
 
-  $('#select_table tr:has(td)').click(function(){
+  $('#select_table').on('click', 'tr:has(td)', function(){
     var selectedID = $(this).find("td:first").html();
     var route = $('#reftype').val();
     var path = document.location.pathname;
