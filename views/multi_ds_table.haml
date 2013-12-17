@@ -40,7 +40,6 @@
         %td<>
           = format_dominance(@first_ds[row[:peptide_sequence]][0])
         %td.alnright<>
-          =# format_spec_score(calc_gen_spec(@first_ds[row[:peptide_sequence]][0], @specs[row[:peptide_sequence]]))
           = calc_gen_spec(@first_ds[row[:peptide_sequence]][0], @specs[row[:peptide_sequence]]).round(5)
         - Observation.where(:dataset_name => params[:ref_ds], :peptide_sequence => row[:peptide_sequence] ).all.each do |cell|
           %td<>
@@ -48,5 +47,4 @@
           %td.alnright<>
             = format_dominance(cell[:dominance])
           %td.alnright<>
-            =# format_spec_score(@first_ds[row[:peptide_sequence]][0]/cell[:dominance])
             = (@first_ds[row[:peptide_sequence]][0]/cell[:dominance]).round(5)

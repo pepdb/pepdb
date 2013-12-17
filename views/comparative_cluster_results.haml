@@ -1,64 +1,57 @@
-- if params[:comptype] == "unique"
-  #compacc
-    - @datasets.each do |ds|
-      - next if @results[ds.to_sym].empty?
-      %h3
-        = ds
-      %div
-        %table.cl_table
-          %thead.ui-widget-header
-            %tr
-              - @columns.each do |column|
-                %th
-                  = column[0].to_s.tr('_', ' ')        
-                  %br
-                  %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-              %th
-                real dom        
-                %br
-                %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-          %tbody.ui-widget-content
-            - @results[ds.to_sym].each do |row|
-              %tr
-                - row.each do |cell|
-                  - if align_right?(cell[0])
-                    -if is_dominance?(cell[0])
-                      %td.alnright
-                        = format_dominance(cell[1])
-                      %td 
-                        = cell[1]
-                    - else
-                      %td.alnright= cell[1]
-
-                  -else
-                    %td= cell[1]
-
-- else
-  #commoncl
-    %table#show_table
-      %thead.ui-widget-header
-        %tr
+#clustertab
+  %table{:id=>"show_table",:class => "ui-widget"}<
+    %thead.ui-widget-header
+      %tr
+        %th<>
+          sequence
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        %th<>
+          dominance sum 
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        %th<>
+          gen. spec. 
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        - (0...@max_length).each do |cluster|
           %th<>
-            consensus sequence
+            sequence
             %br
-            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}  
-          - @datasets.each do
-            %th
-              dataset                
-              %br
-              %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-            %th
-              dominance sum
-              %br
-              %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-      %tbody.ui-widget-content
-        - @results.each do |seq|
-          %tr
-            %td<> 
-              = seq
-            - @datasets.each do |ds|
-              - @clusters.where(:consensus_sequence => seq, :dataset_name => ds).each do |cell|
-                %td<>
-                  = cell[:dataset_name]
-                %td.alnright<> 
-                  = format_dominance(cell[:dominance_sum])
+            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+          %th<>
+            dominance sum 
+            %br
+            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+          %th<>
+            spec. score
+            %br
+            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+          %th<>
+            dataset 
+            %br
+            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+          %th<>
+            sim. score 
+            %br
+            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+    %tbody.ui-widget-content
+      - @investigated_cl.each do |row|
+        %tr
+          %td<>
+            =row[:consensus_sequence]
+          %td<>
+            =format_dominance(row[:dominance_sum])
+          %td<>
+            tba
+          - (0...@max_length).each do |cluster|
+            %td<>
+              ds 
+            %td<>
+              ds 
+            %td<>
+              ds
+            %td<>
+              ds
+            %td<>
+              = @scores[row[:consensus_sequence].upcase][1]

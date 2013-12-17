@@ -69,6 +69,14 @@ module Sinatra
       ref_specs.inject(1){|gen_spec, pep_dom| gen_spec * (spec/pep_dom) }   
     end
 
+    def get_max_row_length(results)
+      length =  0
+      results.each_value do |row|
+        length = row.size if row.size > length
+      end
+      length
+    end
+
   end #module
 
   helpers Utilities

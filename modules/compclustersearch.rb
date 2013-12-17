@@ -1,85 +1,42 @@
 require 'sinatra/base'
+require './modules/blosum'
+module BlosumHelpers
+  def get_neighbours
+    read_blosum_file
+    @references = Cluster.all if @references.nil?
+    calc_selfscore
+    @sequences.each do |con_seq|
+      @curr_seq = con_seq
+      @seq_neighbours[@curr_seq] = []
+      @seq_sim_scores[@curr_seq] = {}
+      @references.each do |ref_seq|
+        next if ref_seq == con_seq
+        compare_length(ref_seq, con_seq)
+      end
+      @seq_neighbours[@curr_seq].each do |sequence|
+        @seq_sim_scores[@curr_seq][sequence[1]] = sequence[2]
+        @in_clause.insert(-1, sequence[1])
+      end
+      @score_index += 1
+    end
+    return @in_clause, @seq_sim_scores
+  end
+end
 module Sinatra
   module ComparativeClusterSearch 
     class CompClusterSearcher
-      attr_reader :uniq_results, :comm_results
-      def initialize(datasets, threshold = nil)
-        @uniq_results = {}
-        @datasets = datasets
-        @threshold = threshold
-        @comm_results = []
-      end #init
-   
-
-      def uniq_search
-        @datasets.each_with_index do |ds, index|
-          filter_ds = @datasets.dup
-          filter_ds.delete_at(index)
-          # select clusters that belong to the reference datasets
-          other = Cluster.select(:consensus_sequence).where(:dataset_name => filter_ds.to_a.map{|fds| fds.to_s})
-          # select all clusters in first dataset minus clusters with a consensus sequence equal to "other"
-          clusters =  Cluster.select(:consensus_sequence, :dominance_sum).where(:dataset_name => ds.to_s).exclude(:consensus_sequence => other).all 
-          @uniq_results[ds.to_sym] = clusters
-        end #each
-      end #uniq_search
-      
-      def common_search
-        # get array with unique consensus sequences from all datasets and 
-        # a count of clusters containing the specific sequence
-        common_seqs_count = Cluster.where(:dataset_name => @datasets.to_a.map{|ds| ds.to_s}).group_and_count(:consensus_sequence)
-        common_seqs = []
-        # only use clusters that are present in each selected dataset
-        # number of cluster => datasets
-        common_seqs_count.each do |seq| 
-          common_seqs.insert(-1, seq[:consensus_sequence]) if seq[:count] >= @datasets.size
-        end #each
-        # build a hash where the keys are all relevant cluster sequences
-        # and values are the dominances of all clusters with that sequence
-        comm_seq_dominances = Cluster.where(:consensus_sequence => common_seqs).to_hash_groups(:consensus_sequence, :dominance_sum)
-        # test for each key if all dominaces are within the given threshold
-        comm_seq_dominances.each do |key, value|
-          if dominances_in_threshold?(value, @threshold)
-            @comm_results.insert(-1, key)
-          end
-        end #each
-      end #common
-  
-      def dominances_in_threshold?(dominances, threshold)
-        within_threshold = true
-        dominances.each_with_index do |ref, index|
-          dominances.each do |comp|
-            unless (ref - comp).abs < threshold
-              within_threshold = false
-            end #unless
-          end #each
-        end #each
-        within_threshold
-      end #threshold?
-
       
     end #class
     
 
-    def find_unique_clusters(datasets)
-      cs = CompClusterSearcher.new(datasets)
-      cs.uniq_search
-      cs.uniq_results
-    end #find_unique
-
-    def find_common_clusters(datasets, threshold)
-      cs = CompClusterSearcher.new(datasets, threshold)
-      cs.common_search
-      cs.comm_results
-    end #find_common)
-    
     # this method should be called from within a route to start the
     # comparative cluster search
-    def comp_cluster_search(params)
-      if params[:comptype] == "unique"
-        results = find_unique_clusters(params[:ref_ds])
-      elsif params[:comptype] == "threshold"
-        results = find_common_clusters(params[:ref_ds], params[:domthr].to_f)
-      end
+    def comp_cluster_search(investigate_ds, references, sim_quot, min_dom_inv, min_dom_ref)
+      investigate = Cluster.select(:consensus_sequence).where(:dataset_name => investigate_ds.to_s).where("dominance_sum > ?", min_dom_inv.to_f).all.map{|s| s[:consensus_sequence].upcase}
+      references = Cluster.select(:consensus_sequence).where(:dataset_name => references.to_a.map{|s| s.to_s}).where("dominance_sum > ?", min_dom_ref.to_f).all.map{|s| s[:consensus_sequence].upcase }
+      bs = BlosumSearch.new(investigate, Float::INFINITY,references, sim_quot.to_f)
+      bs.extend(BlosumHelpers)
+      bs.get_neighbours
     end #comp_cluster_search
   end#module  
   helpers ComparativeClusterSearch 

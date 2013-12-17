@@ -1,20 +1,46 @@
 %h3 comparative cluster search
-#checkboxes
-  %p select sequencing datasets to compare
-  %form{:id => "compclform", :action => "#{url '/comparative-cluster-results'}", :method => 'get'}
-    .check-select#ref-library
+#compclform
+  %p investigated sequencing dataset
+  %input{:type =>"hidden", :value => "comparative", :id => "reftype"}
+  %form{:id => "compclsub", :action => "#{url '/comparative-cluster-results'}", :method => 'get'}
+    .comp-select#comp-library
       %fieldset.checklist
-        %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
+        %input{:type => "checkbox", :id => "c_all_lib",:value => "all_lib"}/
         all
-        %br 
+        %br
         - @libraries.each do |elem|
-          %input{:type => "checkbox", :name => "checked_lib[]", :id => "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+          %input{:type => "checkbox", :id => "c_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
           = elem[:library_name]
           %br
 
-    .check-select#ref-selection
+    .comp-select#comp-selection
 
-    .check-select#ref-dataset
+    .comp-select#comp-dataset
+    %fieldset
+      %legend dominance
+      %label min.
+      %input{:type => "text", :size => 5, :name => "ds_dom_min", :id => "ds_dom_min", :value => 0.0001}
+
+
+    #ref-data
+      %p references 
+      .ref-select#ref-library
+        %fieldset.checklist
+          %input{:type => "checkbox", :id => "r_all_lib",:value => "all_lib"}/
+          all
+          %br
+          - @libraries.each do |elem|
+            %input{:type => "checkbox", :id => "r_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+            = elem[:library_name]
+            %br
+
+      .ref-select#ref-selection
+
+      .ref-select#ref-dataset
+      %fieldset
+        %legend dominance
+        %label min.
+        %input{:type => "text", :size => 5,:name => "ref_dom_min", :id => "ref_dom_min", :value => 0.000001}
 
     #comp-buttons
       %fieldset
@@ -22,14 +48,8 @@
           search options:   
         %ul
           %li
-            %input{:type => "radio", :name => "comptype", :id => "hits-sel", :value => "unique"} 
-            %label show unique clusters per sequencing dataset 
-          %li
-            %input{:type => "radio", :name => "comptype", :id => "hits-sel", :value => "threshold"} 
-            %label show clusters within dominance threshold
-          %li
-            %input{:type => "text", :name => "domthr", :id=> "domthr", :size => 5 }
-            %label cluster dominance threshold 
+            %label{:for => "simsc"} min. similarity score:
+            %input{:type => "text", :name => "simsc", :id=> "simsc", :size => 5, :value => 0.6 }
       %fieldset.checklist
         %input{:type => "submit", :id => "ccsearchb", :value => "compare"}
         %input{:type => "button", :id => "clear-button",:value => "clear selection"}

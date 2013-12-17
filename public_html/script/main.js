@@ -300,34 +300,32 @@ $(document).ready(function(){
       });
     });
       
-   $('#compclform').submit(function(){
+   $('#compclsub').submit(function(){
     if($('#compclresults').is(':visible')){
       $('#compclresults').toggle();
     }
     if($('.loading').is(':hidden')){
       $('.loading').toggle();
     }
-    var radioType = $("#comp-buttons input[type='radio']:checked").val();
     $.ajax({
       data: $(this).serialize(),
       type: $(this).attr('method'),
       url: $(this).attr('action'),
+      error: function(response,error1,error2){
+        $.get(url+'/error', {error:error2},function(response){
+          $('#compclresults').html(response);
+          $('#compclresults').toggle();
+          $('.loading').toggle();
+        });
+      },
       success: function(response){
         $('#compclresults').html(response);
-        if (radioType == "threshold"){
           $.getScript(url+'/script/initshowtable.js', function(){
             $('#compclresults').toggle();
             $('.loading').toggle();
           });
-          
-        } else {
-          $.getScript(url+'/script/accinit.js', function(){
-            $('#compclresults').toggle();
-            $('.loading').toggle();
-          });
-        }
-      }
-    });
+    }
+  });
     return false;
   });
       

@@ -541,19 +541,25 @@ end
 
 get '/comparative-cluster-results' do
   login_required
+  puts params.inspect
   @errors = {}
-  if params[:ref_ds].nil? || params[:ref_ds].size < 2
+  if params[:ref_ds].nil? || params[:radio_ds].nil?
     @errors[:ds] = "select two or more datasets!"
-  elsif params[:comptype].nil?
-    @errors[:type] = "no search type selected!" 
-  elsif params[:comptype] == "threshold" && params[:domthr].empty?
-    @errors[:thr] = "no dominance threshold selected!" 
+  elsif (!option_selected?(params[:ref_dom_min])|| !option_selected?(params[:ds_dom_min])) 
+    @errors[:type] = "dominance values missing" 
+  elsif !option_selected?(params[:simsc])
+    @errors[:type] = "similarity score missing" 
   end
 
   if @errors.empty?
     @columns = Cluster.select(:consensus_sequence, :dominance_sum___dominance).first
     @datasets = params[:ref_ds]
-    @results = comp_cluster_search(params)
+    @matches, @scores = comp_cluster_search(params[:radio_ds], params[:ref_ds], params[:simsc], params[:ds_dom_min], params[:ref_dom_min])
+    puts @matches.inspect
+    puts @scores.inspect
+    @investigated_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(:dataset_name => params[:radio_ds]).where("dominance_sum > ?", params[:ds_dom_min].to_f).all
+    @match_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(Sequel.like(:consensus_sequence, *@matches), :dataset_name => params[:ref_ds].to_a.map{|s| s.to_s}).to_hash_groups(:consensus_sequence)
+    @max_length = get_max_row_length(@match_cl)
     @clusters = Cluster.select(:dataset_name, :dominance_sum)
     haml :comparative_cluster_results, :layout => false
   else
@@ -763,6 +769,12 @@ get '/datalist' do
   haml :datalist, :layout => false, locals:{req: val,label: params[:label].to_s, fieldname: params[:fieldname].to_s,listname: params[:listname].to_s , listlabel:params[:listlabel].to_s, dbdata:@data, columnname:params[:columnname].to_sym  }
 end
 ####### Misc. Routes #############
+get '/error' do
+  login_required
+  @error = {:response => params[:error].to_s}
+  haml :validation_errors_wo_header, :layout => false, locals:{errors:@error}
+end
+
 get '/datatables' do
   login_required
   content_type :json
