@@ -199,6 +199,7 @@ $(document).ready(function(){
 /* initialize second table on data browsing pages with searchable columns*/
   var qTable = $('#show_table').dataTable({
     "bJQueryUI": true,
+    "sScrollX": "100%",
     "bInfo": true,
     "sPaginationType": "full_numbers",
     "bPaginate": true,
@@ -230,6 +231,7 @@ $(document).ready(function(){
     stopTableSorting(e);
   });
   $('#show_table thead input').keyup( function(){
+    stopTableSorting(e);
     qTable.fnFilter(this.value, $("#show_table thead input").index(this));
   });
 

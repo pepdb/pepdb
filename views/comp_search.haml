@@ -1,6 +1,6 @@
 %h3 comparative peptide search
 #comp-data
-  %p dataset to compare against
+  %p investigated sequencing dataset
   %input{:type =>"hidden", :value => "comparative", :id => "reftype"}
   %form{:id => "compdata", :action => "#{url '/comparative-results'}", :method => 'get'}
     .comp-select#comp-library
@@ -25,7 +25,7 @@
 
 
     #ref-data
-      %p reference datasets
+      %p references
       .ref-select#ref-library
         %fieldset.checklist
           %input{:type => "checkbox", :id => "r_all_lib",:value => "all_lib"}/ 
