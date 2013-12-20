@@ -48,3 +48,18 @@
             = format_dominance(cell[:dominance])
           %td.alnright<>
             = calc_spec_score(@first_ds[row[:peptide_sequence]][0],cell[:dominance]).round(5)
+    - @uniq_peptides.all.each do |row| 
+      %tr
+        %td<>
+          = row[:peptide_sequence]
+        %td<>
+          = params[:radio_ds]
+        %td<>
+          = format_dominance(@first_ds[row[:peptide_sequence]][0])
+        %td.alnright<>
+          1.00000
+        - params[:ref_ds].each do |ds|
+          %td<>
+          %td<>
+          %td<>
+        

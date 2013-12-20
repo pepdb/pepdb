@@ -4,12 +4,10 @@
 - elsif request.path_info == "/comparative-results"
   %p
     results
-    - if @peptides.count == 0
+    - if @common_peptides.count == 0 && @uniq_peptides.count == 0
       %p no matches found
-    - elsif params[:comp_type] == "ref_and_ds" 
-      = partial :multi_ds_table, locals: {table_class: "display", table_id: "show_table", choice:"", first_data_to_display:@peptides, second_data_to_display:@peptides}
-    - else 
-      = partial :tables, locals: {table_class: "display", table_id: "show_table", choice:"", first_data_to_display:@peptides, second_data_to_display:@peptides}
+    - else
+      = partial :multi_ds_table, locals: {table_class: "display", table_id: "show_table", choice:""}
 - else
   %p 
     All clusters containing peptide 

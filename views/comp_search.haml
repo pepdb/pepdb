@@ -47,16 +47,6 @@
         %input{:type => "text", :size => 5,:name => "ref_dom_min", :id => "ref_dom_min", :value => 0.000001}
     
     #comp-buttons
-      %fieldset
-        %legend 
-          search options:
-        %ul
-          %li
-            %input{:type => "radio", :name => "comp_type",:id=>"ds_only", :value => "ds_only"}
-            %label{:for => "ds_only"} show peptides included only in first dataset 
-          %li
-            %input{:type => "radio", :name => "comp_type",:id=>"ref_and_ds", :value => "ref_and_ds"}
-            %label{:for => "ref_and_ds"} show peptides included in both selections 
       %input{:type => "submit", :id => "compare", :value => "compare selected"}
       %input{:type => "button", :id => "clear-button",:value => "clear selection"}
       = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)

@@ -382,19 +382,22 @@ get '/comparative-results' do
     @errors[:ds] = "at least one dataset selection per section needed!"
   elsif (params[:ref_dom_max].empty? && params[:ref_dom_min].empty?) || (params[:ds_dom_max].empty? && params[:ds_dom_min].empty?)
     @errors[:dom] = "at least one dominance limit needs to be selected per section!"
-  elsif params[:comp_type].nil?
-    @errors[:type] = "choose a search method!"
   end
   if @errors.empty?
     @datasets = [params[:radio_ds], *params[:ref_ds]].to_set
     @ref_qry, @ref_placeh = build_rdom_string(params)
     @ds_qry, @ds_placeh = build_cdom_string(params)
-    @peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
-    if params[:comp_type] == "ref_and_ds"
-      @first_ds = Observation.select(:dataset_name, :peptide_sequence, :dominance).where(:dataset_name => params[:radio_ds], :peptide_sequence => @peptides.map(:peptide_sequence)).to_hash_groups(:peptide_sequence, :dominance)
-      @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @peptides.map(:peptide_sequence)).all
-      @specs = DB[:peptides_sequencing_datasets].select(:peptide_sequence, :dominance).where(:peptide_sequence => @peptides.map(:peptide_sequence), :dataset_name => params[:ref_ds]).to_hash_groups(:peptide_sequence, :dominance)
-    end
+    @uniq_peptides, @common_peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
+    peptides = @common_peptides.map(:peptide_sequence).concat(@uniq_peptides.map(:peptide_sequence))
+    puts @uniq_peptides.inspect
+    puts "-----"
+    puts @uniq_peptides.map(:peptide_sequence).inspect
+    puts "-----"
+    
+    @first_ds = Observation.select(:dataset_name, :peptide_sequence, :dominance).where(:dataset_name => params[:radio_ds], :peptide_sequence => peptides).to_hash_groups(:peptide_sequence, :dominance)
+    puts @first_ds.inspect
+    @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @common_peptides.map(:peptide_sequence)).all
+    @specs = DB[:peptides_sequencing_datasets].select(:peptide_sequence, :dominance).where(:peptide_sequence => @common_peptides.map(:peptide_sequence), :dataset_name => params[:ref_ds]).to_hash_groups(:peptide_sequence, :dominance)
     haml :peptide_results, :layout => false
   else
     haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
@@ -560,7 +563,6 @@ get '/comparative-cluster-results' do
     #@match_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(Sequel.like(:consensus_sequence, *@matches), :dataset_name => params[:ref_ds].to_a.map{|s| s.to_s}).to_hash_groups(:consensus_sequence)
     @match_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(:consensus_sequence => @matches, :dataset_name => params[:ref_ds].to_a.map{|s| s.to_s}).to_hash_groups(:consensus_sequence)
     @max_length = get_max_row_length(@cluster_to_matches)
-    puts @scores.inspect
     @clusters = Cluster.select(:dataset_name, :dominance_sum)
     haml :comparative_cluster_results, :layout => false
   else
