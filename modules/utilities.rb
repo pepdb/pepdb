@@ -9,6 +9,9 @@ module Sinatra
     
     # formats domanice in datatables
     def format_dominance(value)
+        if value.class != Float
+          return ""
+        end
         dom = value * 100
         "%E" % dom
     end
@@ -65,20 +68,37 @@ module Sinatra
       return libraries, selections, datasets
     end
     
-    def calc_gen_spec(spec, ref_specs)
-      ref_specs.inject(1){|gen_spec, pep_dom| gen_spec * calc_spec_score(spec,pep_dom) }   
+    def calc_gen_spec(spec, ref_specs, cluster_spec, clusters = nil)
+      if cluster_spec
+        gen_spec = 1
+        clusters.each do |cluster|
+          gen_spec *= calc_spec_score(spec,ref_specs[cluster][0][:dominance_sum])
+        end
+        gen_spec
+      else
+        ref_specs.inject(1){|gen_spec, pep_dom| gen_spec * calc_spec_score(spec,pep_dom) }   
+      end
     end
     def calc_spec_score(spec, ref_dom)
       score = 1 - (1 /((spec/ref_dom) + 1 ))
       score
     end
 
-		def get_max_row_length(results)
+    def get_max_row_length(results)
       length =  0
       results.each_value do |row|
         length = row.size if row.size > length
       end
       length
+    end
+
+    def test_for_nil(value, column)
+      if value.nil?
+        ""
+      else
+        puts value.inspect
+        value[0][column]
+      end
     end
   end #module
 

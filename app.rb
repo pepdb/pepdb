@@ -23,6 +23,7 @@ require 'json'
 require './model'
 require 'sinatra-authentication'
 require 'rack-flash'
+require 'set'
 
 Haml::Options.defaults[:format] = :xhtml
 
@@ -554,12 +555,12 @@ get '/comparative-cluster-results' do
   if @errors.empty?
     @columns = Cluster.select(:consensus_sequence, :dominance_sum___dominance).first
     @datasets = params[:ref_ds]
-    @matches, @scores = comp_cluster_search(params[:radio_ds], params[:ref_ds], params[:simsc], params[:ds_dom_min], params[:ref_dom_min])
-    puts @matches.inspect
-    puts @scores.inspect
+    @matches, @scores, @cluster_to_matches = comp_cluster_search(params[:radio_ds], params[:ref_ds], params[:simsc], params[:ds_dom_min], params[:ref_dom_min])
     @investigated_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(:dataset_name => params[:radio_ds]).where("dominance_sum > ?", params[:ds_dom_min].to_f).all
-    @match_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(Sequel.like(:consensus_sequence, *@matches), :dataset_name => params[:ref_ds].to_a.map{|s| s.to_s}).to_hash_groups(:consensus_sequence)
-    @max_length = get_max_row_length(@match_cl)
+    #@match_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(Sequel.like(:consensus_sequence, *@matches), :dataset_name => params[:ref_ds].to_a.map{|s| s.to_s}).to_hash_groups(:consensus_sequence)
+    @match_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(:consensus_sequence => @matches, :dataset_name => params[:ref_ds].to_a.map{|s| s.to_s}).to_hash_groups(:consensus_sequence)
+    @max_length = get_max_row_length(@cluster_to_matches)
+    puts @scores.inspect
     @clusters = Cluster.select(:dataset_name, :dominance_sum)
     haml :comparative_cluster_results, :layout => false
   else

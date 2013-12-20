@@ -20,7 +20,7 @@
             %br
             %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
           %th<>
-            dominance sum 
+            dataset 
             %br
             %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
           %th<>
@@ -28,7 +28,7 @@
             %br
             %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
           %th<>
-            dataset 
+            dominance sum 
             %br
             %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
           %th<>
@@ -37,21 +37,30 @@
             %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
     %tbody.ui-widget-content
       - @investigated_cl.each do |row|
+        - invest_cl = row[:consensus_sequence]
         %tr
           %td<>
-            =row[:consensus_sequence]
+            = invest_cl
           %td<>
             =format_dominance(row[:dominance_sum])
           %td<>
-            tba
+            = calc_gen_spec(row[:dominance_sum],@match_cl,true,@cluster_to_matches[invest_cl]).round(5) 
           - (0...@max_length).each do |cluster|
-            %td<>
-              ds 
-            %td<>
-              ds 
-            %td<>
-              ds
-            %td<>
-              ds
-            %td<>
-              = @scores[row[:consensus_sequence].upcase][1]
+            - ref_cluster = @cluster_to_matches[invest_cl][cluster]
+            - if @match_cl[ref_cluster].nil?
+              %td<>
+              %td<>
+              %td<>
+              %td<>
+              %td<>
+            - else
+              %td<>
+                = @match_cl[ref_cluster][0][:consensus_sequence] 
+              %td<>
+                = @match_cl[ref_cluster][0][:dataset_name] 
+              %td<>
+                = calc_spec_score(row[:dominance_sum].to_f,@match_cl[ref_cluster][0][:dominance_sum].to_f).round(5) 
+              %td<>
+                = format_dominance(@match_cl[ref_cluster][0][:dominance_sum]) 
+              %td<>
+                = @scores[invest_cl][ref_cluster].round(5)
