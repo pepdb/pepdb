@@ -272,6 +272,7 @@ get '/show-info' do
     @eletype = "Selection"
     @next = "selections"
     @column = :selection_name
+    @element = params[:ele_name].to_s
     haml :show_info, :layout => false
   elsif params['ref'] == "Selection"
     @info_data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_info)
@@ -279,11 +280,19 @@ get '/show-info' do
     @eletype = "Sequencing Dataset"
     @next = "datasets"
     @column = :dataset_name
+    @element = params[:ele_name].to_s
     haml :show_info, :layout => false
   elsif params['ref'] == "Sequencing Dataset"
-    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info)
-    #@peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_info).where(:peptide_sequence => params[:ele_name], :sequencing_datasets__dataset_name => params[:ele_name2]).to_hash(:DNA_sequence, :Reads)
+    @element = params[:ele_name].to_s
+    corres_dataset = params[:ele_name2].to_s
+    puts "start"
+    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Peptide_sequence => @element, :Sequencing_dataset => corres_dataset).all
+    puts "dna"
     @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name =>:dataset_name).select(*dna_info).where(:peptide_sequence => params[:ele_name], :sequencing_datasets__dataset_name => params[:ele_name2]).to_hash(:DNA_sequence, :Reads)
+    puts "fertisch"
+    puts @peptide_dna.inspect
+    puts @info_data.inspect
+    
     @eletype = "Peptide"
     @column1 = :Peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
@@ -294,10 +303,9 @@ get '/show-info' do
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
-    puts "vor data"
     @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => params[:ele_name].to_s)
-    puts "vor DNA"
     @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => params[:ele_name].to_s).to_hash(:DNA_sequence, :Reads)
+    @element = params[:ele_name].to_s
     haml :show_info, :layout => false
   elsif params['ref'] == "comparative"
     @datasets = params['selRow'].to_set
@@ -306,6 +314,7 @@ get '/show-info' do
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
+    @element = params[:ele_name].to_s
     if params[:comptype] == "ref_and_ds"
       haml :ref_ds_comp, :layout => false
     else
@@ -402,11 +411,6 @@ get '/comparative-results' do
     @ds_qry, @ds_placeh = build_cdom_string(params)
     @uniq_peptides, @common_peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
     peptides = @common_peptides.map(:peptide_sequence).concat(@uniq_peptides.map(:peptide_sequence))
-    puts @uniq_peptides.inspect
-    puts "-----"
-    puts @uniq_peptides.map(:peptide_sequence).inspect
-    puts "-----"
-    
     @first_ds = Observation.select(:dataset_name, :peptide_sequence, :dominance).where(:dataset_name => params[:radio_ds], :peptide_sequence => peptides).to_hash_groups(:peptide_sequence, :dominance)
     puts @first_ds.inspect
     @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @common_peptides.map(:peptide_sequence)).all
@@ -419,8 +423,12 @@ end
 
 get '/peptide-infos' do
   login_required
-  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
-  haml :peptide_infos, :layout => false
+  corres_dataset = params['selDS'].to_s
+  peptide = params['selSeq'].to_s
+  @eletype = "Peptide"
+  @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => peptide)
+  @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => peptide).to_hash(:DNA_sequence, :Reads)
+  haml :show_info, :layout => false
 end
 
 # -------- Motif Search ----------- #
