@@ -47,11 +47,17 @@ dataset_info_columns = [:dataset_name___name, :libraries__library_name___library
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
 dataset_edit_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target]
 peptide_columns = [:peptide_sequence, :rank, :reads , :dominance]
-peptide_browse_columns = [:peptides__peptide_sequence, :rank, :reads , :dominance, :performance, :species, :tissue, :cell]
 sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence, :rank, :reads , :dominance, :sequencing_datasets__dataset_name___dataset]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
-dna_columns = [:dna_sequences__dna_sequence, :reads]
+
+# Order and naming for info columns shown in the browsing options
+library_info = [:library_name___Name, :carrier___Carrier, :insert_length___Insert_length, :encoding_scheme___Encoding_scheme, :produced_by___Produced_by, :date___Date, :distinct_peptides___Distinct_peptides, :peptide_diversity___Peptide_diversity]
+selection_info = [:selection_name___Name, :date___Date, :performed_by___Performed_by,:library_name___Library, :species___Species, :tissue___Tissue, :cell___Cell]
+dataset_info = [:dataset_name___Name, :date___Date, :produced_by___Peformed_by, :statistics___Statistics, :library_name___Library, :selection_name___Selection, :selection_round___Selection_round, :species___Species, :tissue___Tissue, :cell___Cell, :origin___Origin, :sequencer___Sequencer, :read_type___Read_type, :sequence_length___Read_length, :used_indices___Used_barcode]
+peptide_info = [:peptides_sequencing_datasets__peptide_sequence___Peptide_sequence, :library_name___Library, :selection_name___Selection, :sequencing_datasets__dataset_name___Sequencing_dataset, :rank___Rank, :reads___Reads , :dominance___Dominance, :performance___Peptide_performance ]
+dna_info = [:dna_sequences_peptides_sequencing_datasets__dna_sequence___DNA_sequence, :reads___Reads]
+cluster_info = [:consensus_sequence___Consensus_sequence, :library_name___Library, :selection_name___Selection, :dataset_name___Sequencing_dataset, :dominance_sum___Dominance_sum, :parameters___Parameters]
 
 
 get '/' do
@@ -92,8 +98,9 @@ get '/libraries/:lib_name' do
   else
     redirect '/libraries'
   end
-    @selections = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns)
-  @infodata = Library.select(*library_all)
+  @selections = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns)
+  #@columns = {"Name" => :library_name, "Carrier"}
+  @infodata = Library.select(*library_info)
   haml :libraries
 end
 
@@ -126,7 +133,8 @@ get '/selections/:sel_name' do
     redirect '/selections'
   end
   @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns)
-  @infodata = Selection.select(*selection_info_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:sel_name])
+  @infodata = Selection.select(*selection_info).left_join(Target, :target_id => :target_id).where(:selection_name => params[:sel_name])
+  @eletype = "Selection"
   haml :selections
 end
 
@@ -159,8 +167,9 @@ get '/datasets/:set_name' do
     redirect '/datasets'
   end
   @peptides = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
-  #@peptides = Observation.select(*peptide_columns_new)
-  @infodata = SequencingDataset.select(*dataset_all_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
+  @infodata = SequencingDataset.select(*dataset_info).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
+  @pep_count = Observation.sum(:reads).where(:dataset_name => params[:ele_name].to_s)
+  @eletype = "Sequencing Dataset"
   haml :datasets
 end
 
@@ -214,10 +223,9 @@ end
 ####### Data Browsing Helper Routes ####################
 get '/cluster-infos' do
   login_required
-  puts params.inspect
-  puts Cluster.where(:cluster_id => "#{params[:selCl]}").inspect
-  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}")
-  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}")
+  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}").select(*cluster_info).all
+  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}").all
+  @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:peptide_sequence]}).sum(:reads)
   haml :cluster_infos, :layout => false
 end
 
@@ -245,51 +253,56 @@ end
 get '/info-tables' do
   login_required
   if request.referer.include?("libraries")
-    @infodata = Library.select(*library_all).where(:library_name => params[:infoElem])
+    @infodata = Library.select(*library_info).where(:library_name => params[:infoElem])
   elsif request.referer.include?("selection")
-    @infodata = Selection.select(*selection_info_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:infoElem])
+    @infodata = Selection.select(*selection_info).left_join(Target, :target_id => :target_id).where(:selection_name => params[:infoElem])
+    @eletype = "Selection"
   elsif request.referer.include?("datasets")
-    @infodata = SequencingDataset.select(*dataset_all_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:infoElem])
+    @infodata = SequencingDataset.select(*dataset_info).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:infoElem])
+    @pep_count = Observation.where(:dataset_name => params[:infoElem].to_s).sum(:reads)
+    @eletype = "Sequencing Dataset" 
   end
-  haml :info_tables, :layout => false, locals:{data_to_display:@infodata, element:"#{h params[:infoElem]}"}
+  haml :info_tables, :layout => false, locals:{data_to_display:@infodata, element:"#{h params[:infoElem]}", pep_count:@pep_count, type:@eletype}
 end
 
 get '/show-info' do
   login_required
   if params['ref'] == "Library"
-    @info_data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_info_columns)
+    @info_data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_info)
     @eletype = "Selection"
     @next = "selections"
     @column = :selection_name
     haml :show_info, :layout => false
   elsif params['ref'] == "Selection"
-    @info_data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_all_columns)
+    @info_data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_info)
+    @pep_count = Observation.where(:dataset_name => params[:ele_name].to_s).sum(:reads)
     @eletype = "Sequencing Dataset"
     @next = "datasets"
     @column = :dataset_name
     haml :show_info, :layout => false
   elsif params['ref'] == "Sequencing Dataset"
-    #@info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
-    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
-    @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
+    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info)
+    #@peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_info).where(:peptide_sequence => params[:ele_name], :sequencing_datasets__dataset_name => params[:ele_name2]).to_hash(:DNA_sequence, :Reads)
+    @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name =>:dataset_name).select(*dna_info).where(:peptide_sequence => params[:ele_name], :sequencing_datasets__dataset_name => params[:ele_name2]).to_hash(:DNA_sequence, :Reads)
     @eletype = "Peptide"
-    @column1 = :peptides__peptide_sequence
+    @column1 = :Peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
     haml :show_info, :layout => false
   elsif params[:ref] == "Clusters"
     dataset = Cluster.select(:dataset_name).where(:cluster_id => params[:ele_name2].to_i).first
-    params['ele_name2'] = dataset[:dataset_name]
+    corres_dataset = dataset[:dataset_name]
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
-    @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
-    @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
+    puts "vor data"
+    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => params[:ele_name].to_s)
+    puts "vor DNA"
+    @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => params[:ele_name].to_s).to_hash(:DNA_sequence, :Reads)
     haml :show_info, :layout => false
   elsif params['ref'] == "comparative"
     @datasets = params['selRow'].to_set
-    puts @datasets
     @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
-    @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_columns)
+    @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_info)
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
@@ -404,7 +417,7 @@ get '/comparative-results' do
   end
 end
 
-post '/peptide-infos' do
+get '/peptide-infos' do
   login_required
   @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :peptide_infos, :layout => false

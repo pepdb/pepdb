@@ -7,7 +7,7 @@
   #selectedinfo
     - if params.size != 0
       %p
-        = partial :info_tables, locals: {data_to_display:@infodata.where(:dataset_name => "#{params[:set_name]}"), element: "#{h params[:set_name]}"}
+        = partial :info_tables, locals: {data_to_display:@infodata.where(:dataset_name => "#{params[:set_name]}"), element: "#{h params[:set_name]}", pep_count:@pep_count, type:@eletype}
 
   #selecteddata
     - if params.size != 0

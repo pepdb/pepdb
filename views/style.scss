@@ -267,6 +267,8 @@ ul {
   border:none;
   float:left;
   width:25%;
+  overflow-y:auto;
+  height:500px;
 }
 
 #clbrresults {
@@ -288,10 +290,12 @@ ul {
 #clsearchinfo{
   float:left;
   width:40%;
+  overflow:hide;
 }
 #clsearchpeps {
   float:left;
   width:40%;
+  overflow:hide;
 }
 
 ul#navigation{
@@ -469,6 +473,13 @@ iframe#propresults {
   border:0;
   width:100%;
 }
+/* Data browsing   */
+.seltar {
+  font-weight:bold;
+  text-align:center;
+}
+
+
 /* cluster browsing */
 #clustertab {
   //overflow-x:scroll;  

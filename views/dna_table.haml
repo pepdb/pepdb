@@ -4,7 +4,7 @@
       - dna.first.each do |name|
         %th= name[0].to_s.tr('_', ' ')
   %tbody
-    - dna.where(:peptides__peptide_sequence => seq, :sequencing_datasets__dataset_name => ds).each do |info|
+    - dna.where(:peptide_sequence => seq, :sequencing_datasets__dataset_name => ds).each do |info|
       %tr
         - info.each do |column|
           %td= column[1]

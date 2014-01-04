@@ -2,7 +2,7 @@
 #clsearchinfo
   %p 
     infos on selected cluster
-    = partial :info_tables, locals: {data_to_display:@cluster_infos , element:@cluster_infos[:consensus_sequence]}
+    = partial :info_tables, locals: {reads_sum:@reads_sum, data_to_display:@cluster_infos , element:@cluster_infos[0][:Consensus_sequence]}
 #clsearchpeps
   %p 
     all peptides in this cluster
