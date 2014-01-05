@@ -17,6 +17,21 @@ module Sinatra
     return unique_peptides, common_peptides 
     
     end #comparative_search
+    
+    def build_dna_hash(peptide_info, second_dna, first_dna)
+      dna_hash = {}
+      dataset =  peptide_info[0][:Sequencing_dataset]
+      if second_dna[dataset].nil?
+        dna_hash = first_dna
+      else
+        second_dna[dataset].each do |dna|
+          reads = dna[:Reads]
+          seq = dna[:DNA_sequence]
+          dna_hash[seq] = reads
+        end
+      end
+      dna_hash
+    end
   end #comparative_search
   helpers ComparativeSearch
 end #Sinatra

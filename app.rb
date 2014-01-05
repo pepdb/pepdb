@@ -56,7 +56,7 @@ library_info = [:library_name___Name, :carrier___Carrier, :insert_length___Inser
 selection_info = [:selection_name___Name, :date___Date, :performed_by___Performed_by,:library_name___Library, :species___Species, :tissue___Tissue, :cell___Cell]
 dataset_info = [:dataset_name___Name, :date___Date, :produced_by___Peformed_by, :statistics___Statistics, :library_name___Library, :selection_name___Selection, :selection_round___Selection_round, :species___Species, :tissue___Tissue, :cell___Cell, :origin___Origin, :sequencer___Sequencer, :read_type___Read_type, :sequence_length___Read_length, :used_indices___Used_barcode]
 peptide_info = [:peptides_sequencing_datasets__peptide_sequence___Peptide_sequence, :library_name___Library, :selection_name___Selection, :sequencing_datasets__dataset_name___Sequencing_dataset, :rank___Rank, :reads___Reads , :dominance___Dominance, :performance___Peptide_performance ]
-dna_info = [:dna_sequences_peptides_sequencing_datasets__dna_sequence___DNA_sequence, :reads___Reads]
+dna_info = [:dna_sequences_peptides_sequencing_datasets__dna_sequence___DNA_sequence, :dna_sequences_peptides_sequencing_datasets__reads___Reads]
 cluster_info = [:consensus_sequence___Consensus_sequence, :library_name___Library, :selection_name___Selection, :dataset_name___Sequencing_dataset, :dominance_sum___Dominance_sum, :parameters___Parameters]
 
 
@@ -272,6 +272,7 @@ get '/show-info' do
     @eletype = "Selection"
     @next = "selections"
     @column = :selection_name
+    @element = params[:ele_name].to_s
     haml :show_info, :layout => false
   elsif params['ref'] == "Selection"
     @info_data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_info)
@@ -279,11 +280,14 @@ get '/show-info' do
     @eletype = "Sequencing Dataset"
     @next = "datasets"
     @column = :dataset_name
+    @element = params[:ele_name].to_s
     haml :show_info, :layout => false
   elsif params['ref'] == "Sequencing Dataset"
-    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info)
-    #@peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_info).where(:peptide_sequence => params[:ele_name], :sequencing_datasets__dataset_name => params[:ele_name2]).to_hash(:DNA_sequence, :Reads)
+    @element = params[:ele_name].to_s
+    corres_dataset = params[:ele_name2].to_s
+    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Peptide_sequence => @element, :Sequencing_dataset => corres_dataset).all
     @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name =>:dataset_name).select(*dna_info).where(:peptide_sequence => params[:ele_name], :sequencing_datasets__dataset_name => params[:ele_name2]).to_hash(:DNA_sequence, :Reads)
+    
     @eletype = "Peptide"
     @column1 = :Peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
@@ -294,10 +298,9 @@ get '/show-info' do
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
-    puts "vor data"
     @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => params[:ele_name].to_s)
-    puts "vor DNA"
     @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => params[:ele_name].to_s).to_hash(:DNA_sequence, :Reads)
+    @element = params[:ele_name].to_s
     haml :show_info, :layout => false
   elsif params['ref'] == "comparative"
     @datasets = params['selRow'].to_set
@@ -306,6 +309,7 @@ get '/show-info' do
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
+    @element = params[:ele_name].to_s
     if params[:comptype] == "ref_and_ds"
       haml :ref_ds_comp, :layout => false
     else
@@ -402,11 +406,6 @@ get '/comparative-results' do
     @ds_qry, @ds_placeh = build_cdom_string(params)
     @uniq_peptides, @common_peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
     peptides = @common_peptides.map(:peptide_sequence).concat(@uniq_peptides.map(:peptide_sequence))
-    puts @uniq_peptides.inspect
-    puts "-----"
-    puts @uniq_peptides.map(:peptide_sequence).inspect
-    puts "-----"
-    
     @first_ds = Observation.select(:dataset_name, :peptide_sequence, :dominance).where(:dataset_name => params[:radio_ds], :peptide_sequence => peptides).to_hash_groups(:peptide_sequence, :dominance)
     puts @first_ds.inspect
     @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @common_peptides.map(:peptide_sequence)).all
@@ -417,11 +416,6 @@ get '/comparative-results' do
   end
 end
 
-get '/peptide-infos' do
-  login_required
-  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
-  haml :peptide_infos, :layout => false
-end
 
 # -------- Motif Search ----------- #
 
@@ -486,6 +480,37 @@ get '/motif-search-results' do
 end
 
 #----------- Peptide Search Helper Routes -----------#
+get '/peptide-infos' do
+  login_required
+  puts params.inspect
+  @element = params['selSeq'].to_s
+  @eletype = "Peptide"
+  
+  if request.referrer.include?('comparative-search')
+    @eletype = "Peptide Comparative"
+    @ref_qry, @ref_placeh = build_rdom_string(params)
+    @peptides_info = []
+    @peptides_dna = []
+    inv_ds = params['invDS'].to_s
+    ref_ds = params['refDS'].to_a.map{|ds| ds.to_s }
+    @first_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => inv_ds, :peptide_sequence => @element).all
+    @second_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => ref_ds, :peptide_sequence => @element).where(Sequel.lit(@ref_qry, *@ref_placeh)).all
+    @peptides_info.insert(-1, @first_data)
+    @second_data.each do |pep|
+      @peptides_info.insert(-1, [pep])
+    end
+    @first_dna = DnaFinding.select(*dna_info).where(:dataset_name => inv_ds, :peptide_sequence => @element).to_hash(:DNA_sequence, :Reads)
+    @second_dna = DnaFinding.select(:dataset_name, *dna_info).where(:dataset_name => ref_ds, :peptide_sequence => @element).to_hash_groups(:dataset_name)
+
+  else
+    corres_dataset = params['selDS'].to_s
+    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => @element).all
+    @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => @element).to_hash(:DNA_sequence, :Reads)
+  end
+
+  haml :show_info, :layout => false
+end
+
 post '/checklist' do
   login_required
   case params[:selector]

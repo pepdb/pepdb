@@ -1,6 +1,6 @@
 %h3 systemic peptide search
 #checkboxes
-  %form{:id => "libform", :action => "#{url '/sys-search'}", :method => 'post'}
+  %form{:id => "libform", :action => "#{url '/sys-search'}", :method => 'get'}
     .check-select#ref-library
       %fieldset.checklist
         %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 

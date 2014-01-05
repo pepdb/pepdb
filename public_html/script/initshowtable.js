@@ -107,8 +107,10 @@ $(document).ready(function(){
     var route = document.location.pathname;
     var dataType = $('#reftype').val();
     var firstChoice = $('#refelem1').val();
-    if (route == url+"/comparative-search" || route == url +"/systemic-search" || route == url+"/property-search"){
-      $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
+    if (route == url +"/systemic-search" || route == url+"/property-search"){
+      $.get(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS}, function(data){
+        $('#infos').html(data);
+      });
     } else {
       $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
         $('#datainfo').html(data);
@@ -182,16 +184,13 @@ $(document).ready(function(){
     var route = document.location.pathname;
     var dataType = $('#reftype').val();
     var firstChoice = $('#refelem1').val();
-    if (route == url+"/comparative-search" || route == url +"/systemic-search" || route == url+"/property-search"){
-      $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
-    } else {
-      $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
-        $('#datainfo').html(data);
-        $.getScript(url+'/script/initbutton.js', function(){
-          $('#datainfo').show();
-        });
+    
+    $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
+      $('#datainfo').html(data);
+      $.getScript(url+'/script/initbutton.js', function(){
+        $('#datainfo').show();
       });
-    }     
+    });
   });
 
 
@@ -216,7 +215,7 @@ $(document).ready(function(){
   });
   var route = document.location.pathname;
 
-  $('#show_table tr').hover(function(){
+  $('#show_table').on('mouseenter mouseleave', 'tr' ,function(){
     $(this).toggleClass('highlight');
   });
 
@@ -246,13 +245,29 @@ $(document).ready(function(){
       this.value = "";
     }
   });
-  $('#show_table tr:has(td)').click(function(){
+  $('#show_table').on('click', 'tr:has(td)', function(){
     var selectedID = $(this).find("td:first").html();
     var selectedDS = $(this).find("td:nth-child(2)").html();
     var route = document.location.pathname;
     var dataType = $('#reftype').val();
     var firstChoice = $('#refelem1').val();
     if (route == url+"/comparative-search"){
+      var refMx = $('#ref_dom_max').val();
+      var refMn = $('#ref_dom_min').val();
+      var dsMx = $('#ds_dom_max').val();
+      var dsMn = $('#ds_dom_min').val();
+      var refDS = [];
+      var investDS = $("#comp-dataset input[type='radio']:checked").val();
+      $('#r_all_ds').closest('fieldset').find(':checkbox').each(function(){
+        var elemVal = $(this).attr('value');
+        if(this.checked && elemVal != "all_ds"){
+          refDS.push(elemVal);
+        }
+      });
+      $.get(url+'/peptide-infos', {selSeq: selectedID, invDS: investDS, refDS: refDS, ref_dom_max: refMx, ref_dom_min: refMn, ds_dom_max: dsMx, ds_dom_min: dsMn}, function(data){
+        $('#infos').html(data);
+      });
+    /*if (route == url+"/comparative-search"){
       var checkedDS = [];
       $('#r_all_ds').closest('fieldset').find(':checkbox').each(function(){
         var elemVal = $(this).attr('value');
@@ -265,9 +280,7 @@ $(document).ready(function(){
       checkedDS.push(radioDS);
       $.get(url+'/show-info', {comptype: radioType, selRow:checkedDS, ele_name: selectedID, ref:dataType, ele_name2: selectedDS}, function(data){
         $('#compinfos').html(data);
-      });
-    } else if (route == url+"/systemic-search"){
-      $('#infos').load(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS});
+      });*/
     } else if (route.match(/clusters/) != null || route == url+"/cluster-search"){
       $.get(url+'/show-info', {ele_name: selectedID, ref:"Clusters", ele_name2: firstChoice}, function(data){
         $('#clusterlist_pep').html(data);
