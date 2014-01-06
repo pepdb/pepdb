@@ -285,14 +285,8 @@ get '/show-info' do
   elsif params['ref'] == "Sequencing Dataset"
     @element = params[:ele_name].to_s
     corres_dataset = params[:ele_name2].to_s
-    puts "start"
     @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Peptide_sequence => @element, :Sequencing_dataset => corres_dataset).all
-    puts "dna"
     @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name =>:dataset_name).select(*dna_info).where(:peptide_sequence => params[:ele_name], :sequencing_datasets__dataset_name => params[:ele_name2]).to_hash(:DNA_sequence, :Reads)
-    puts "fertisch"
-    puts @peptide_dna.inspect
-    puts @info_data.inspect
-    
     @eletype = "Peptide"
     @column1 = :Peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
@@ -421,15 +415,6 @@ get '/comparative-results' do
   end
 end
 
-get '/peptide-infos' do
-  login_required
-  corres_dataset = params['selDS'].to_s
-  peptide = params['selSeq'].to_s
-  @eletype = "Peptide"
-  @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => peptide)
-  @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => peptide).to_hash(:DNA_sequence, :Reads)
-  haml :show_info, :layout => false
-end
 
 # -------- Motif Search ----------- #
 
@@ -494,6 +479,37 @@ get '/motif-search-results' do
 end
 
 #----------- Peptide Search Helper Routes -----------#
+get '/peptide-infos' do
+  login_required
+  puts params.inspect
+  @element = params['selSeq'].to_s
+  @eletype = "Peptide"
+  
+  if request.referrer.include?('comparative-search')
+    @eletype = "Peptide Comparative"
+    @ref_qry, @ref_placeh = build_rdom_string(params)
+    @peptides_info = []
+    @peptides_dna = []
+    inv_ds = params['invDS'].to_s
+    ref_ds = params['refDS'].to_a.map{|ds| ds.to_s }
+    @first_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => inv_ds, :peptide_sequence => @element).all
+    @second_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => ref_ds, :peptide_sequence => @element).where(Sequel.lit(@ref_qry, *@ref_placeh)).all
+    @peptides_info.insert(-1, @first_data)
+    @second_data.each do |pep|
+      @peptides_info.insert(-1, [pep])
+    end
+    @first_dna = DnaFinding.select(*dna_info).where(:dataset_name => inv_ds, :peptide_sequence => @element).to_hash(:DNA_sequence, :Reads)
+    @second_dna = DnaFinding.select(:dataset_name, *dna_info).where(:dataset_name => ref_ds, :peptide_sequence => @element).to_hash_groups(:dataset_name)
+
+  else
+    corres_dataset = params['selDS'].to_s
+    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => @element).all
+    @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => @element).to_hash(:DNA_sequence, :Reads)
+  end
+
+  haml :show_info, :layout => false
+end
+
 post '/checklist' do
   login_required
   case params[:selector]

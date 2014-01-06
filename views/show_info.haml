@@ -1,11 +1,13 @@
 %p
-  %input{:type => "hidden", :id => "refele2", :value => "#{params[:ele_name]}"}
+  %input{:type => "hidden", :id => "refele2", :value => "#{@element}"}
   = @eletype 
   information
   - if @eletype == "Peptide"
-    = partial :info_tables, locals: {element:params[:ele_name], data_to_display:@info_data, dna_data:@peptide_dna}
-  - else
-    = puts "FFFFFFFFFFFFFFFFFFFFFFFSDFFFFFFFFFFFFFFFFFFFFF"
-    = partial :info_tables, locals: {element: params[:ele_name], data_to_display:@info_data.where(@column => "#{params[:ele_name]}"), element:"#{h params[:ele_name]}", pep_count:@pep_count, type:@eletype}
+    = partial :info_tables, locals: {element:@element, data_to_display:@info_data, dna_data:@peptide_dna}
+  - elsif @eletype == "Peptide Comparative"
+    - @peptides_info.each do |peptide|
+      - peptide_dna = build_dna_hash(peptide, @second_dna, @first_dna)
+      = partial :info_tables, locals: {element:@element, data_to_display:peptide, dna_data:peptide_dna}
+    =# partial :info_tables, locals: {element: params[:ele_name], data_to_display:@info_data.where(@column => "#{params[:ele_name]}"), element:"#{h params[:ele_name]}", pep_count:@pep_count, type:@eletype}
   - if !@next.nil?
     %input{:id => "continue",:type => "button", :action => "#{url '/'}" + @next ,:method => "get", :value => "continue with "+ @eletype}

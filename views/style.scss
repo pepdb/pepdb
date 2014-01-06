@@ -370,7 +370,7 @@ div#clinput {
   float:left;
   width: 40%;
 }
-
+/* motif search  */
 #motif-select {
   clear:left;
 } 
@@ -398,6 +398,21 @@ div#motif-list {
     width:15%;
   }*/
 }
+
+#motresults {
+  width:100%;
+}
+
+#motpepinfos {
+  float:left;
+  width:30%;
+}
+
+#motacc {
+  float:left;
+  width:70%;
+}
+
 
 td.details {
   background-color:#d1cfd0;

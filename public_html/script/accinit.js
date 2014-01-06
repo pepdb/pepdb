@@ -11,8 +11,6 @@ $(document).ready(function(){
     }
   };
   var url = baseDir();
-  $('#motacc').accordion({ heightStyle: "content" },
-                          {collapsible:true } );  
   $('#compacc').accordion({ heightStyle: "content" },
                           {collapsible:true } );  
   
@@ -21,9 +19,9 @@ $(document).ready(function(){
     "bPaginate": "true",
     "sPaginationType": "full_numbers",
     "bInfo": true,
-    "aaSorting": [[2, "desc"]],
+    "aaSorting": [[1, "desc"]],
     "aoColumnDefs": [
-      {"iDataSort": 2 , "aTargets":[1]},
+      {"iDataSort": 1 , "aTargets":[2]},
       {"bVisible": false , "aTargets":[2]},
     ],
     "bJQueryUI": true,
@@ -68,6 +66,31 @@ $(document).ready(function(){
       this.value = asInitVals[$(".mot_table thead input").index(this)];
     }
   } );
+
+  $('.mot_table').on('mouseenter mouseleave', 'tr', function(){
+    $(this).toggleClass('highlight');
+  });
+
+  $('.mot_table').on('click', 'tr:has(td)', function(){
+    var selectedPep = $(this).find("td:first").html();
+    var selectedDS = $(this).find("td:nth-child(3)").html();
+    $.get(url +"/peptide-infos", {selDS: selectedDS, selSeq: selectedPep}, function(data){
+      $('#motpepinfos').html(data);
+    });
+
+
+  });
+
+
+  /* init jquery accordion displaying the results */
+  $('#motacc').accordion({ heightStyle: "content" },
+                          {collapsible:true },
+
+   {activate: function(event, ui){
+      oTable.fnDraw();
+    }}   
+   );  
+
 
   // initialzie datatables table
     var pTable = $('.cl_table').dataTable({

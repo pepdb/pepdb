@@ -110,7 +110,7 @@ $(document).ready(function(){
     if($('.loading').is(':hidden')){
       $('.loading').toggle();
     }
-    $('#compinfos').html("");
+    $('#infos').html("");
     $.ajax({
       data: $(this).serialize(),
       type: $(this).attr('method'),
