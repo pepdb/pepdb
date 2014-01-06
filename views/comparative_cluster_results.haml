@@ -54,13 +54,20 @@
               %td<>
               %td<>
             - else
-              %td<>
-                = @match_cl[ref_cluster][0][:consensus_sequence] 
-              %td<>
-                = @match_cl[ref_cluster][0][:dataset_name] 
-              %td<>
-                = calc_spec_score(row[:dominance_sum].to_f,@match_cl[ref_cluster][0][:dominance_sum].to_f).round(5) 
-              %td<>
-                = format_dominance(@match_cl[ref_cluster][0][:dominance_sum]) 
-              %td<>
-                = @scores[invest_cl][ref_cluster].round(5)
+              -if @match_cl[ref_cluster][cluster].nil?
+                %td<>
+                %td<>
+                %td<>
+                %td<>
+                %td<>
+              - else
+                %td<>
+                  = @match_cl[ref_cluster][cluster][:consensus_sequence] 
+                %td<>
+                  = @match_cl[ref_cluster][cluster][:dataset_name] 
+                %td<>
+                  = calc_spec_score(row[:dominance_sum].to_f,@match_cl[ref_cluster][cluster][:dominance_sum].to_f).round(5) 
+                %td<>
+                  = format_dominance(@match_cl[ref_cluster][cluster][:dominance_sum]) 
+                %td<>
+                  = @scores[invest_cl][ref_cluster].round(5)
