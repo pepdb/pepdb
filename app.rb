@@ -268,19 +268,19 @@ end
 get '/show-info' do
   login_required
   if params['ref'] == "Library"
-    @info_data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_info)
     @eletype = "Selection"
     @next = "selections"
     @column = :selection_name
     @element = params[:ele_name].to_s
+    @info_data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_info).where(:selection_name => @element).all
     haml :show_info, :layout => false
   elsif params['ref'] == "Selection"
-    @info_data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_info)
     @pep_count = Observation.where(:dataset_name => params[:ele_name].to_s).sum(:reads)
     @eletype = "Sequencing Dataset"
     @next = "datasets"
     @column = :dataset_name
     @element = params[:ele_name].to_s
+    @info_data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_info).where(:dataset_name => @element).all
     haml :show_info, :layout => false
   elsif params['ref'] == "Sequencing Dataset"
     @element = params[:ele_name].to_s
