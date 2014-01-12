@@ -168,7 +168,7 @@ get '/datasets/:set_name' do
   end
   @peptides = Observation.join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*peptide_columns)
   @infodata = SequencingDataset.select(*dataset_info).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:set_name])
-  @pep_count = Observation.sum(:reads).where(:dataset_name => params[:ele_name].to_s)
+  @pep_count = Observation.where(:dataset_name => params[:ele_name].to_s).sum(:reads)
   @eletype = "Sequencing Dataset"
   haml :datasets
 end
