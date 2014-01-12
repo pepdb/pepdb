@@ -1,4 +1,5 @@
 #clustertab
+  %input{:id => "max_len", :type => "hidden", :value => @max_length}
   %table{:id=>"show_table",:class => "ui-widget"}<
     %thead.ui-widget-header
       %tr
@@ -71,3 +72,4 @@
                   = format_dominance(@match_cl[ref_cluster][cluster][:dominance_sum]) 
                 %td<>
                   = @scores[invest_cl][ref_cluster].round(5)
+#clusterinfos

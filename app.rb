@@ -560,13 +560,6 @@ get '/cluster-results' do
   haml :peptide_results, :layout => false
 end
 
-get '/cluster-infos' do
-  login_required
-  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}")
-  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}")
-  haml :cluster_infos, :layout => false
-end
-
 #------- Comparative Cluster Search ------------#
 get '/comparative-cluster-search' do
   login_required
@@ -606,6 +599,21 @@ get '/comparative-cluster-results' do
     haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
   end
 end
+
+####### Cluster Helper Routes #########
+
+get '/cluster-info' do
+  dataset = Cluster.select(:dataset_name).where(:cluster_id => params[:ele_name2].to_i).first
+  corres_dataset = dataset[:dataset_name]
+  @eletype = "Peptide"
+  @column1 = :peptides__peptide_sequence
+  @column2 = :sequencing_datasets__dataset_name
+  @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => params[:ele_name].to_s)
+  @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => params[:ele_name].to_s).to_hash(:DNA_sequence, :Reads)
+  @element = params[:ele_name].to_s
+  haml :show_info, :layout => false
+end
+
 
 
 ############ Add Data ################
