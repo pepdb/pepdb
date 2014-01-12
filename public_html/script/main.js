@@ -115,6 +115,13 @@ $(document).ready(function(){
       data: $(this).serialize(),
       type: $(this).attr('method'),
       url: $(this).attr('action'),
+      error: function(response,error1,error2){
+        $.get(url+'/error', {error:error2},function(response){
+          $('#comppepresults').html(response);
+          $('#comppepresults').toggle();
+          $('.loading').toggle();
+        });
+      },
       success: function(response){
         $('#comppepresults').html(response);
         $.getScript(url+'/script/initshowtable.js', function(){
@@ -137,6 +144,14 @@ $(document).ready(function(){
       data: $(this).serialize(),
       type: $(this).attr('method'),
       url: $(this).attr('action'),
+      error: function(response,error1,error2){
+        $.get(url+'/error', {error:error2},function(response){
+          $('#motresults').html(response);
+          $('#motresults').toggle();
+          $('.loading').toggle();
+        });
+      },
+
       success: function(response){
         $('#motresults').html(response);
         $.getScript(url+'/script/accinit.js', function(){
@@ -161,6 +176,13 @@ $(document).ready(function(){
       data: $(this).serialize(),
       type: $(this).attr('method'),
       url: $(this).attr('action'),
+      error: function(response,error1,error2){
+        $.get(url+'/error', {error:error2},function(response){
+          $('#clpepresults').html(response);
+          $('#clpepresults').toggle();
+          $('.loading').toggle();
+        });
+      },
       success: function(response){
         $('#clpepresults').html(response);
         $.getScript(url+'/script/tableinit.js', function(){
@@ -252,6 +274,13 @@ $(document).ready(function(){
       data: $(this).serialize(),
       type: $(this).attr('method'),
       url: $(this).attr('action'),
+      error: function(response,error1,error2){
+        $.get(url+'/error', {error:error2},function(response){
+          $('#propresults').html(response);
+          $('#propresults').toggle();
+          $('.loading').toggle();
+        });
+      },
       success: function(response){
         $('#propresults').html(response);
         $.getScript(url+'/script/initshowtable.js', function(){
