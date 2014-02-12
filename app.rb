@@ -223,9 +223,15 @@ end
 ####### Data Browsing Helper Routes ####################
 get '/cluster-infos' do
   login_required
-  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}").select(*cluster_info).all
-  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}").all
-  @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:peptide_sequence]}).sum(:reads)
+  if request.referrer.include?("comparative-cluster")
+    qry, placeholder = build_comp_cl_string(params)
+    @cluster_infos = Cluster.select(*cluster_info).where(Sequel.lit(qry,*placeholder)).all
+    @reads_sum, @cluster_peps = calc_cluster_read_sums(params)
+  else
+    @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}").select(*cluster_info).all
+    @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}").all
+    @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:peptide_sequence]}).sum(:reads)
+  end
   haml :cluster_infos, :layout => false
 end
 
@@ -406,7 +412,6 @@ get '/comparative-results' do
     @uniq_peptides, @common_peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
     peptides = @common_peptides.map(:peptide_sequence).concat(@uniq_peptides.map(:peptide_sequence))
     @first_ds = Observation.select(:dataset_name, :peptide_sequence, :dominance).where(:dataset_name => params[:radio_ds], :peptide_sequence => peptides).to_hash_groups(:peptide_sequence, :dominance)
-    puts @first_ds.inspect
     @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @common_peptides.map(:peptide_sequence)).all
     @specs = DB[:peptides_sequencing_datasets].select(:peptide_sequence, :dominance).where(:peptide_sequence => @common_peptides.map(:peptide_sequence), :dataset_name => params[:ref_ds]).to_hash_groups(:peptide_sequence, :dominance)
     haml :peptide_results, :layout => false
@@ -481,7 +486,6 @@ end
 #----------- Peptide Search Helper Routes -----------#
 get '/peptide-infos' do
   login_required
-  puts params.inspect
   @element = params['selSeq'].to_s
   @eletype = "Peptide"
   
@@ -575,7 +579,6 @@ end
 
 get '/comparative-cluster-results' do
   login_required
-  puts params.inspect
   @errors = {}
   if params[:ref_ds].nil? || params[:radio_ds].nil?
     @errors[:ds] = "select two or more datasets!"
@@ -601,19 +604,22 @@ get '/comparative-cluster-results' do
 end
 
 ####### Cluster Helper Routes #########
-
+=begin
 get '/cluster-info' do
-  dataset = Cluster.select(:dataset_name).where(:cluster_id => params[:ele_name2].to_i).first
-  corres_dataset = dataset[:dataset_name]
-  @eletype = "Peptide"
-  @column1 = :peptides__peptide_sequence
-  @column2 = :sequencing_datasets__dataset_name
-  @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => params[:ele_name].to_s)
-  @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => params[:ele_name].to_s).to_hash(:DNA_sequence, :Reads)
-  @element = params[:ele_name].to_s
+  if request.referrer.include?("comparative-cluster")
+  else
+    dataset = Cluster.select(:dataset_name).where(:cluster_id => params[:ele_name2].to_i).first
+    corres_dataset = dataset[:dataset_name]
+    @eletype = "Peptide"
+    @column1 = :peptides__peptide_sequence
+    @column2 = :sequencing_datasets__dataset_name
+    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => params[:ele_name].to_s)
+    @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => params[:ele_name].to_s).to_hash(:DNA_sequence, :Reads)
+    @element = params[:ele_name].to_s
+  end
   haml :show_info, :layout => false
 end
-
+=end
 
 
 ############ Add Data ################
@@ -779,7 +785,6 @@ end
 post '/validate-data' do
   login_required
   redirect "/" unless current_user.admin?
-  puts params[:dtar]
   
   @errors = validate(params)
   @values = params
