@@ -267,20 +267,6 @@ $(document).ready(function(){
       $.get(url+'/peptide-infos', {selSeq: selectedID, invDS: investDS, refDS: refDS, ref_dom_max: refMx, ref_dom_min: refMn, ds_dom_max: dsMx, ds_dom_min: dsMn}, function(data){
         $('#infos').html(data);
       });
-    /*if (route == url+"/comparative-search"){
-      var checkedDS = [];
-      $('#r_all_ds').closest('fieldset').find(':checkbox').each(function(){
-        var elemVal = $(this).attr('value');
-        if(this.checked && elemVal != "all_ds"){
-          checkedDS.push(elemVal);
-        }
-      });
-      var radioDS = $("#comp-dataset input[type='radio']:checked").val();
-      var radioType = $("#comp-buttons input[type='radio']:checked").val();
-      checkedDS.push(radioDS);
-      $.get(url+'/show-info', {comptype: radioType, selRow:checkedDS, ele_name: selectedID, ref:dataType, ele_name2: selectedDS}, function(data){
-        $('#compinfos').html(data);
-      });*/
     } else if (route.match(/clusters/) != null || route == url+"/cluster-search"){
       $.get(url+'/show-info', {ele_name: selectedID, ref:"Clusters", ele_name2: firstChoice}, function(data){
         $('#clusterlist_pep').html(data);
@@ -303,6 +289,9 @@ $(document).ready(function(){
       }      
       $.get(url+"/cluster-infos", {ele_name: selectedSeq, ele_name2: selectedDS}, function(data){
         $('#clusterinfos').html(data);
+        $.getScript(url+'/script/initproptable.js', function(){
+          $('#clusterinfos').show();
+        });
       }); 
     } else {
       $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){

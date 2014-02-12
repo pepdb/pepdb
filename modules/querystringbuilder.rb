@@ -188,6 +188,17 @@ module Sinatra
      end       
       return querystring, placeholders
     end
+  
+    def build_comp_cl_string(params)
+      querystring = ''
+      placeholders = Array.new
+      params[:ele_name].zip(params[:ele_name2]).each do |cl, ds|
+        querystring << "consensus_sequence = ? AND dataset_name = ? OR "
+        placeholders.push(cl.to_s, ds.to_s)
+      end
+      return querystring.chop!.chop!.chop, placeholders
+  
+    end
 
   end
 

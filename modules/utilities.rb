@@ -100,6 +100,17 @@ module Sinatra
         value[0][column]
       end
     end
+    
+    def calc_cluster_read_sums(params)
+      reads = []
+      cl_peps = []
+      params[:ele_name].zip(params[:ele_name2]).each do |cl, ds|
+        peps = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(:peptide_sequence).where(:dataset_name => ds.to_s, :consensus_sequence => cl.to_s).all
+        reads.push(Observation.where(:dataset_name => ds.to_s, :peptide_sequence => peps.map{|pep| pep[:peptide_sequence]}).sum(:reads))
+        cl_peps.push(peps)
+      end
+      return reads, cl_peps
+    end
   end #module
 
   helpers Utilities
