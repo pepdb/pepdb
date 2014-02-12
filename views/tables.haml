@@ -1,4 +1,8 @@
-%table{:id=>"#{table_id}",:class => "ui-widget #{table_class}", :data=>{:first_choice => "#{choice}"}}
+- if defined?(table_class)
+  - tclass = table_class
+- else 
+  - tclass = ""
+%table{:id=>"#{table_id}",:class => "ui-widget #{tclass}" , :data=>{:first_choice => "#{choice}"}}
   %thead.ui-widget-header
     %tr
       - first_data_to_display.first.each do |column_name|

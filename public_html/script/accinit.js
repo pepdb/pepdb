@@ -1,21 +1,15 @@
 pepdb.accinit = pepdb.accinit || {};
 var asInitVals = new Array();
+var tables =  new Array();
 // this file initializes the jquery accordions used within some search results (e.g. motif search)
 $(document).ready(function(){
-  function baseDir(){
-    var url = document.location.pathname.split('/')[1];
-    if (url == "pepdb"){
-      return '/'+url;
-    }else{
-      return '';
-    }
-  };
-  var url = baseDir();
+  
+  var url = $.baseDir();
   $('#compacc').accordion({ heightStyle: "content" },
                           {collapsible:true } );  
   
 // initialzie datatables table
-  var oTable = $('.mot_table').dataTable({
+  oTable = $('.mot_table').dataTable({
     "bPaginate": "true",
     "sPaginationType": "full_numbers",
     "bInfo": true,
@@ -36,59 +30,14 @@ $(document).ready(function(){
         }]
       }
     });
-
-  // stop table sorting when clicking on the filter-field  
-  $('.mot_table thead input').click( function(e){
-    stopTableSorting(e);
-  });
-    
-  // the following lines are neccessary for the individual column filtering
-  $('.mot_table thead input').keyup( function(e){
-    stopTableSorting(e);
-    oTable.fnFilter(this.value, $(".mot_table thead input").index(this));
-  });
-  $('.mot_table thead input').each( function (i) {
-    asInitVals[i] = this.value;
-  } );
-
-  $('.mot_table thead input').focus( function () {
-    if ( this.className == "search_init" )
-    {
-      this.className = "text_filter";
-      this.value = "";
-    }
-  } );
-
-  $('.mot_table thead input').blur( function (i) {
-    if ( this.value == "" )
-    {
-      $(this).addClass("search_init");
-      this.value = asInitVals[$(".mot_table thead input").index(this)];
-    }
-  } );
-
-  $('.mot_table').on('mouseenter mouseleave', 'tr', function(){
-    $(this).toggleClass('highlight');
-  });
-
-  $('.mot_table').on('click', 'tr:has(td)', function(){
-    var selectedPep = $(this).find("td:first").html();
-    var selectedDS = $(this).find("td:nth-child(3)").html();
-    $.get(url +"/peptide-infos", {selDS: selectedDS, selSeq: selectedPep}, function(data){
-      $('#motpepinfos').html(data);
-    });
-
-
-  });
-
+  $.addTableFunctions(".mot_table", oTable);
 
   /* init jquery accordion displaying the results */
   $('#motacc').accordion({ heightStyle: "content" },
                           {collapsible:true },
-
-   {activate: function(event, ui){
-      oTable.fnDraw();
-    }}   
+     {activate: function(event, ui){
+        oTable.fnDraw();
+      }}   
    );  
 
 
@@ -115,6 +64,8 @@ $(document).ready(function(){
       }
     });
 
+  $.addTableFunctions(".cl_table", pTable);
+/*
   // stop table sorting when clicking on the filter-field  
   $('.cl_table thead input').click( function(e){
     stopTableSorting(e);
@@ -142,7 +93,7 @@ $(document).ready(function(){
   $('.cl_table').on('click', 'tr:has(td)', function(){
     //alert("click");
   });
-
+*/
 
 });
 

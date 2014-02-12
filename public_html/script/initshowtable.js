@@ -11,16 +11,7 @@ function fnFormatDetails ( mTable, nTr )
     return sOut;
 }
 $(document).ready(function(){
-  function baseDir(){
-    var url = document.location.pathname.split('/')[1];
-    if (url == "pepdb"){
-      return '/'+url;
-    }else{
-      return '';
-    }
-  };
-
-  var url = baseDir();
+  var url = $.baseDir();
 
   /* setup and function for datatables using server-side data, used with large tables (e.g. dataset-peptides browsing)  */
   var route = document.location.pathname;
@@ -49,8 +40,8 @@ $(document).ready(function(){
     "aaSorting": [[1, "asc"]],
     "aoColumnDefs":[{"aTargets":[1,2,3],
                     "sClass": "alignRight"
-    },
-],
+      },
+    ],
     "sDom": '<"H"lfrT>t<"F"ip>',
     "oTableTools":{
       "sSwfPath": url+"/copy_csv_xls_pdf.swf",
@@ -68,58 +59,7 @@ $(document).ready(function(){
     }
   
   });
-
-  $('#pep_table thead input').click( function(e){
-    stopTableSorting(e);
-  });
-
-  $('#pep_table thead input').keyup( function(){
-    pTable.fnFilter(this.value, $("#pep_table thead input").index(this));
-  });
-
-  $('#pep_table thead input').each( function (i) {
-    asInitVals[i] = this.value;
-  } );
-
-  $('#pep_table thead input').focus( function () {
-    if ( this.className == "search_init" )
-    {
-      this.className = "text_filter";
-      this.value = "";
-    }
-  } );
-
-  $('#pep_table thead input').blur( function (i) {
-    if ( this.value == "" )
-    {
-      $(this).addClass("search_init");
-      this.value = asInitVals[$("#pep_table thead input").index(this)];
-    }
-  });
-
-  $('#pep_table').on('mouseenter mouseleave', 'tr', function(){
-    $(this).toggleClass('highlight');
-  });
-
-  $('#pep_table').on('click', 'tr:has(td)', function(){
-    var selectedID = $(this).find("td:first").html();
-    var selectedDS = $(this).find("td:nth-child(5)").html();
-    var route = document.location.pathname;
-    var dataType = $('#reftype').val();
-    var firstChoice = $('#refelem1').val();
-    if (route == url +"/systemic-search" || route == url+"/property-search"){
-      $.get(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS}, function(data){
-        $('#infos').html(data);
-      });
-    } else {
-      $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
-        $('#datainfo').html(data);
-        $.getScript(url+'/script/initbutton.js', function(){
-          $('#datainfo').show();
-        });
-      });
-    }     
-  });
+  $.addTableFunctions("#pep_table", pTable);
 
   // initialzie datatables table
   var aTable = $('.prop_table').dataTable({
@@ -144,55 +84,7 @@ $(document).ready(function(){
       }
     });
 
-  // stop table sorting when clicking on the filter-field  
-  $('.prop_table thead input').click( function(e){
-    stopTableSorting(e);
-  });
-
-  // the following lines are neccessary for the individual column filtering
-  $('.prop_table thead input').keyup( function(e){
-    stopTableSorting(e);
-    aTable.fnFilter(this.value, $(".prop_table thead input").index(this));
-  });
-  $('.prop_table thead input').each( function (i) {
-    asInitVals[i] = this.value;
-  } );
-
-  $('.prop_table thead input').focus( function () {
-    if ( this.className == "search_init" )
-    {
-      this.className = "text_filter";
-      this.value = "";
-    }
-  } );
-
-  $('.prop_table thead input').blur( function (i) {
-    if ( this.value == "" )
-    {
-      $(this).addClass("search_init");
-      this.value = asInitVals[$(".prop_table thead input").index(this)];
-    }
-  } );
-
-  $('.prop_table').on('mouseenter mouseleave', 'tr', function(){
-    $(this).toggleClass('highlight');
-  });
-
-  $('.prop_table').on('click', 'tr:has(td)', function(){
-    var selectedID = $(this).find("td:first").html();
-    var selectedDS = $(this).find("td:nth-child(5)").html();
-    var route = document.location.pathname;
-    var dataType = $('#reftype').val();
-    var firstChoice = $('#refelem1').val();
-    
-    $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
-      $('#datainfo').html(data);
-      $.getScript(url+'/script/initbutton.js', function(){
-        $('#datainfo').show();
-      });
-    });
-  });
-
+  $.addTableFunctions('.prop_table', aTable);
 
 
 /* initialize second table on data browsing pages with searchable columns*/
@@ -214,94 +106,7 @@ $(document).ready(function(){
     },
   });
   var route = document.location.pathname;
-
-  $('#show_table').on('mouseenter mouseleave', 'tr' ,function(){
-    $(this).toggleClass('highlight');
-  });
-
-  $('#show_table thead input').blur( function (i) {
-    if ( this.value == "" )
-    {
-      $(this).addClass("search_init");
-      this.value = asInitVals[$("#show_table thead input").index(this)];
-    }
-  });
-  $('#show_table thead input').click( function(e){
-    stopTableSorting(e);
-  });
-  $('#show_table thead input').keyup( function(){
-    stopTableSorting(e);
-    qTable.fnFilter(this.value, $("#show_table thead input").index(this));
-  });
-
-  $('#show_table thead input').each( function (i) {
-    asInitVals[i] = this.value;
-  } );
-
-  $('#show_table thead input').focus( function () {
-    if ( this.className == "search_init" )
-    {
-      this.className = "text_filter";
-      this.value = "";
-    }
-  });
-  $('#show_table').on('click', 'tr:has(td)', function(){
-    var selectedID = $(this).find("td:first").html();
-    var selectedDS = $(this).find("td:nth-child(2)").html();
-    var route = document.location.pathname;
-    var dataType = $('#reftype').val();
-    var firstChoice = $('#refelem1').val();
-    if (route == url+"/comparative-search"){
-      var refMx = $('#ref_dom_max').val();
-      var refMn = $('#ref_dom_min').val();
-      var dsMx = $('#ds_dom_max').val();
-      var dsMn = $('#ds_dom_min').val();
-      var refDS = [];
-      var investDS = $("#comp-dataset input[type='radio']:checked").val();
-      $('#r_all_ds').closest('fieldset').find(':checkbox').each(function(){
-        var elemVal = $(this).attr('value');
-        if(this.checked && elemVal != "all_ds"){
-          refDS.push(elemVal);
-        }
-      });
-      $.get(url+'/peptide-infos', {selSeq: selectedID, invDS: investDS, refDS: refDS, ref_dom_max: refMx, ref_dom_min: refMn, ds_dom_max: dsMx, ds_dom_min: dsMn}, function(data){
-        $('#infos').html(data);
-      });
-    } else if (route.match(/clusters/) != null || route == url+"/cluster-search"){
-      $.get(url+'/show-info', {ele_name: selectedID, ref:"Clusters", ele_name2: firstChoice}, function(data){
-        $('#clusterlist_pep').html(data);
-      });
-    } else if (route == url+"/comparative-cluster-search"){
-      var maxLen = $('#max_len').val();
-      var selectedDS = [];
-      var selectedSeq = [];
-      selectedDS.push($("#comp-dataset input[type='radio']:checked").val());
-      selectedSeq.push($(this).find("td:first").html());
-      for(var cluster = 0; cluster < maxLen; cluster++){
-        var seqCell = 4 + cluster * 5;
-        var dsCell = seqCell+1;
-        var seq = $(this).find("td:nth-child("+seqCell+")").html();
-        var ds = $(this).find("td:nth-child("+dsCell+")").html();
-        if (seq){
-          selectedSeq.push(seq);
-          selectedDS.push(ds);
-        }
-      }      
-      $.get(url+"/cluster-infos", {ele_name: selectedSeq, ele_name2: selectedDS}, function(data){
-        $('#clusterinfos').html(data);
-        $.getScript(url+'/script/initproptable.js', function(){
-          $('#clusterinfos').show();
-        });
-      }); 
-    } else {
-      $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
-        $('#datainfo').html(data);
-        $.getScript(url+'/script/initbutton.js', function(){
-          $('#datainfo').show();
-        });
-      });
-    }     
-  });
+  $.addTableFunctions('#show_table', qTable);
 
   /* setup for table with collapsible rows in motif list table  */
   var nCloneTh = document.createElement('th');

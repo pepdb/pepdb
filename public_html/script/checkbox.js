@@ -2,16 +2,8 @@ pepdb.checkbox = pepdb.checkbox || {};
 // this file provides checkbox features like loading additional database objects
 // after one checkbox was selected (e.g. systemic search)
 $(document).ready(function(){
-  function baseDir(){
-    var url = document.location.pathname.split('/')[1];
-    if (url == "pepdb"){
-      return '/'+url;
-    }else{
-      return '';
-    }
-  };
 
-  var url = baseDir();
+  var url = $.baseDir();
   var formAll = ["#c_all_sel", "#r_all_sel", "#r_all_ds", "#all_sell", "#all_ds"];
 
     /*(un)check all checkboxes on checking "all"*/
