@@ -49,7 +49,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
     var selectedID = $(this).find("td:first").html();
     var route = $('#reftype').val();
     var path = document.location.pathname;
-    if (path == url+"/cluster-search"){
+    if (path == url+"/cluster-search" && objID == '#select_table'){
       if($('#clsearch').is(':visible')){
         $('#clsearch').toggle();
       }
