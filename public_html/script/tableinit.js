@@ -1,24 +1,16 @@
 pepdb.tableinit = pepdb.tableinit || {};
-var asInitVals = new Array();
-
-jQuery.baseDir =  function baseDir(){
-    var url = document.location.pathname.split('/')[1];
-    if (url == "pepdb"){
-      return '/'+url;
-    }else{
-      return '';
-    }
-  };
 
 jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
+  'use strict';
+  var asInitVals = [];
   var url = $.baseDir();
   $(objID + ' thead input').click( function(e){
-    stopTableSorting(e);
+    $.stopTableSorting(e);
   });
 
   $(objID +' thead input').keyup( function(e){
-    stopTableSorting(e);
-    tabVar.fnFilter(this.value, $(objID + " thead input").index(this));
+    $.stopTableSorting(e);
+    tabVar.fnFilter(this.value, $(objID + ' thead input').index(this));
   });
 
   $(objID+' thead input').each( function (i) {
@@ -26,18 +18,18 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
   } );
   
   $(objID+' thead input').focus( function () {
-    if ( this.className == "search_init" )
+    if ( this.className == 'search_init' )
     {
-      this.className = "text_filter";
-      this.value = "";
+      this.className = 'text_filter';
+      this.value = '';
     }
   } );
   
   $(objID+' thead input').blur( function (i) {
-    if ( this.value == "" )
+    if ( this.value === '' )
     {
-      $(this).addClass("search_init");
-      this.value = asInitVals[$(objID+" thead input").index(this)];
+      $(this).addClass('search_init');
+      this.value = asInitVals[$(objID+' thead input').index(this)];
     }
   } );
   
@@ -46,10 +38,10 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
   });
 
   $(objID).on('click', 'tr:has(td)', function(){
-    var selectedID = $(this).find("td:first").html();
+    var selectedID = $(this).find('td:first').html();
     var route = $('#reftype').val();
     var path = document.location.pathname;
-    if (path == url+"/cluster-search" && objID == '#select_table'){
+    if (path == url+'/cluster-search' && objID == '#select_table'){
       if($('#clsearch').is(':visible')){
         $('#clsearch').toggle();
       }
@@ -59,21 +51,20 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
           $('#clsearch').toggle();
         });
       });
-    } else if (path == url+"/motif-search" ) {
+    } else if (path == url+'/motif-search' ) {
       $(objID).on('click', 'tr:has(td)', function(){
-        var selectedPep = $(this).find("td:first").html();
-        var selectedDS = $(this).find("td:nth-child(3)").html();
-        $.get(url +"/peptide-infos", {selDS: selectedDS, selSeq: selectedPep}, function(data){
+        var selectedPep = $(this).find('td:first').html();
+        var selectedDS = $(this).find('td:nth-child(3)').html();
+        $.get(url +'/peptide-infos', {selDS: selectedDS, selSeq: selectedPep}, function(data){
           $('#motpepinfos').html(data);
         });
       });
-    } else if (objID == "#pep_table"){ 
-      var selectedID = $(this).find("td:first").html();
-      var selectedDS = $(this).find("td:nth-child(5)").html();
-      var route = document.location.pathname;
+    // dealing with a server-side dataTable
+    } else if (objID == '#pep_table'){
+      var selectedDS = $(this).find('td:nth-child(5)').html();
       var dataType = $('#reftype').val();
       var firstChoice = $('#refelem1').val();
-      if (route == url +"/systemic-search" || route == url+"/property-search"){
+      if (route == url +'/systemic-search' || route == url+'/property-search'){
         $.get(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS}, function(data){
           $('#infos').html(data);
         });
@@ -85,10 +76,8 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
           });
         });
       }
-    } else if (objID == ".prop_table"){
-      var selectedID = $(this).find("td:first").html();
-      var selectedDS = $(this).find("td:nth-child(5)").html();
-      var route = document.location.pathname;
+    } else if (objID == '.prop_table'){
+      var selectedDS = $(this).find('td:nth-child(5)').html();
       var dataType = $('#reftype').val();
       var firstChoice = $('#refelem1').val();
 
@@ -98,49 +87,47 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
           $('#datainfo').show();
         });
       });
-    }else if (objID == "#show_table"){
-      var selectedID = $(this).find("td:first").html();
-      var selectedDS = $(this).find("td:nth-child(2)").html();
-      var route = document.location.pathname;
+    } else if (objID == '#show_table'){
+      var selectedDS = $(this).find('td:nth-child(2)').html();
       var dataType = $('#reftype').val();
       var firstChoice = $('#refelem1').val();
-      if (route == url+"/comparative-search"){
+      if (route == url+'/comparative-search'){
         var refMx = $('#ref_dom_max').val();
         var refMn = $('#ref_dom_min').val();
         var dsMx = $('#ds_dom_max').val();
         var dsMn = $('#ds_dom_min').val();
         var refDS = [];
-        var investDS = $("#comp-dataset input[type='radio']:checked").val();
+        var investDS = $('#comp-dataset input[type="radio"]:checked').val();
         $('#r_all_ds').closest('fieldset').find(':checkbox').each(function(){
           var elemVal = $(this).attr('value');
-          if(this.checked && elemVal != "all_ds"){
+          if(this.checked && elemVal != 'all_ds'){
             refDS.push(elemVal);
           }
         });
         $.get(url+'/peptide-infos', {selSeq: selectedID, invDS: investDS, refDS: refDS, ref_dom_max: refMx, ref_dom_min: refMn, ds_dom_max: dsMx, ds_dom_min: dsMn}, function(data){
           $('#infos').html(data);
         });
-      } else if (route.match(/clusters/) != null || route == url+"/cluster-search"){
-        $.get(url+'/show-info', {ele_name: selectedID, ref:"Clusters", ele_name2: firstChoice}, function(data){
+      } else if (route.match(/clusters/) !== null || route == url+'/cluster-search'){
+        $.get(url+'/show-info', {ele_name: selectedID, ref:'Clusters', ele_name2: firstChoice}, function(data){
           $('#clusterlist_pep').html(data);
         });
-      } else if (route == url+"/comparative-cluster-search"){
+      } else if (route == url+'/comparative-cluster-search'){
         var maxLen = $('#max_len').val();
         var selectedDS = [];
         var selectedSeq = [];
-        selectedDS.push($("#comp-dataset input[type='radio']:checked").val());
-        selectedSeq.push($(this).find("td:first").html());
+        selectedDS.push($('#comp-dataset input[type="radio"]:checked').val());
+        selectedSeq.push($(this).find('td:first').html());
         for(var cluster = 0; cluster < maxLen; cluster++){
           var seqCell = 4 + cluster * 5;
           var dsCell = seqCell+1;
-          var seq = $(this).find("td:nth-child("+seqCell+")").html();
-          var ds = $(this).find("td:nth-child("+dsCell+")").html();
+          var seq = $(this).find('td:nth-child('+seqCell+')').html();
+          var ds = $(this).find('td:nth-child('+dsCell+')').html();
           if (seq){
             selectedSeq.push(seq);
             selectedDS.push(ds);
           }
         }
-        $.get(url+"/cluster-infos", {ele_name: selectedSeq, ele_name2: selectedDS}, function(data){
+        $.get(url+'/cluster-infos', {ele_name: selectedSeq, ele_name2: selectedDS}, function(data){
           $('#clusterinfos').html(data);
           $.getScript(url+'/script/initproptable.js', function(){
             $('#clusterinfos').show();
@@ -176,22 +163,18 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
 
 
 $(document).ready(function(){
-
-
-
+  'use strict';
   var url = $.baseDir();
 
   $.getScript(url+'/script/initshowtable.js');
 /* --------------DataTables configuration----------------  */
   /* initialize first table with searchable columns*/
   var oTable = $('#select_table').dataTable({
-    "bPaginate": "true",
-    "sPaginationType": "full_numbers",
-    "bInfo": true,
-    "bJQueryUI": true,
+    'bPaginate': 'true',
+    'sPaginationType': 'full_numbers',
+    'bInfo': true,
+    'bJQueryUI': true,
   });
   
   $.addTableFunctions('#select_table', oTable);
- 
-
 });
