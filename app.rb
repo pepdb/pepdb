@@ -50,6 +50,7 @@ peptide_columns = [:peptide_sequence, :rank, :reads , :dominance]
 sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence, :rank, :reads , :dominance, :sequencing_datasets__dataset_name___dataset]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
+clsearch_results = [:consensus_sequence___consensus, :library_name___library, :selection_name___selection, :dataset_name___dataset]
 
 # Order and naming for info columns shown in the browsing options
 library_info = [:library_name___Name, :carrier___Carrier, :insert_length___Insert_length, :encoding_scheme___Encoding_scheme, :produced_by___Produced_by, :date___Date, :distinct_peptides___Distinct_peptides, :peptide_diversity___Peptide_diversity]
@@ -223,9 +224,20 @@ end
 ####### Data Browsing Helper Routes ####################
 get '/cluster-infos' do
   login_required
-  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}").select(*cluster_info).all
-  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}").all
-  @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:peptide_sequence]}).sum(:reads)
+  if request.referrer.include?("comparative-cluster")
+    qry, placeholder = build_comp_cl_string(params)
+    @cluster_infos = Cluster.select(*cluster_info).where(Sequel.lit(qry,*placeholder)).all
+    @reads_sum, @cluster_peps = calc_cluster_read_sums(params)
+  elsif request.referrer.include?("cluster-search")
+    puts params.inspect
+    @cluster_infos = Cluster.where(:consensus_sequence => params[:selCl].to_s,:dataset_name => params[:selDS].to_s).select(*cluster_info).all
+    @cluster_peps = DB[:clusters_peptides].join(:clusters, :cluster_id=>:cluster_id).select(:peptide_sequence).where(:consensus_sequence => params[:selCl].to_s, :dataset_name => params[:selDS].to_s).all
+    @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:peptide_sequence]}).sum(:reads)
+  else
+    @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}").select(*cluster_info).all
+    @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}").all
+    @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:peptide_sequence]}).sum(:reads)
+  end
   haml :cluster_infos, :layout => false
 end
 
@@ -268,19 +280,19 @@ end
 get '/show-info' do
   login_required
   if params['ref'] == "Library"
-    @info_data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_info)
     @eletype = "Selection"
     @next = "selections"
     @column = :selection_name
     @element = params[:ele_name].to_s
+    @info_data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_info).where(:selection_name => @element).all
     haml :show_info, :layout => false
   elsif params['ref'] == "Selection"
-    @info_data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_info)
     @pep_count = Observation.where(:dataset_name => params[:ele_name].to_s).sum(:reads)
     @eletype = "Sequencing Dataset"
     @next = "datasets"
     @column = :dataset_name
     @element = params[:ele_name].to_s
+    @info_data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_info).where(:dataset_name => @element).all
     haml :show_info, :layout => false
   elsif params['ref'] == "Sequencing Dataset"
     @element = params[:ele_name].to_s
@@ -291,8 +303,9 @@ get '/show-info' do
     @column1 = :Peptide_sequence
     @column2 = :sequencing_datasets__dataset_name
     haml :show_info, :layout => false
-  elsif params[:ref] == "Clusters"
-    dataset = Cluster.select(:dataset_name).where(:cluster_id => params[:ele_name2].to_i).first
+  elsif (params[:ref] == "Clusters" || params[:ref] == "Clustersearch")
+    dataset = Cluster.select(:dataset_name).where(:cluster_id => params[:ele_name2].to_i).first if params[:ref] == "Clusters"
+    dataset = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(:dataset_name).where(:peptide_sequence => params[:ele_name].to_s, :consensus_sequence => params[:ele_name2].to_s).first if params[:ref] == "Clustersearch"
     corres_dataset = dataset[:dataset_name]
     @eletype = "Peptide"
     @column1 = :peptides__peptide_sequence
@@ -302,6 +315,7 @@ get '/show-info' do
     @element = params[:ele_name].to_s
     haml :show_info, :layout => false
   elsif params['ref'] == "comparative"
+    puts  params.inspect
     @datasets = params['selRow'].to_set
     @info_data = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_browse_columns)
     @peptide_dna = Peptide.join(DnaFinding, :peptide_sequence=>:peptide_sequence).join(SequencingDataset, :dataset_name =>:dataset_name).join(DnaSequence, :dna_sequence=>:dna_sequences_peptides_sequencing_datasets__dna_sequence).select(*dna_info)
@@ -406,7 +420,6 @@ get '/comparative-results' do
     @uniq_peptides, @common_peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
     peptides = @common_peptides.map(:peptide_sequence).concat(@uniq_peptides.map(:peptide_sequence))
     @first_ds = Observation.select(:dataset_name, :peptide_sequence, :dominance).where(:dataset_name => params[:radio_ds], :peptide_sequence => peptides).to_hash_groups(:peptide_sequence, :dominance)
-    puts @first_ds.inspect
     @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @common_peptides.map(:peptide_sequence)).all
     @specs = DB[:peptides_sequencing_datasets].select(:peptide_sequence, :dominance).where(:peptide_sequence => @common_peptides.map(:peptide_sequence), :dataset_name => params[:ref_ds]).to_hash_groups(:peptide_sequence, :dominance)
     haml :peptide_results, :layout => false
@@ -481,7 +494,6 @@ end
 #----------- Peptide Search Helper Routes -----------#
 get '/peptide-infos' do
   login_required
-  puts params.inspect
   @element = params['selSeq'].to_s
   @eletype = "Peptide"
   
@@ -556,15 +568,8 @@ get '/cluster-results' do
     DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
     @datasets = SequencingDataset.select(:dataset_name).where(:dataset_name => allowed).map(:dataset_name)
   end
-  @cluster = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(:clusters__cluster_id___id ,:consensus_sequence___consensus, :library_name___library, :selection_name___selection, :dataset_name___dataset )
+  @cluster = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(*clsearch_results)
   haml :peptide_results, :layout => false
-end
-
-get '/cluster-infos' do
-  login_required
-  @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}")
-  @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}")
-  haml :cluster_infos, :layout => false
 end
 
 #------- Comparative Cluster Search ------------#
@@ -582,7 +587,6 @@ end
 
 get '/comparative-cluster-results' do
   login_required
-  puts params.inspect
   @errors = {}
   if params[:ref_ds].nil? || params[:radio_ds].nil?
     @errors[:ds] = "select two or more datasets!"
@@ -606,6 +610,24 @@ get '/comparative-cluster-results' do
     haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
   end
 end
+
+####### Cluster Helper Routes #########
+=begin
+get '/cluster-info' do
+  if request.referrer.include?("comparative-cluster")
+  else
+    dataset = Cluster.select(:dataset_name).where(:cluster_id => params[:ele_name2].to_i).first
+    corres_dataset = dataset[:dataset_name]
+    @eletype = "Peptide"
+    @column1 = :peptides__peptide_sequence
+    @column2 = :sequencing_datasets__dataset_name
+    @info_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => corres_dataset, :peptide_sequence => params[:ele_name].to_s)
+    @peptide_dna = DnaFinding.join(SequencingDataset, :dataset_name => :dataset_name).select(*dna_info).where(:sequencing_datasets__dataset_name => corres_dataset, :peptide_sequence => params[:ele_name].to_s).to_hash(:DNA_sequence, :Reads)
+    @element = params[:ele_name].to_s
+  end
+  haml :show_info, :layout => false
+end
+=end
 
 
 ############ Add Data ################
@@ -771,7 +793,6 @@ end
 post '/validate-data' do
   login_required
   redirect "/" unless current_user.admin?
-  puts params[:dtar]
   
   @errors = validate(params)
   @values = params

@@ -2,24 +2,16 @@ pepdb.initbutton = pepdb.initbutton || {};
 // this file initializes the continue buttons displayed within the data browsing
 // additionally it hides previous search results when a new search is send
 $(document).ready(function(){
-   function baseDir(){
-    var url = document.location.pathname.split('/')[1];
-    if (url == "pepdb"){
-      return '/'+url;
-    }else{
-      return '';
-    }
-  };
-
-  var url = baseDir();
+  'use strict';
+  var url = $.baseDir();
  
   $('#continue').click(function(){
     var url2 = $(this).attr('action');
     var cont = $('#refele2').val();
     url2 = url2 + '/'+ cont;
-    window.location = url2; 
+    window.location = url2;
   });
-  if(!isFirstLoad(pepdb.initbutton, "initbutton.js")){
+  if(!isFirstLoad(pepdb.initbutton, 'initbutton.js')){
     return;
   }
   $('#search').click(function(){
@@ -32,13 +24,13 @@ $(document).ready(function(){
     var checkedDS = [];
     $('#ref-dataset input:checkbox:checked').each(function(){
       var elemVal = this.value;
-      if(elemVal != "all_ds"){
+      if(elemVal != 'all_ds'){
         checkedDS.push(elemVal);
       }
     });
     $.get(url+'/systemic-results',{sysDS: checkedDS}, function(data){
       $('#sysresults').html(data);
-      $.getScript(url +"/script/initshowtable.js", function(){
+      $.getScript(url +'/script/initshowtable.js', function(){
         $('.loading').toggle();
         $('#sysresults').toggle();
       });
@@ -49,7 +41,7 @@ $(document).ready(function(){
     var tab = $('#tab').val();
     var element = $('#eleid').val();
     $.ajax({
-      type: "DELETE",
+      type: 'DELETE',
       url: url+'/delete-entry',
       data: {table: tab, id: element},
       success: function(response){
