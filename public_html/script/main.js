@@ -2,7 +2,7 @@
 var pepdb = pepdb || {};
 
 $.ajaxSetup ({
-  cache: true
+  cache: false 
 });
 
 var isFirstLoad = function(namesp, jsFile) {
@@ -23,17 +23,6 @@ jQuery.baseDir =  function baseDir(){
   }
 };
 
-
-jQuery.stopTableSorting = function stopTableSorting(e) {
-  'use strict';
-  if (!e) {
-    var e = window.event;
-  }
-  e.cancelBubble = true;
-  if (e.stopPropagation){
-    e.stopPropagation();
-  }
-};
 
 /* get url parameter 'name' or return '' if does not exist */
 function urlParam(name){
@@ -165,7 +154,7 @@ $(document).ready(function(){
       $('#clsearch').toggle();
     }
     $('#clpepresults').html('');
-    $('#clsearchpeps').html('');
+    $('.clsearchpeps').html('');
     $.ajax({
       data: $(this).serialize(),
       type: $(this).attr('method'),

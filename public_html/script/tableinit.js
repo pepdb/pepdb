@@ -1,5 +1,27 @@
 pepdb.tableinit = pepdb.tableinit || {};
 
+jQuery.baseDir =  function baseDir(){
+  'use strict';
+  var url = document.location.pathname.split('/')[1];
+  if (url == 'pepdb'){
+    return '/'+url;
+  } else {
+    return '';
+  }
+};
+
+jQuery.stopTableSorting = function stopTableSorting(e) {
+  'use strict';
+  if (!e) {
+    var e = window.event;
+  }
+  e.cancelBubble = true;
+  if (e.stopPropagation){
+    e.stopPropagation();
+  }
+};
+
+
 jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
   'use strict';
   var asInitVals = [];
@@ -42,29 +64,28 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
     var route = $('#reftype').val();
     var path = document.location.pathname;
     if (path == url+'/cluster-search' && objID == '#select_table'){
+      var selectedDS = $(this).find('td:nth-child(4)').html();
       if($('#clsearch').is(':visible')){
         $('#clsearch').toggle();
       }
-      $.get(url+'/cluster-infos', {selCl:selectedID}, function(data){
+      $.get(url+'/cluster-infos', {selCl:selectedID, selDS:selectedDS}, function(data){
         $('#clprop').html(data);
         $.getScript(url+'/script/initshowtable.js', function(){
           $('#clsearch').toggle();
         });
       });
     } else if (path == url+'/motif-search' ) {
-      $(objID).on('click', 'tr:has(td)', function(){
         var selectedPep = $(this).find('td:first').html();
         var selectedDS = $(this).find('td:nth-child(3)').html();
         $.get(url +'/peptide-infos', {selDS: selectedDS, selSeq: selectedPep}, function(data){
           $('#motpepinfos').html(data);
         });
-      });
     // dealing with a server-side dataTable
     } else if (objID == '#pep_table'){
       var selectedDS = $(this).find('td:nth-child(5)').html();
       var dataType = $('#reftype').val();
       var firstChoice = $('#refelem1').val();
-      if (route == url +'/systemic-search' || route == url+'/property-search'){
+      if (path == url +'/systemic-search' || path == url+'/property-search'){
         $.get(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS}, function(data){
           $('#infos').html(data);
         });
@@ -77,6 +98,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
         });
       }
     } else if (objID == '.prop_table'){
+      alert("proooop");
       var selectedDS = $(this).find('td:nth-child(5)').html();
       var dataType = $('#reftype').val();
       var firstChoice = $('#refelem1').val();
@@ -91,7 +113,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
       var selectedDS = $(this).find('td:nth-child(2)').html();
       var dataType = $('#reftype').val();
       var firstChoice = $('#refelem1').val();
-      if (route == url+'/comparative-search'){
+      if (path == url+'/comparative-search'){
         var refMx = $('#ref_dom_max').val();
         var refMn = $('#ref_dom_min').val();
         var dsMx = $('#ds_dom_max').val();
@@ -107,11 +129,15 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
         $.get(url+'/peptide-infos', {selSeq: selectedID, invDS: investDS, refDS: refDS, ref_dom_max: refMx, ref_dom_min: refMn, ds_dom_max: dsMx, ds_dom_min: dsMn}, function(data){
           $('#infos').html(data);
         });
-      } else if (route.match(/clusters/) !== null || route == url+'/cluster-search'){
+      } else if (path.match(/clusters/) !== null ){
         $.get(url+'/show-info', {ele_name: selectedID, ref:'Clusters', ele_name2: firstChoice}, function(data){
           $('#clusterlist_pep').html(data);
         });
-      } else if (route == url+'/comparative-cluster-search'){
+      } else if (path == url+'/cluster-search'){
+        $.get(url+'/show-info', {ele_name: selectedID, ref:'Clustersearch', ele_name2: firstChoice}, function(data){
+          $('#clusterlist_pep').html(data);
+        });
+      } else if (path == url+'/comparative-cluster-search'){
         var maxLen = $('#max_len').val();
         var selectedDS = [];
         var selectedSeq = [];
@@ -132,6 +158,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
           $.getScript(url+'/script/initproptable.js', function(){
             $('#clusterinfos').show();
           });
+          $('.clsearchpeps').show();
         });
       } else {
         $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
@@ -141,6 +168,14 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
           });
         });
       }
+    } else if (objID.match(/clpeptab/) !== null) {
+        var selectedPep = $(this).find('td:first').html();
+        var selectedDS = $(objID).data('ds');
+        var idx = $(objID).data('idx');
+        $.get(url +'/peptide-infos', {selDS: selectedDS, selSeq: selectedPep}, function(data){
+          $('#clpepinfos'+idx).html(data);
+        });
+      
     } else {
       if ($('#selecteddata').is(':visible')){
         $('#selecteddata').hide();
@@ -177,4 +212,5 @@ $(document).ready(function(){
   });
   
   $.addTableFunctions('#select_table', oTable);
+
 });

@@ -77,7 +77,7 @@ $(document).ready(function(){
     'oTableTools':{
       'sSwfPath': url+'/copy_csv_xls_pdf.swf',
       'aButtons': [{
-        'sExtends': 'collection',
+       'sExtends': 'collection',
         'sButtonText': 'save as',
         'aButtons': ['csv', 'pdf'],
       }]
