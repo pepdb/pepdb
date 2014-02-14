@@ -72,7 +72,7 @@ module Sinatra
             @matches[real_motif.to_sym].insert(-1, [@dataset, real_motif, peptide, dominance]) 
           else
             @dataset.each do |ds|
-              if Observation.select(:peptide_sequence).where(:dataset_name => ds).count != 0
+              if Observation.select(:peptide_sequence).where(:dataset_name => ds, :peptide_sequence => peptide).count != 0
                 dominance = Observation.select(:dominance).where(:dataset_name => ds, :peptide_sequence => peptide).first[:dominance]
                 @matches[real_motif.to_sym].insert(-1, [ds, real_motif, peptide, dominance]) 
               end
