@@ -7,29 +7,33 @@ $(document).ready(function(){
   var url = $.baseDir();
   $('#compacc').accordion({ heightStyle: 'content' },
                           {collapsible:true });
+  var noOfResults = $('#resamt').val();
 // initialzie datatables table
-  tables[0] = $('.mot_table').dataTable({
-    'bPaginate': 'true',
-    'sPaginationType': 'full_numbers',
-    'bInfo': true,
-    'aaSorting': [[1, 'desc']],
-    'aoColumnDefs': [
-      {'iDataSort': 1 , 'aTargets':[2]},
-      {'bVisible': false , 'aTargets':[2]},
-    ],
-    'bJQueryUI': true,
-    'sDom': '<"H"lfrT>t<"F"ip>',
-    'oTableTools':{
-      'sSwfPath': url+'/copy_csv_xls_pdf.swf',
-      'aButtons': [
-      {
-        'sExtends': 'collection',
-        'sButtonText': 'save as',
-        'aButtons': ['csv', 'pdf'],
-        }]
-      }
-    });
-  $.addTableFunctions('.mot_table', tables[0]);
+  for(var count = 0; count < noOfResults; count++){
+    var tabID = '#mot_table'+count;
+    tables[count] = $(tabID).dataTable({
+      'bPaginate': 'true',
+      'sPaginationType': 'full_numbers',
+      'bInfo': true,
+      'aaSorting': [[1, 'desc']],
+      'aoColumnDefs': [
+        {'iDataSort': 1 , 'aTargets':[2]},
+        {'bVisible': false , 'aTargets':[2]},
+      ],
+      'bJQueryUI': true,
+      'sDom': '<"H"lfrT>t<"F"ip>',
+      'oTableTools':{
+        'sSwfPath': url+'/copy_csv_xls_pdf.swf',
+        'aButtons': [
+        {
+          'sExtends': 'collection',
+          'sButtonText': 'save as',
+          'aButtons': ['csv', 'pdf'],
+          }]
+        }
+      });
+    $.addTableFunctions(tabID, tables[count]);
+  }
   // init jquery accordion displaying the results 
   $('#motacc').accordion({ heightStyle: 'content' },
                           {collapsible:true },

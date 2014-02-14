@@ -5,11 +5,12 @@
   - if @pep_per_mots.empty?
     = "No results found."
   - else
+    - index = 0
     - @pep_per_mots.each_key do |motif|
       %h3 
         = "#{motif} hits: #{@pep_per_mots[motif].size} <br />target: #{@mot_infos[motif][:target]} <br />receptor: #{@mot_infos[motif][:receptor]}"
       %div
-        %table.mot_table
+        %table{:id=>"mot_table#{index}"}
           %thead.ui-widget-header
             %tr
               %th 
@@ -41,4 +42,5 @@
                     = row[:dominance]
                   %td<>
                     = row[:dataset_name]
-                
+      - index += 1
+    %input{:type => "hidden", :id =>"resamt", :value => index+1}            
