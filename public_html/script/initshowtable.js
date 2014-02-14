@@ -90,7 +90,7 @@ $(document).ready(function(){
 /* initialize second table on data browsing pages with searchable columns*/
   var qTable = $('#show_table').dataTable({
     'bJQueryUI': true,
-    'sScrollX': '100%',
+    //'sScrollX': '100%',
     'bInfo': true,
     'sPaginationType': 'full_numbers',
     'bPaginate': true,
