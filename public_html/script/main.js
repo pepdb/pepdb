@@ -254,9 +254,21 @@ $(document).ready(function(){
 
   $('#edittype').change(function(){
     var selected = $(this).children('option:selected').val();
+    if (selected.length == 1){
+      $('#elementselection').hide();
+      $('#clusterselection').hide();
+      $('#editform').hide();
+      
+      return false;
+    }
     $.get(url+'/editdrop', {table:selected}, function(data){
       $('#elementselection').html(data);
       $.getScript(url+'/script/dropbox.js');
+      $('#elementselection').show();
+      
+      if (selected !== 'clusters'){
+        $('#clusterselection').hide();
+      }
     });
   });
     

@@ -8,6 +8,7 @@ $(document).ready(function(){
     var selected = $(this).children('option:selected').val();
     $.get(url+'/editclusters', {selElem:selected},function(data){
       $('#editform').html(data);
+      $('#editform').show();
     });
   });
 
@@ -18,11 +19,13 @@ $(document).ready(function(){
       $.get(url+ '/clusterdrop', {selElem:selected}, function(data){
         $('#clusterselection').html(data);
         $.getScript(url+'/script/dropbox.js');
+        $('#clusterselection').show();
       });
       return false;
     }
     $.get(url+'/edit'+table, {selElem:selected},function(data){
       $('#editform').html(data);
+      $('#editform').show();
       $.getScript(url+'/script/initbutton.js', function(){
       });
       $('#dspecies').change(function(){
