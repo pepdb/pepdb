@@ -16,9 +16,10 @@ module Sinatra
         "%E" % dom
     end
 
-    def format_spec_score(value)
-        "%E" % value 
+    def format_score(value)
+        "%.5f" % value 
     end
+
     
     def is_dominance?(column)
       column == :dominance || column == :dominance_sum
@@ -84,13 +85,53 @@ module Sinatra
       score
     end
 
-    def get_max_row_length(results)
+    def get_max_row_length(cluster_per_match, results)
       length =  0
-      results.each_value do |row|
-        length = row.size if row.size > length
+      cluster_per_match.each_value do |row|
+        puts row.inspect
+        uniq_cl = row.dup.to_set
+        cl_sum = 0
+        uniq_cl.each do |cluster|
+          puts results[cluster].inspect
+          puts results[cluster].size
+          cl_sum += results[cluster].size
+        end
+        length = cl_sum if cl_sum > length
       end
+      puts length
       length
     end
+
+    def format_comp_cl_data(investigated_cl, cl_to_matches, matched_cl_info, sim_scores, max_row_len)
+      table_header = ["sequence", "real dom.","dominance sum", "gen. spec."]
+      table_row = {}
+      is_numeric_cell = [false,true,true,true]
+      0.upto(max_row_len-1) {|header_cells| table_header.push("sequence", "dataset", "spec. score", "real dom","dominance sum", "sim. score")}
+      investigated_cl.each do |invest|
+        invest_cons = invest[:consensus_sequence]
+        invest_dom = format_dominance(invest[:dominance_sum])
+        invest_spec = format_spec_score(calc_gen_spec(invest[:dominance_sum], matched_cl_info, true,cl_to_matches[invest_cons]))
+        table_row[invest_cons] = [invest_cons, invest[:dominance_sum],invest_dom, invest_spec]
+        sim_scores[invest_cons].each_pair do |key,value|
+          matched_cl_info[key].each do |reference|
+            cons = reference[:consensus_sequence]
+            ds = reference[:dataset_name]
+            spec = format_spec_score(calc_spec_score(invest[:dominance_sum].to_f, reference[:dominance_sum].to_f))
+            dom = format_dominance(reference[:dominance_sum])
+            sim = format_spec_score(value) 
+            table_row[invest_cons].push(cons, ds, spec, reference[:dominance_sum],dom, sim)
+            is_numeric_cell.push(false,false,true,true,true,true)
+          end 
+        end
+        num_of_matched_cl = cl_to_matches[invest_cons].size
+        if num_of_matched_cl < max_row_len
+          cells = (max_row_len - num_of_matched_cl)*6
+          0.upto(cells-1) {|emtpy_cell| table_row[invest_cons].push("")}
+        end
+      end
+      return table_row, table_header, is_numeric_cell
+    end
+
 
     def test_for_nil(value, column)
       if value.nil?

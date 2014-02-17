@@ -603,8 +603,17 @@ get '/comparative-cluster-results' do
     @investigated_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(:dataset_name => params[:radio_ds]).where("dominance_sum > ?", params[:ds_dom_min].to_f).all
     #@match_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(Sequel.like(:consensus_sequence, *@matches), :dataset_name => params[:ref_ds].to_a.map{|s| s.to_s}).to_hash_groups(:consensus_sequence)
     @match_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(:consensus_sequence => @matches, :dataset_name => params[:ref_ds].to_a.map{|s| s.to_s}).to_hash_groups(:consensus_sequence)
-    @max_length = get_max_row_length(@cluster_to_matches)
+    @max_length = get_max_row_length(@cluster_to_matches, @match_cl)
     @clusters = Cluster.select(:dataset_name, :dominance_sum)
+    #puts @scores.inspect
+    #puts "-------------------------------------------------------"
+    #puts @match_cl.inspect
+    puts "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    #puts @cluster_to_matches.inspect
+    @tab_rows, @header, @is_numeric_cell = format_comp_cl_data(@investigated_cl, @cluster_to_matches, @match_cl,@scores, @max_length)
+    puts @tab_header.inspect
+    puts @tab_rows.inspect
+    puts @is_numeric_cell.inspect
     haml :comparative_cluster_results, :layout => false
   else
     haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
@@ -859,4 +868,8 @@ get '/user-management' do
   @selections = Selection.all
   @users = SequelUser.all
   haml :user_management
+end
+
+get '/ki' do
+  send_file "known_issues", :type => :txt
 end

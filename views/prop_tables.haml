@@ -27,6 +27,6 @@
           -else
             %td= cell_data[1]
         %td.alnright 
-          = @sim_quots[data_element[:peptide_sequence]].round(5)
+          = format_score(@sim_quots[data_element[:peptide_sequence]])
         %td
           = data_element[:dominance]

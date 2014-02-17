@@ -1,75 +1,23 @@
 #clustertab
   %input{:id => "max_len", :type => "hidden", :value => @max_length}
-  %table{:id=>"show_table",:class => "ui-widget"}<
+  %table{:id=>"compcl_table",:class => "ui-widget"}<
     %thead.ui-widget-header
       %tr
-        %th<>
-          sequence
-          %br
-          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-        %th<>
-          dominance sum 
-          %br
-          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-        %th<>
-          gen. spec. 
-          %br
-          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-        - (0...@max_length).each do |cluster|
+        - @header.each do |cell|
           %th<>
-            sequence
-            %br
-            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-          %th<>
-            dataset 
-            %br
-            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-          %th<>
-            spec. score
-            %br
-            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-          %th<>
-            dominance sum 
-            %br
-            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-          %th<>
-            sim. score 
+            = cell
             %br
             %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
     %tbody.ui-widget-content
-      - @investigated_cl.each do |row|
-        - invest_cl = row[:consensus_sequence]
+      - @tab_rows.each_value do |row|
+        - index = 0
         %tr
-          %td<>
-            = invest_cl
-          %td<>
-            =format_dominance(row[:dominance_sum])
-          %td<>
-            = calc_gen_spec(row[:dominance_sum],@match_cl,true,@cluster_to_matches[invest_cl]).round(5) 
-          - (0...@max_length).each do |cluster|
-            - ref_cluster = @cluster_to_matches[invest_cl][cluster]
-            - if @match_cl[ref_cluster].nil?
-              %td<>
-              %td<>
-              %td<>
-              %td<>
-              %td<>
+          - row.each do |cell|
+            - if @is_numeric_cell[index]
+              %td.alnright<>
+                = cell
             - else
-              -if @match_cl[ref_cluster][cluster].nil?
-                %td<>
-                %td<>
-                %td<>
-                %td<>
-                %td<>
-              - else
-                %td<>
-                  = @match_cl[ref_cluster][cluster][:consensus_sequence] 
-                %td<>
-                  = @match_cl[ref_cluster][cluster][:dataset_name] 
-                %td<>
-                  = calc_spec_score(row[:dominance_sum].to_f,@match_cl[ref_cluster][cluster][:dominance_sum].to_f).round(5) 
-                %td<>
-                  = format_dominance(@match_cl[ref_cluster][cluster][:dominance_sum]) 
-                %td<>
-                  = @scores[invest_cl][ref_cluster].round(5)
+              %td<>
+                = cell
+            - index += 1
 #clusterinfos

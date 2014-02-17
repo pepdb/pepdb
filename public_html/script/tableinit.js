@@ -137,29 +137,6 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
         $.get(url+'/show-info', {ele_name: selectedID, ref:'Clustersearch', ele_name2: firstChoice}, function(data){
           $('#clusterlist_pep').html(data);
         });
-      } else if (path == url+'/comparative-cluster-search'){
-        var maxLen = $('#max_len').val();
-        var selectedDS = [];
-        var selectedSeq = [];
-        selectedDS.push($('#comp-dataset input[type="radio"]:checked').val());
-        selectedSeq.push($(this).find('td:first').html());
-        for(var cluster = 0; cluster < maxLen; cluster++){
-          var seqCell = 4 + cluster * 5;
-          var dsCell = seqCell+1;
-          var seq = $(this).find('td:nth-child('+seqCell+')').html();
-          var ds = $(this).find('td:nth-child('+dsCell+')').html();
-          if (seq){
-            selectedSeq.push(seq);
-            selectedDS.push(ds);
-          }
-        }
-        $.get(url+'/cluster-infos', {ele_name: selectedSeq, ele_name2: selectedDS}, function(data){
-          $('#clusterinfos').html(data);
-          $.getScript(url+'/script/initproptable.js', function(){
-            $('#clusterinfos').show();
-          });
-          $('.clsearchpeps').show();
-        });
       } else {
         $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
           $('#datainfo').html(data);
@@ -168,6 +145,29 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
           });
         });
       }
+    } else if (objID === '#compcl_table'){
+      var maxLen = $('#max_len').val();
+      var selectedDS = [];
+      var selectedSeq = [];
+      selectedDS.push($('#comp-dataset input[type="radio"]:checked').val());
+      selectedSeq.push($(this).find('td:first').html());
+      for(var cluster = 0; cluster < maxLen; cluster++){
+        var seqCell = 5 + cluster * 6;
+        var dsCell = seqCell+1;
+        var seq = $(this).find('td:nth-child('+seqCell+')').html();
+        var ds = $(this).find('td:nth-child('+dsCell+')').html();
+        if (seq){
+          selectedSeq.push(seq);
+          selectedDS.push(ds);
+        }
+      }
+      $.get(url+'/cluster-infos', {ele_name: selectedSeq, ele_name2: selectedDS}, function(data){
+        $('#clusterinfos').html(data);
+        $.getScript(url+'/script/initproptable.js', function(){
+          $('#clusterinfos').show();
+        });
+        $('.clsearchpeps').show();
+      });
     } else if (objID.match(/clpeptab/) !== null) {
         var selectedPep = $(this).find('td:first').html();
         var selectedDS = $(objID).data('ds');

@@ -106,6 +106,33 @@ $(document).ready(function(){
   });
   $.addTableFunctions('#show_table', qTable);
 
+  var maxLen = $('#max_len').val();
+  var sortCols = [ {'iDataSort':1, 'aTargets':[2]}, {'bVisible':false, 'aTargets':[1]} ];
+  for(var domRow = 0; domRow<maxLen;domRow++){
+    var realDomCol = 7 + domRow * 6;
+    sortCols.push({'iDataSort':realDomCol, 'aTargets':[realDomCol+1]});
+    sortCols.push({'bVisible':false, 'aTargets':[realDomCol]});
+  }
+  var clTable = $('#compcl_table').dataTable({
+    'bJQueryUI': true,
+    //'sScrollX': '100%',
+    'bInfo': true,
+    'aaSorting':[[3,'desc'],[2, 'desc']],
+    'aoColumnDefs':sortCols,
+    'sPaginationType': 'full_numbers',
+    'bPaginate': true,
+    'sDom': '<"H"lfrT>t<"F"ip>',
+    'oTableTools':{
+      'sSwfPath': url+'/copy_csv_xls_pdf.swf',
+      'aButtons': [{
+        'sExtends': 'collection',
+        'sButtonText': 'save as',
+        'aButtons': ['csv', 'pdf'],
+      }]
+    },
+  });
+  $.addTableFunctions('#compcl_table', clTable);
+
   /* setup for table with collapsible rows in motif list table  */
   var nCloneTh = document.createElement('th');
   var nCloneTd = document.createElement('td');
