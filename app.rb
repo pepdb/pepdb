@@ -415,6 +415,7 @@ get '/comparative-results' do
   end
   if @errors.empty?
     @datasets = [params[:radio_ds], *params[:ref_ds]].to_set
+    @maxlength = params[:ref_ds].size
     @ref_qry, @ref_placeh = build_rdom_string(params)
     @ds_qry, @ds_placeh = build_cdom_string(params)
     @uniq_peptides, @common_peptides = comparative_search(params[:comp_type], params[:ref_ds], params[:radio_ds])
@@ -498,20 +499,13 @@ get '/peptide-infos' do
   @eletype = "Peptide"
   
   if request.referrer.include?('comparative-search')
+    puts params[:refDS].inspect
     @eletype = "Peptide Comparative"
-    @ref_qry, @ref_placeh = build_rdom_string(params)
     @peptides_info = []
     @peptides_dna = []
-    inv_ds = params['invDS'].to_s
-    ref_ds = params['refDS'].to_a.map{|ds| ds.to_s }
-    @first_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => inv_ds, :peptide_sequence => @element).all
-    @second_data = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => ref_ds, :peptide_sequence => @element).where(Sequel.lit(@ref_qry, *@ref_placeh)).all
-    @peptides_info.insert(-1, @first_data)
-    @second_data.each do |pep|
-      @peptides_info.insert(-1, [pep])
-    end
-    @first_dna = DnaFinding.select(*dna_info).where(:dataset_name => inv_ds, :peptide_sequence => @element).to_hash(:DNA_sequence, :Reads)
-    @second_dna = DnaFinding.select(:dataset_name, *dna_info).where(:dataset_name => ref_ds, :peptide_sequence => @element).to_hash_groups(:dataset_name)
+    ref_ds = params[:refDS].to_a.map{|ds| ds.to_s }
+    @peptides_dna = DnaFinding.select(:dataset_name, *dna_info).where(:dataset_name => ref_ds, :peptide_sequence => @element).to_hash_groups(:dataset_name)
+    @peptides_info = Observation.join(SequencingDataset, :dataset_name___dataset=> :dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :results__target_id => :targets__target_id).select(*peptide_info).where(:Sequencing_dataset => ref_ds, :peptide_sequence => @element).all
 
   else
     corres_dataset = params['selDS'].to_s

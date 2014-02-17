@@ -85,6 +85,7 @@ module Sinatra
       score
     end
 
+
     def get_max_row_length(cluster_per_match, results)
       length =  0
       cluster_per_match.each_value do |row|

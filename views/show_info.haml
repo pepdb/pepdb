@@ -6,8 +6,8 @@
     = partial :info_tables, locals: {element:@element, data_to_display:@info_data, dna_data:@peptide_dna}
   - elsif @eletype == "Peptide Comparative"
     - @peptides_info.each do |peptide|
-      - peptide_dna = build_dna_hash(peptide, @second_dna, @first_dna)
-      = partial :info_tables, locals: {element:@element, data_to_display:peptide, dna_data:peptide_dna}
+      - peptide_dna = build_dna_hash(@peptides_dna[peptide[:Sequencing_dataset]])
+      = partial :info_tables, locals: {element:@element, data_to_display:[peptide], dna_data:peptide_dna}
   - else
     = partial :info_tables, locals: {element: params[:ele_name], data_to_display:@info_data, element:"#{h params[:ele_name]}", pep_count:@pep_count, type:@eletype}
   - if !@next.nil?

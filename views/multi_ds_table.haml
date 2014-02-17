@@ -1,3 +1,4 @@
+%input{:type =>"hidden", :id => "max_len", :value => maxlen}
 %table{:id=>"#{table_id}",:class => "ui-widget", :data=>{:first_choice => "#{choice}"}}<
   %thead.ui-widget-header
     %tr
@@ -7,6 +8,10 @@
         %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
           dataset
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        %th<>
+          real dom 
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
@@ -20,6 +25,10 @@
       - params[:ref_ds].each do
         %th<>
           dataset
+          %br
+          %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+        %th<>
+          real dom 
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
@@ -37,13 +46,17 @@
           =row[:peptide_sequence]
         %td<>
           = params[:radio_ds]
-        %td<>
+        %td.alnright<>
+          = @first_ds[row[:peptide_sequence]][0]
+        %td.alnright<>
           = format_dominance(@first_ds[row[:peptide_sequence]][0])
         %td.alnright<>
           = format_score(calc_gen_spec(@first_ds[row[:peptide_sequence]][0], @specs[row[:peptide_sequence]], false))
         - Observation.where(:dataset_name => params[:ref_ds], :peptide_sequence => row[:peptide_sequence] ).all.each do |cell|
           %td<>
             = cell[:dataset_name]
+          %td.alnright<>
+            = cell[:dominance]
           %td.alnright<>
             = format_dominance(cell[:dominance])
           %td.alnright<>
@@ -54,11 +67,14 @@
           = row[:peptide_sequence]
         %td<>
           = params[:radio_ds]
-        %td<>
+        %td.alnright<>
+          = @first_ds[row[:peptide_sequence]][0]
+        %td.alnright<>
           = format_dominance(@first_ds[row[:peptide_sequence]][0])
         %td.alnright<>
           1.00000
         - params[:ref_ds].each do |ds|
+          %td<>
           %td<>
           %td<>
           %td<>

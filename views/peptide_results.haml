@@ -7,7 +7,7 @@
     - if @common_peptides.count == 0 && @uniq_peptides.count == 0
       %p no matches found
     - else
-      = partial :multi_ds_table, locals: {table_class: "display", table_id: "show_table", choice:""}
+      = partial :multi_ds_table, locals: {table_class: "display", table_id: "comppep_table", choice:"", maxlen:@maxlength}
 - else
   %p 
     All clusters containing peptide 

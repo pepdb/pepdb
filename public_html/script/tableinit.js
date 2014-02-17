@@ -109,27 +109,23 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
           $('#datainfo').show();
         });
       });
+    } else if (objID === '#comppep_table'){
+      var maxLen = $('#max_len').val();
+      var firstDS = $(this).find('td:nth-child(2)').html();
+      var refDS = [firstDS];
+      for (var dsCount = 0; dsCount < maxLen; dsCount++){
+        var cell = 5 + 3 * dsCount;
+        var nextDS = $(this).find('td:nth-child('+cell+')').html();
+        refDS.push(nextDS);
+      }
+      $.get(url+'/peptide-infos', {selSeq: selectedID, refDS: refDS}, function(data){
+        $('#infos').html(data);
+      });
     } else if (objID == '#show_table'){
       var selectedDS = $(this).find('td:nth-child(2)').html();
       var dataType = $('#reftype').val();
       var firstChoice = $('#refelem1').val();
-      if (path == url+'/comparative-search'){
-        var refMx = $('#ref_dom_max').val();
-        var refMn = $('#ref_dom_min').val();
-        var dsMx = $('#ds_dom_max').val();
-        var dsMn = $('#ds_dom_min').val();
-        var refDS = [];
-        var investDS = $('#comp-dataset input[type="radio"]:checked').val();
-        $('#r_all_ds').closest('fieldset').find(':checkbox').each(function(){
-          var elemVal = $(this).attr('value');
-          if(this.checked && elemVal != 'all_ds'){
-            refDS.push(elemVal);
-          }
-        });
-        $.get(url+'/peptide-infos', {selSeq: selectedID, invDS: investDS, refDS: refDS, ref_dom_max: refMx, ref_dom_min: refMn, ds_dom_max: dsMx, ds_dom_min: dsMn}, function(data){
-          $('#infos').html(data);
-        });
-      } else if (path.match(/clusters/) !== null ){
+      if (path.match(/clusters/) !== null ){
         $.get(url+'/show-info', {ele_name: selectedID, ref:'Clusters', ele_name2: firstChoice}, function(data){
           $('#clusterlist_pep').html(data);
         });

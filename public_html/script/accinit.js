@@ -17,7 +17,7 @@ $(document).ready(function(){
       'bInfo': true,
       'aaSorting': [[1, 'desc']],
       'aoColumnDefs': [
-        {'iDataSort': 1 , 'aTargets':[2]},
+        {'iDataSort': 2 , 'aTargets':[1]},
         {'bVisible': false , 'aTargets':[2]},
       ],
       'bJQueryUI': true,
