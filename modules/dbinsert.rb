@@ -65,8 +65,25 @@ module Sinatra
           @peps.insert(-1, linematch[0])
           reads = linematch[1].nil? ? 1 : linematch[1].to_i
           dominance = reads / total_reads.to_f
-          @pep_ds.insert(-1,[@dataset, linematch[0], reads, dominance, index.next])
+          @pep_ds.insert(-1,[@dataset, linematch[0], reads, dominance])
         end #dsfile
+        sorted_list = @pep_ds.sort {|x,y| y[2] <=> x[2]}
+        skipped_ranks = rank = last_reads = 0
+        sorted_list.each do |line|
+          reads = line[2]
+          if last_reads == reads
+            skipped_ranks += 1
+          elsif skipped_ranks != 0
+            rank = rank + skipped_ranks + 1
+            skipped_ranks = 0
+            last_reads = reads
+          else
+            rank += 1
+            last_reads = reads
+          end 
+          line.push(rank)
+        end
+        @pep_ds = sorted_list
         raise ArgumentError, "duplicate peptides on lines #{duplicate_peps.join(", ")}" unless duplicate_peps.empty?
       end #manual_file
 
@@ -84,10 +101,24 @@ module Sinatra
       end
 
       def read_ngs_file(dsfile)
-        dsfile.each_with_index do |line, index|
+        last_reads = 0
+        skipped_ranks = 0
+        rank = 0
+        dsfile.each do |line|
           linematch = line.scan(/\S+/)
           @peps.insert(-1, linematch[0])
-          @pep_ds.insert(-1,[@dataset, linematch[0], linematch[1].to_i, linematch[2].to_f, index.next])
+          reads = linematch[1].to_i
+          if last_reads == reads
+            skipped_ranks += 1
+          elsif skipped_ranks != 0
+            rank = rank + skipped_ranks + 1
+            skipped_ranks = 0
+            last_reads = reads
+          else
+            rank += 1
+            last_reads = reads
+          end
+          @pep_ds.insert(-1,[@dataset, linematch[0], reads, linematch[2].to_f, rank])
           ds_pep_dna = [@dataset, linematch[0]]
           linematch.slice(3, linematch.size - 3).each do |part|
             @dnas.insert(-1, part) if part =~ /\D+/
