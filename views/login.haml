@@ -1,11 +1,26 @@
 !!! 5
-%html
+%html{:lang=>"en"}
   %head
     %meta{:charset => "UTF-8"}
-      = stylesheet_link_tag("/jquery-ui-1.10.3.custom.min.css", "/jquery.dataTables_themeroller.css" , "/TableTools.css", "/style.css")
-      =link_favicon_tag
-      %title pepDB Login
+    %meta{ "http-equiv" => "X-UA-Compatible", :content => "IE=edge"}
+    %meta{ :name =>"viewport", :content =>"width=device-width, initial-scale=1"}
+    = stylesheet_link_tag("/bootstrap/css/bootstrap.min.css", "/bootstrap/css/bootstrap-theme.min.css" "/ilogin.css")
+    =link_favicon_tag
+    %title pepDB Login
   %body
+    .jumbotron
+      .container
+        %h1 Welcome to pepDB!
+        %p pepDB is a software application developed for storage and analysis of large datasets from randomized peptide libraries as used in viral or phage display
+        %p pepDB was developed by Christian Casar with support by Timo Sieber, Malik Alawi and Stefan Kurtz  
+    
+    .container
+      %form.form-signin{:role=>"form"}
+        %h2 Please Login
+        %input.form-control{:id => "user_username", :name => "username", :placeholder => "username"}
+        %input.form-control{:id => "user_password", :name => "password", :placeholder => "password"}
+        %button.btn.btn-lg.btn-primary.btn-block{:type => "submit"}Login
+
     .login-box.ui-corner-all
       #loginlogo
         = image_tag("/images/pepdb_logo.png")
