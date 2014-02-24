@@ -199,6 +199,9 @@ $(document).ready(function(){
     if(selected == 'motif list'){
       selected = 'motif';
     }
+    if(selected == 'peptide performance'){
+      selected = 'performance';
+    }
     $('#dataform').load(url+'/add'+ selected, function(){
       var boxNames = ['#dlibname', '#dselname', '#ddsname', '#dspecies'];
 
@@ -257,6 +260,7 @@ $(document).ready(function(){
     if (selected.length == 1){
       $('#elementselection').hide();
       $('#clusterselection').hide();
+      $('#peptideselection').hide();
       $('#editform').hide();
       
       return false;
@@ -269,6 +273,9 @@ $(document).ready(function(){
       if (selected !== 'clusters'){
         $('#clusterselection').hide();
       }
+      if (selected !== 'peptide performances'){
+        $('#peptideselection').hide();
+      }
     });
   });
     
@@ -276,6 +283,7 @@ $(document).ready(function(){
   $('#propsearch').submit(function(){
     if($('#propresults').is(':visible')){
       $('#propresults').toggle();
+      $('#infos').html('');
     }
     if($('.loading').is(':hidden')){
       $('.loading').toggle();

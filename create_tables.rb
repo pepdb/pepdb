@@ -60,11 +60,12 @@ DB.create_table?(:dna_sequences) do
   index :dna_sequence
 end
 
-DB.create_table?(:results) do
-  primary_key :result_id
+DB.create_table?(:peptide_performances) do
+  foreign_key :library_name, :libraries, :on_delete => :cascade, :type =>'varchar(255)'
+  foreign_key :peptide_sequence, :peptides, :type=>'varchar(255)'
   Text :performance
-  foreign_key :target_id, :targets, :on_delete => :set_null
-  index :result_id
+  primary_key [:peptide_sequence, :library_name]
+  index [:library_name, :peptide_sequence]
 end
 
 DB.create_table?(:targets) do

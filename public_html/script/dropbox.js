@@ -9,6 +9,17 @@ $(document).ready(function(){
     $.get(url+'/editclusters', {selElem:selected},function(data){
       $('#editform').html(data);
       $('#editform').show();
+      $.getScript(url+'/script/initbutton.js');
+    });
+  });
+
+  $('#peptideselect').change(function(){
+    var selected_pep = $(this).children('option:selected').val();
+    var selected_lib = $('#editselect').children('option:selected').text();
+    $.get(url+'/editperformances', {selElem:selected_pep, selLib:selected_lib},function(data){
+      $('#editform').html(data);
+      $('#editform').show();
+      $.getScript(url+'/script/initbutton.js');
     });
   });
 
@@ -16,11 +27,27 @@ $(document).ready(function(){
     var table = $(this).children('option:selected').val();
     var selected = $(this).children('option:selected').text();
     if(table == 'clusters'){
-      $.get(url+ '/clusterdrop', {selElem:selected}, function(data){
-        $('#clusterselection').html(data);
-        $.getScript(url+'/script/dropbox.js');
-        $('#clusterselection').show();
-      });
+      if (selected.size == 1){
+        $('#clusterselection').html('');
+      } else {
+        $.get(url+ '/clusterdrop', {selElem:selected}, function(data){
+          $('#clusterselection').html(data);
+          $.getScript(url+'/script/dropbox.js');
+          $('#clusterselection').show();
+        });
+      }
+      return false;
+    }
+    if(table == 'peptide-performances'){
+      if (selected.size == 1){
+        $('#peptideselection').html('');
+      } else {
+        $.get(url+ '/performancesdrop', {selElem:selected}, function(data){
+          $('#peptideselection').html(data);
+          $.getScript(url+'/script/dropbox.js');
+          $('#peptideselection').show();
+        });
+      }
       return false;
     }
     $.get(url+'/edit'+table, {selElem:selected},function(data){
