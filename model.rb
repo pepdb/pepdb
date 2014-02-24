@@ -6,6 +6,7 @@ require 'logger'
 # after this file has been loaded
 
 # create db connection and load the regexp module
+#DB = Sequel.sqlite('pep.db', :synchronous => "off", :loggers => Logger.new('update.log'),:after_connect => (proc do |db|
 DB = Sequel.sqlite('pep.db', :synchronous => "off", :after_connect => (proc do |db|
   db.enable_load_extension(1) 
   db.execute("SELECT load_extension('./regexp.sqlext')")
@@ -90,6 +91,11 @@ class Observation < Sequel::Model(:peptides_sequencing_datasets)
   many_to_one :peptide, :key => :peptide_sequence
   many_to_one :sequencing_dataset, :key => :dataset_name
   many_to_one :result
+end
+
+class PeptidePerformance < Sequel::Model
+  many_to_one :libraries, :key => :library_name
+  many_to_one :peptides, :key => :peptide_sequence
 end
 
 class Motif < Sequel::Model

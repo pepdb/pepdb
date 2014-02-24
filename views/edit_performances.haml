@@ -1,0 +1,29 @@
+%h3 Edit Peptide Performance 
+%form{:id => "editdata", :action => "#{url '/validate-data'}", :target => "notify",:method => "post", :enctype => "multipart/form-data"}
+  %input{:type => "hidden", :value => "performance", :name => "submittype", :id =>"submittype"}
+  %input{:type => "hidden", :value => "#{params[:selElem]},#{params[:selLib]}", :name => "eleid", :id =>"eleid"}
+  %input{:type => "hidden", :value => "peptide_performances", :name => "tab",:id =>"tab"}
+  %fieldset.resform
+    %legend performance information:
+    %p.formfield
+      %label{:for => "perf"}
+        %span performance:
+        %textarea{:form => "editdata", :name =>"perf", :id => "perf"}
+          = @performance[:performance].to_s
+  %fieldset.resform
+    %legend
+      related entities:
+      %strong 
+        %abbr{:title => "required"}*
+    %label{:for => "dlibname"}
+      %span library:
+      = partial :editformdrop, locals:{selected:@performance[:library_name], para: "dlibname", values:@libraries, column: :library_name, required:true}
+    %p
+      %label{:for => "pseq"}
+        %span peptide sequence:
+        %input{:type => "text", :id => "pseq", :name => "pseq", :value=> @performance[:peptide_sequence].to_s, :required => true}
+  %input{:type => "submit", :value => "update result"}
+  %input{:type => "button", :id => "delbut",:value => "delete entry"}
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+

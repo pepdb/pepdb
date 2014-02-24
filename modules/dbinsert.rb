@@ -197,12 +197,12 @@ module Sinatra
             into_dataset 
           elsif @datatype == "cluster"
             into_cluster 
-          elsif @datatype == "result"
-            into_result 
           elsif @datatype == "target"
             into_target
           elsif @datatype == "motif"
             into_motif
+          elsif @datatype == "performance"
+            into_performance
           end
           @errors
       end #try_insert
@@ -328,19 +328,12 @@ module Sinatra
         end
       end #target
       
-      def into_result
-          get_target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).count
-          if get_target > 0
-            target = DB[:targets].select(:target_id).where(:species => @values[:dspecies].to_s, :tissue => @values[:dtissue].to_s, :cell => @values[:dcell].to_s).first[:target_id]
-          else
-            target = nil
-          end  
+      def into_performance
         begin
-          id = DB[:results].insert(:target_id => target, :performance => "#{es @values[:perf].to_s}")
-          DB[:peptides_sequencing_datasets].where(:dataset_name => @values[:ddsname], :peptide_sequence => @values[:pseq]).update(:result_id => id)
+          DB[:peptide_performances].insert(:library_name => @values[:dlibname].to_s, :peptide_sequence => @values[:pseq],:performance => "#{es @values[:perf].to_s}")
         rescue Sequel::Error => e
           if e.message.include? "unique"
-            @errors[:result] = "Given name not unique"
+            @errors[:result] = "Given peptide performace already exists. Try editing existing data."
           else
            @errors[:result] = e.message 
           end

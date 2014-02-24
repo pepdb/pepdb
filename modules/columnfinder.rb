@@ -18,6 +18,8 @@ module Sinatra
         :target_id
       when "motif_lists"
         :list_name
+      when "peptide_performances"
+        :library_name
       end
     end 
 

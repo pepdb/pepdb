@@ -1,0 +1,26 @@
+%h3 Add Peptide Performance 
+%form{:id => "adddata", :action => "#{url '/validate-data'}", :target => "notify",:method => "post", :enctype => "multipart/form-data"}
+  %input{:type => "hidden", :value => "performance", :name => "submittype", :id =>"submittype"}
+  %fieldset.resform
+    %legend performance information:
+    %p.formfield
+      %label{:for => "perf"}
+        %span performance:
+        %textarea{:form => "adddata", :name =>"perf", :id => "perf"}
+  %fieldset.resform
+    %legend
+      related entities:
+      %strong 
+        %abbr{:title => "required"}*
+    %label{:for => "dlibname"}
+      %span library:
+      = partial :formdrop, locals:{para: "dlibname", values:@libraries, column: :library_name, required: true}
+    %p
+      %label{:for => "pseq"}
+        %span peptide sequence:
+        %input{:type => "text", :id => "pseq", :name => "pseq", :required => true}
+  %input{:type => "submit", :value => "add performance"}
+  %input{:type => "reset"}
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+

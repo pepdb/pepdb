@@ -28,6 +28,8 @@ module Sinatra
             validate_target
           elsif @datatype == "motif"
             validate_motif
+          elsif @datatype == "performance"
+            validate_performance
           end
           @errors
       end #validate_form
@@ -79,6 +81,17 @@ module Sinatra
           @errors[:dsname] = "Field name is required"
         end
       end #valid_dataset
+
+      def validate_performance
+        if given? @params[:dlibname]
+          @erros[:peptide_sequence] = "Field peptide sequence is required" unless given? @params[:pseq]
+          @params[:pseq] = @params[:pseq].to_s.upcase
+          pep_cnt = Observation.select(:peptide_sequence).join(SequencingDataset, :dataset_name => :dataset_name).where(:library_name => @params[:dlibname].to_s, :peptide_sequence => @params[:pseq].to_s).count
+          @errors[:peplib] = "Given peptide #{@params[:pseq]} not found in library #{@params[:dlibname]}" if pep_cnt == 0
+        else
+          @errors[:dlibname] = "Field library is required"
+        end
+      end 
         
       def validate_cluster
         if given? @params[:ddsname]
@@ -97,16 +110,6 @@ module Sinatra
           @params[:tis] = @params[:fbtis] unless given? @params[:tis]
           @params[:cell] = @params[:fbcell] unless given? @params[:cell]
       end #valid_target
-
-      def validate_result
-        if given? @params[:ddsname] 
-          @errors[:pseq] = "Field peptide sequence is required" unless given? @params[:pseq]
-          pep_ds = Observation.select(:peptide_sequence).where(:dataset_name => @params[:ddsname].to_s, :peptide_sequence => @params[:pseq].to_s).count
-          @errors[:seqds] = "Given peptide #{@params[:pseq]} not found in sequencing dataset #{@params[:ddsname]}" if pep_ds == 0
-        else
-          @errors[:ddsname] = "Field sequencing dataset is required"
-        end
-      end #valid_result
 
       def validate_motif
         if given? @params[:mlname] 

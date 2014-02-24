@@ -111,15 +111,15 @@ module Sinatra
       investigated_cl.each do |invest|
         invest_cons = invest[:consensus_sequence]
         invest_dom = format_dominance(invest[:dominance_sum])
-        invest_spec = format_spec_score(calc_gen_spec(invest[:dominance_sum], matched_cl_info, true,cl_to_matches[invest_cons]))
+        invest_spec = format_score(calc_gen_spec(invest[:dominance_sum], matched_cl_info, true,cl_to_matches[invest_cons]))
         table_row[invest_cons] = [invest_cons, invest[:dominance_sum],invest_dom, invest_spec]
         sim_scores[invest_cons].each_pair do |key,value|
           matched_cl_info[key].each do |reference|
             cons = reference[:consensus_sequence]
             ds = reference[:dataset_name]
-            spec = format_spec_score(calc_spec_score(invest[:dominance_sum].to_f, reference[:dominance_sum].to_f))
+            spec = format_score(calc_spec_score(invest[:dominance_sum].to_f, reference[:dominance_sum].to_f))
             dom = format_dominance(reference[:dominance_sum])
-            sim = format_spec_score(value) 
+            sim = format_score(value) 
             table_row[invest_cons].push(cons, ds, spec, reference[:dominance_sum],dom, sim)
             is_numeric_cell.push(false,false,true,true,true,true)
           end 

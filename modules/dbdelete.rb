@@ -11,7 +11,12 @@ module Sinatra
       end #init
 
       def delete 
-        DB[@table].where(@id_column => @row_id).delete
+        if @table == :peptide_performances
+          ids = @row_id.split(',', 2)
+          DB[@table].where(@id_column => ids[0], @id_column2 => ids[1]).delete
+        else
+          DB[@table].where(@id_column => @row_id).delete
+        end
       end
       
       private
@@ -31,11 +36,14 @@ module Sinatra
           @id_column = :cluster_id
         when :motif_lists
           @id_column = :list_name
+        when :peptide_performances
+          @id_column = :peptide_sequence
+          @id_column2 = :library_name
         end
       end #set_column
     end #class
 
-    # this method is called from within routes to delete the given column
+    # this method is called from within routes to delete the given row 
     def delete_entry(params)
       dd = DBDeleter.new(params)
       dd.delete
