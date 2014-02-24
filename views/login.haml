@@ -4,7 +4,7 @@
     %meta{:charset => "UTF-8"}
     %meta{ "http-equiv" => "X-UA-Compatible", :content => "IE=edge"}
     %meta{ :name =>"viewport", :content =>"width=device-width, initial-scale=1"}
-    = stylesheet_link_tag("/bootstrap/css/bootstrap.min.css", "/bootstrap/css/bootstrap-theme.min.css" "/ilogin.css")
+    = stylesheet_link_tag("/bootstrap/css/bootstrap.min.css", "/bootstrap/css/bootstrap-theme.min.css", "/login.css")
     =link_favicon_tag
     %title pepDB Login
   %body
@@ -17,8 +17,8 @@
     .container
       %form.form-signin{:role=>"form"}
         %h2 Please Login
-        %input.form-control{:id => "user_username", :name => "username", :placeholder => "username"}
-        %input.form-control{:id => "user_password", :name => "password", :placeholder => "password"}
+        %input.form-control{:id => "user_username", :name => "username", :placeholder => "username", :required => true, :autofocus => true}
+        %input.form-control{:id => "user_password", :name => "password", :placeholder => "password", :required => true}
         %button.btn.btn-lg.btn-primary.btn-block{:type => "submit"}Login
 
     .login-box.ui-corner-all
