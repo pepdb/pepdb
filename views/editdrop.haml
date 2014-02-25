@@ -1,6 +1,6 @@
 %label select element to edit
 %select{:name => "editselect", :id => "editselect" }
-  %option{:value => params[:table].to_s.tr('_','-')} 
+  %option{:value => params[:table].to_s.tr('_','-')}< 
     &nbsp;
   - @data.each do |elem|
     %option{:value => params[:table].to_s.tr('_', '-')}<                    

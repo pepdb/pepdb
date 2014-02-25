@@ -705,66 +705,95 @@ end
 get '/editlibraries' do
   login_required
   redirect "/" unless current_user.admin?
-  @schemes = Library.distinct.select(:encoding_scheme)
-  @carriers = Library.distinct.select(:carrier)
-  @producers = Library.distinct.select(:produced_by)
-  @library = Library.select(*library_all).where(:library_name => params[:selElem].to_s).first 
-  haml :edit_libraries, :layout => false
+  puts params[:selElem].inspect
+  if params[:selElem].match(/^[[:space:]]$/) 
+    haml :empty, :layout => false
+  elsif
+    @schemes = Library.distinct.select(:encoding_scheme)
+    @carriers = Library.distinct.select(:carrier)
+    @producers = Library.distinct.select(:produced_by)
+    @library = Library.select(*library_all).where(:library_name => params[:selElem].to_s).first 
+    haml :edit_libraries, :layout => false
+  end
 end
 
 get '/editselections' do
   login_required
   redirect "/" unless current_user.admin?
-  @species = Target.distinct.select(:species)
-  @performs = Selection.distinct.select(:performed_by)
-  @selection = Selection.select(*selection_edit_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
-  @target = @selection[:target]
-  @libraries = Library.all
-  haml :edit_selections, :layout => false
+  if params[:selElem].match(/^[[:space:]]$/) 
+    haml :empty, :layout => false
+  elsif
+    @species = Target.distinct.select(:species)
+    @performs = Selection.distinct.select(:performed_by)
+    @selection = Selection.select(*selection_edit_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
+    @target = @selection[:target]
+    @libraries = Library.all
+    haml :edit_selections, :layout => false
+  end
 end
 
 get '/editsequencing-datasets' do
   login_required
   redirect "/" unless current_user.admin?
-  @dataset = SequencingDataset.select(*dataset_edit_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
-  @libraries = Library
-  @selections = Selection
-  @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
-  @target = @dataset[:target]
-  haml :edit_datasets, :layout => false
+  if params[:selElem].match(/^[[:space:]]$/) 
+    haml :empty, :layout => false
+  elsif
+    @dataset = SequencingDataset.select(*dataset_edit_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
+    @libraries = Library
+    @selections = Selection
+    @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
+    @target = @dataset[:target]
+    haml :edit_datasets, :layout => false
+  end
 end
 
 get '/edittargets' do
   login_required
   redirect "/" unless current_user.admin?
-  @target = Target.select(:species, :tissue, :cell).where(:target_id => params[:selElem].to_i).first
-  @species = Target.distinct.select(:species)
-  @tissues = Target.distinct.select(:tissue)
-  @cells = Target.distinct.select(:cell)
-  haml :edit_targets, :layout => false
+  if params[:selElem].match(/^[[:space:]]$/) 
+    haml :empty, :layout => false
+  elsif
+    @target = Target.select(:species, :tissue, :cell).where(:target_id => params[:selElem].to_i).first
+    @species = Target.distinct.select(:species)
+    @tissues = Target.distinct.select(:tissue)
+    @cells = Target.distinct.select(:cell)
+    haml :edit_targets, :layout => false
+  end
 end
 get '/editperformances' do
   login_required
   redirect "/" unless current_user.admin?
-  @performance = PeptidePerformance.select(:performance, :library_name, :peptide_sequence).where(:library_name => params[:selLib].to_s, :peptide_sequence => params[:selElem].to_s).first
-  @libraries = Library
-  haml :edit_performances, :layout => false
+  if (params[:selElem].match(/^[[:space:]]$/) || params[:selLib].match(/^[[:space:]]$/) )
+    haml :empty, :layout => false
+  elsif
+    @performance = PeptidePerformance.select(:performance, :library_name, :peptide_sequence).where(:library_name => params[:selLib].to_s, :peptide_sequence => params[:selElem].to_s).first
+    @libraries = Library
+    haml :edit_performances, :layout => false
+  end
 end
 
 get '/editmotif-lists' do
   login_required
   redirect "/" unless current_user.admin?
-  @motlist = DB[:motifs_motif_lists].select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:selElem].to_s)
-  haml :edit_motiflists, :layout => false
+  if params[:selElem].match(/^[[:space:]]$/) 
+    haml :empty, :layout => false
+  elsif
+    @motlist = DB[:motifs_motif_lists].select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:selElem].to_s)
+    haml :edit_motiflists, :layout => false
+  end
 end
 
 get '/editclusters' do
   login_required
   redirect "/" unless current_user.admin?
-  @datasets = SequencingDataset.all
-  @cluster = Cluster.select(:parameters, :dataset_name, :cluster_id).where(:cluster_id => params[:selElem]).first
-  @peptides = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => params[:selElem])
-  haml :edit_clusters, :layout => false
+  if params[:selElem].match(/^[[:space:]]$/) 
+    haml :empty, :layout => false
+  elsif
+    @datasets = SequencingDataset.all
+    @cluster = Cluster.select(:parameters, :dataset_name, :cluster_id).where(:cluster_id => params[:selElem]).first
+    @peptides = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => params[:selElem])
+    haml :edit_clusters, :layout => false
+  end
 end
 
 delete '/delete-entry' do
