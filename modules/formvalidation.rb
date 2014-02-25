@@ -38,6 +38,9 @@ module Sinatra
 
       def validate_library
         if given? @params[:libname] 
+          if @params[:date].empty?
+            @params[:date] = "1970-01-01"
+          end
           @errors[:date] = "Date format not valid, must be yyyy-mm-dd" unless valid_date_format? @params[:date]
           @errors[:diversity] = "Peptide diversity not a valid floating point number. Use . as decimal delimiter" if !@params[:diversity].empty? && !valid_floating_point?(@params[:diversity])
           @errors[:insert] = "Insert length invalid number" if !@params[:insert].empty? && !valid_number?(@params[:insert]) 
@@ -51,6 +54,9 @@ module Sinatra
 
       def validate_selection
         if given? @params[:selname] 
+          if @params[:date].empty?
+            @params[:date] = "1970-01-01"
+          end
           @errors[:date] = "Date format not valid, must be yyyy-mm-dd" unless valid_date_format? @params[:date]
           @errors[:dlibname] = "Field library is required" unless given? @params[:dlibname]
           @params[:perf] = @params[:fbperf] unless given? @params[:perf]
@@ -61,10 +67,15 @@ module Sinatra
         
       def validate_dataset
         if given? @params[:dsname] 
+          if @params[:date].empty?
+            @params[:date] = "1970-01-01"
+          end
           @errors[:date] = "Date format not valid, must be yyyy-mm-dd" unless valid_date_format? @params[:date]
           @errors[:dselname] = "Field selection is required" unless given? @params[:dselname]
           if !@params[:pepfile].nil?
-            @errors[:filetype] = "Given file type must be plain text" unless valid_file_format? @params[:pepfile]
+            @errors[:filetype] = "Given peptide file must be plain text" unless valid_file_format? @params[:pepfile]
+          elsif !@params[:statfile].nil?
+            @errors[:filetype] = "Given statistics file must be plain text" unless valid_file_format? @params[:statfile]
           elsif @params[:tab].nil?
             @errors[:pepfile] = "No sequence file given" 
           end

@@ -10,6 +10,7 @@ module Sinatra
     # see the bachelor thesis
     class FileReader
       def initialize(filetype, file, dataset)
+        puts "init file reader"
         @filetype = filetype
         @file = file
         @dataset = dataset
@@ -21,7 +22,7 @@ module Sinatra
       
       def ds_type
         dsfile = File.readlines(@file)
-        if dsfile[0].match(/\S+\s+\S*\s*$/)
+        if dsfile[0].match(/^\S+\s+\S*\s*$/)
           :manual 
         else
           :ngs
@@ -47,7 +48,7 @@ module Sinatra
     
       def read_dataset_file
         dsfile = File.readlines(@file)
-        if dsfile[0].match(/\S+\s+\S*\s*$/)
+        if dsfile[0].match(/^\S+\s+\S*\s*$/)
           read_manual_file(dsfile)
           :manual
         else
@@ -101,6 +102,7 @@ module Sinatra
       end
 
       def read_ngs_file(dsfile)
+        puts "ngs file1"
         last_reads = 0
         skipped_ranks = 0
         rank = 0
@@ -234,6 +236,7 @@ module Sinatra
       end #selection
       
       def into_dataset
+        puts "starting ds"
         pep_ds = []
         dna_pep = []
         # because a large amount of data is inserted in the following section wrap it in a transaction
@@ -246,7 +249,7 @@ module Sinatra
             else
               target = nil
             end  
-            DB[:sequencing_datasets].insert(:dataset_name => "#{es @values[:dsname].to_s}", :read_type => "#{es @values[:rt].to_s}", :date =>"#{es @values[:date]}", :target_id => target, :library_name => library, :selection_name => "#{es @values[:dselname].to_s}", :used_indices => "#{es @values[:ui].to_s}", :origin => "#{es @values[:or].to_s}", :produced_by => "#{es @values[:prod].to_s}", :sequencer => "#{es @values[:seq].to_s}", :selection_round => "#{es @values[:selr].to_i}", :sequence_length => "#{es @values[:seql]}")
+            DB[:sequencing_datasets].insert(:dataset_name => "#{es @values[:dsname].to_s}", :read_type => "#{es @values[:rt].to_s}", :date =>"#{es @values[:date]}", :target_id => target, :library_name => library, :selection_name => "#{es @values[:dselname].to_s}", :used_indices => "#{es @values[:ui].to_s}", :origin => "#{es @values[:or].to_s}", :produced_by => "#{es @values[:prod].to_s}", :sequencer => "#{es @values[:seq].to_s}", :selection_round => "#{es @values[:selr].to_i}", :sequence_length => "#{es @values[:seql]}", :statistic_file => @values[:statpath])
           rescue Sequel::Error => e
             if e.message.include? "unique"
               @errors[:ds] = "Given name not unique"
@@ -255,28 +258,40 @@ module Sinatra
             end
             raise Sequel::Rollback 
           end
+        puts "reading file"
           begin 
             fr = FileReader.new(@values[:submittype], @values[:pepfile][:tempfile], @values[:dsname])
+            puts "after init"
             dataset_type = fr.ds_type
+            puts "type dertermined"
             if dataset_type == :ngs 
+              puts "before method call"
               dnas, dna_pep, peps, pep_ds =  fr.read_file
+              puts "after method call"
             else
+            puts "manueal file"
               peps, pep_ds =  fr.read_file 
             end
+          puts "file read"
           dnas_qry, dnas_placeholder_args = build_compound_select_string(dnas, :dna_sequences, :dna_sequence) if dataset_type == :ngs
           peps_qry, peps_placeholder_args = build_compound_select_string(peps, :peptides, :peptide_sequence)
+          puts "strings build"
 
             if dataset_type == :ngs
+              puts "start dna zipping"
               dnas_qry.zip(dnas_placeholder_args).each do |qry, args|
                 new_data= DB[qry, *args]
                 new_data.insert
 
               end #qry,args
+              puts "zipped"
             end #ngs
+              puts "start pep zipping"
             peps_qry.zip(peps_placeholder_args).each do |qry, args|
               new_data = DB[qry, *args]
               new_data.insert
             end #qry,args
+              puts "pep zipping fin"
  
           rescue Sequel::Error => e 
             @errors[:insert] = e.message #"Inserting data failed. Changes rolled back"
@@ -285,13 +300,17 @@ module Sinatra
             @errors[:ds] = e.message
             raise Sequel::Rollback
           end # resc
+        
+        puts "beginnging import"
         DB[:dna_sequences_peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :dna_sequence,:reads], dna_pep) if dataset_type == :ngs
         DB[:peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :reads, :dominance, :rank], pep_ds)
         #end # trans
       end
+        puts "updating library"
       # fter inserting a new sequencing dataset update the distinct peptides field of the corresponding library 
       update_distinct_peptides = DB["UPDATE libraries SET distinct_peptides = (SELECT COUNT (DISTINCT peptide_sequence) FROM peptides_sequencing_datasets AS pep_seq INNER JOIN sequencing_datasets AS ds ON pep_seq.dataset_name = ds.dataset_name  WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)) WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)", @values[:dsname].to_s, @values[:dsname].to_s]
       update_distinct_peptides.update
+        puts "done"
       end #dataset
        
       def into_cluster
@@ -509,6 +528,7 @@ module Sinatra
         @update_hash[:selection_name] = es @values[:dselname].to_s      
         lib = Selection.select(:library_name).where(:selection_name => @update_hash[:selection_name]).first
         @update_hash[:library_name] = lib[:library_name]      
+        @update_hash[:statistic_file] = @values[:statpath]
         @row_id.to_s
       end #up_ds
 

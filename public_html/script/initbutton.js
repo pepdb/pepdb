@@ -40,13 +40,26 @@ $(document).ready(function(){
   $('#delbut').click(function(){
     var tab = $('#tab').val();
     var element = $('#eleid').val();
-    $.ajax({
-      type: 'DELETE',
-      url: url+'/delete-entry',
-      data: {table: tab, id: element},
-      success: function(response){
-        $('#respage').html(response);
-      }
-    });
+    if (confirm('Are you sure?')){
+      $.ajax({
+        type: 'DELETE',
+        url: url+'/delete-entry',
+        data: {table: tab, id: element},
+        success: function(response){
+          $('#respage').html(response);
+        }
+      });
+    }
   });
+  $('#updds').click(function(event){
+    var old_file = $('#statpath').val();
+    var new_file = $('#statfile').val();
+    if (old_file !== undefined && new_file !== ""){
+      if (!confirm('This will overwrite the current statistic file')){
+        event.preventDefault();
+      }
+    }
+  }); 
+
+
 });

@@ -153,6 +153,31 @@ module Sinatra
       end
       return reads, cl_peps
     end
+
+    def save_statfile(params)
+      errors = {}
+      filename = h params[:dsname].to_s.tr(' ', '_')
+      unless Dir.exists?('statisticfiles/')
+        begin
+          Dir.mkdir('statisticfiles/')
+        rescue SystemCallError => e
+          errors[:mkdir] = "can't create statistics directory" 
+        end
+      end
+      filepath = 'statisticfiles/'+filename
+      if ( errors.empty? && (!File.exists?(filepath)||  params[:overwrite]))
+        File.open(filepath, 'w') do |statfile|
+          statfile.write(params[:statfile][:tempfile].read)
+        end
+        params[:statpath] = filepath 
+      else
+        errors[:file] = "dataset already exists, try editing it"
+      end
+      errors
+    end
+
+
+
   end #module
 
   helpers Utilities
