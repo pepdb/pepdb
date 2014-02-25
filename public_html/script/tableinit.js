@@ -98,15 +98,14 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
         });
       }
     } else if (objID == '.prop_table'){
-      alert("proooop");
       var selectedDS = $(this).find('td:nth-child(5)').html();
       var dataType = $('#reftype').val();
       var firstChoice = $('#refelem1').val();
 
-      $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
-        $('#datainfo').html(data);
+      $.get(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS,ref:dataType, ele_name2: firstChoice}, function(data){
+        $('#infos').html(data);
         $.getScript(url+'/script/initbutton.js', function(){
-          $('#datainfo').show();
+          $('#infos').show();
         });
       });
     } else if (objID === '#comppep_table'){
