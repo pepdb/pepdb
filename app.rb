@@ -44,8 +44,8 @@ selection_info_columns = [:selection_name___name, :library_name___library, :date
 selection_edit_columns = [:selection_name___name, :library_name___library, :date, :performed_by,:targets__target_id___target]
 dataset_columns = [:dataset_name___name, :species, :tissue, :cell ]
 dataset_info_columns = [:dataset_name___name, :libraries__library_name___library, :selection_name___selection, :sequencing_datasets__date, :species, :tissue, :cell, :selection_round, :carrier]
-dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistics]
-dataset_edit_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target]
+dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistic_file]
+dataset_edit_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target, :statistic_file]
 peptide_columns = [:peptide_sequence, :rank, :reads , :dominance]
 sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence, :rank, :reads , :dominance, :sequencing_datasets__dataset_name___dataset]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
@@ -55,7 +55,7 @@ clsearch_results = [:consensus_sequence___consensus, :library_name___library, :s
 # Order and naming for info columns shown in the browsing options
 library_info = [:library_name___Name, :carrier___Carrier, :insert_length___Insert_length, :encoding_scheme___Encoding_scheme, :produced_by___Produced_by, :date___Date, :distinct_peptides___Distinct_peptides, :peptide_diversity___Peptide_diversity]
 selection_info = [:selection_name___Name, :date___Date, :performed_by___Performed_by,:library_name___Library, :species___Species, :tissue___Tissue, :cell___Cell]
-dataset_info = [:dataset_name___Name, :date___Date, :produced_by___Peformed_by, :statistics___Statistics, :library_name___Library, :selection_name___Selection, :selection_round___Selection_round, :species___Species, :tissue___Tissue, :cell___Cell, :origin___Origin, :sequencer___Sequencer, :read_type___Read_type, :sequence_length___Read_length, :used_indices___Used_barcode]
+dataset_info = [:dataset_name___Name, :date___Date, :produced_by___Peformed_by, :statistic_file___Statistics, :library_name___Library, :selection_name___Selection, :selection_round___Selection_round, :species___Species, :tissue___Tissue, :cell___Cell, :origin___Origin, :sequencer___Sequencer, :read_type___Read_type, :sequence_length___Read_length, :used_indices___Used_barcode]
 peptide_info = [:peptides_sequencing_datasets__peptide_sequence___Peptide, :sequencing_datasets__library_name___Library, :selection_name___Selection, :sequencing_datasets__dataset_name___Sequencing_dataset, :rank___Rank, :reads___Reads , :dominance___Dominance, :performance___Peptide_performance ]
 dna_info = [:dna_sequences_peptides_sequencing_datasets__dna_sequence___DNA_sequence, :reads___Reads]
 cluster_info = [:consensus_sequence___Consensus_sequence, :library_name___Library, :selection_name___Selection, :dataset_name___Sequencing_dataset, :dominance_sum___Dominance_sum, :parameters___Parameters]
@@ -270,7 +270,9 @@ get '/info-tables' do
     @infodata = Selection.select(*selection_info).left_join(Target, :target_id => :target_id).where(:selection_name => params[:infoElem])
     @eletype = "Selection"
   elsif request.referer.include?("datasets")
-    @infodata = SequencingDataset.select(*dataset_info).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:infoElem])
+    @infodata = SequencingDataset.select(*dataset_info).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:infoElem]).all
+    puts @infodata.inspect
+    puts "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     @pep_count = Observation.where(:dataset_name => params[:infoElem].to_s).sum(:reads)
     @eletype = "Sequencing Dataset" 
   end
@@ -808,6 +810,16 @@ post '/validate-data' do
   @errors = validate(params)
   @values = params
   puts params.inspect
+  puts "before stat upload"
+  unless params[:statfile].nil?
+    if params[:tab].nil?
+      @values[:overwrite] = false
+    else
+      @values[:overwrite] = true 
+    end
+    @errors = save_statfile(@values)
+  end
+  puts "after stat upload"
   if @errors.empty?
     if params[:tab].nil?
       @dberrors = insert_data(@values)
@@ -873,6 +885,20 @@ get '/user-management' do
   haml :user_management
 end
 
-get '/ki' do
-  send_file "known_issues", :type => :txt
+get '/stats/:ds_name' do
+  login_required
+  if current_user.admin?
+    allowed = 1
+  else
+    allowed = DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id, :dataset_name => params[:ds_name].to_s).count
+  end
+ 
+  filename = SequencingDataset.select(:statistic_file).where(:dataset_name => params[:ds_name].to_s).first
+  
+  if (allowed != 1 || filename == nil || filename[:statistic_file] == nil)
+    not_found("file not found")
+  else
+    output_name = filename[:statistic_file].split('/')[-1] << ".txt"
+    send_file filename[:statistic_file], :type => :txt 
+  end
 end

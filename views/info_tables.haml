@@ -26,7 +26,11 @@
               = pep_count
           %tr
             %td= column[0].to_s.tr('_', ' ')
-            %td= link_to("Statistic file" ,"test")
+            - if column[1].nil?
+              %td no statistic file available
+            - else
+              %td= link_to("Statistic file" ,"stats/"+element, :target => "_blank")
+
         - elsif column[0] == :Dominance || column[0] == :Dominance_sum
           %tr
             %td= column[0].to_s.tr('_', ' ')

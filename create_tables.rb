@@ -31,7 +31,7 @@ DB.create_table?(:sequencing_datasets) do
   Date :date
   Integer :selection_round
   Integer :sequence_length
-  File :statistics
+  String :statistic_file
   foreign_key :target_id, :targets, :on_delete => :set_null
   foreign_key :library_name, :libraries, :on_delete => :cascade, :type=>'varchar(255)'
   foreign_key :selection_name, :selections, :on_delete => :cascade, :type=>'varchar(255)'
