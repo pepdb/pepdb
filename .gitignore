@@ -1,5 +1,4 @@
 *.swp
-pep.db
 pep.db-journal
 .sass-cache
 regexp.o
@@ -10,6 +9,8 @@ pepdb/
 public_html/.directory
 .viminfo
 .gitconfig
-pep_clean_w_admin.db
-pep_w_test_data_admin.db
 test.rb
+*.bak
+known_issues
+*.log
+*.db
