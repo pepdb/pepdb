@@ -821,7 +821,12 @@ get '/editdrop' do
   login_required
   redirect "/" unless current_user.admin?
   @column = find_id_column(params[:table].to_s) 
-  @data = DB[params[:table].to_sym].distinct.select(@column)
+  puts params[:table]
+  if params[:table] == "targets"
+    @data = DB[params[:table].to_sym].select(:target_id, :species, :tissue, :cell).order(:species, :tissue, :cell).all
+  else
+    @data = DB[params[:table].to_sym].distinct.select(@column)
+  end
   haml :editdrop, :layout => false
 end
 

@@ -57,6 +57,11 @@ $(document).ready(function(){
       }
       return false;
     }
+    if (table.match(/targets/) !== null){
+      var tmpStr = table.split(',');
+      table = tmpStr[0];
+      selected = tmpStr[tmpStr.length-1];
+    }
     $.get(url+'/edit'+table, {selElem:selected},function(data){
       $('#editform').html(data);
       $('#editform').show();

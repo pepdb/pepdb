@@ -26,6 +26,11 @@ $(document).ready(function(){
         type: 'DELETE',
         url: url+'/delete-entry',
         data: {table: tab, id: element},
+        error: function(response,error1,error2){
+          $.get(url+'/error', {error:error2}, function(response){
+            $('#respage').html(response);
+          });
+        },
         success: function(response){
           $('#respage').html(response);
         }
@@ -39,6 +44,7 @@ $(document).ready(function(){
       }
     }
   });
+
   $('#search').click(function(){
     if($('#sysresults').is(':visible')){
       $('#sysresults').toggle();

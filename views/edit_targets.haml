@@ -13,7 +13,7 @@
     %p
       = partial :editlist, locals: {selected:@target[:cell], label:"cell", fieldname:"cell:", listname:"celllist", listlabel:"fbcell", dbdata:@cells, columnname: :cell} 
         
-  %input{:type => "submit", :value => "update target"}
+  %input{:type => "submit", :value => "update target", :id => "updtar"}
   %input{:type => "button", :id => "delbut",:value => "delete entry"}
 #respage
   %iframe{:name => "notify", :id =>"notify"}
