@@ -4,6 +4,13 @@ pepdb.initbutton = pepdb.initbutton || {};
 $(document).ready(function(){
   'use strict';
   var url = $.baseDir();
+
+  if(!isFirstLoad(pepdb.initbutton, 'initbutton.js')){
+    $('#delbut').off();
+    $('#updds').off();
+    $('#search').off();
+    $('#continue').off();
+  }
  
   $('#continue').click(function(){
     var url2 = $(this).attr('action');
@@ -11,9 +18,27 @@ $(document).ready(function(){
     url2 = url2 + '/'+ cont;
     window.location = url2;
   });
-  if(!isFirstLoad(pepdb.initbutton, 'initbutton.js')){
-    return;
-  }
+  $('#delbut').click(function(){
+    var tab = $('#tab').val();
+    var element = $('#eleid').val();
+    if (confirm('Are you sure?')){
+      $.ajax({
+        type: 'DELETE',
+        url: url+'/delete-entry',
+        data: {table: tab, id: element},
+        success: function(response){
+          $('#respage').html(response);
+        }
+      });
+      if (tab === "peptide_performances"){
+        $('#editselect').change();
+      } else if (tab === "clusters"){
+        $('#editselect').change();
+      } else {
+        $('#edittype').change();
+      }
+    }
+  });
   $('#search').click(function(){
     if($('#sysresults').is(':visible')){
       $('#sysresults').toggle();
@@ -37,20 +62,6 @@ $(document).ready(function(){
     });
   });
 
-  $('#delbut').click(function(){
-    var tab = $('#tab').val();
-    var element = $('#eleid').val();
-    if (confirm('Are you sure?')){
-      $.ajax({
-        type: 'DELETE',
-        url: url+'/delete-entry',
-        data: {table: tab, id: element},
-        success: function(response){
-          $('#respage').html(response);
-        }
-      });
-    }
-  });
   $('#updds').click(function(event){
     var old_file = $('#statpath').val();
     var new_file = $('#statfile').val();

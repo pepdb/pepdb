@@ -1,9 +1,16 @@
+pepdb.dropbox = pepdb.dropbox|| {};
 // this file is nearly obsolete since the target selection was changed so now additional
 // data needs to be loaded after one part of the target was selected (e.g. adding a selection)
 $(document).ready(function(){
   'use strict';
 
   var url = $.baseDir();
+  if(!isFirstLoad(pepdb.dropbox, 'dropbox.js')){
+    $('#editselect').off();
+    $('#clusterselect').off();
+    $('#peptideselect').off();
+  }
+
   $('#clusterselect').change(function(){
     var selected = $(this).children('option:selected').val();
     $.get(url+'/editclusters', {selElem:selected},function(data){
@@ -53,8 +60,7 @@ $(document).ready(function(){
     $.get(url+'/edit'+table, {selElem:selected},function(data){
       $('#editform').html(data);
       $('#editform').show();
-      $.getScript(url+'/script/initbutton.js', function(){
-      });
+      $.getScript(url+'/script/initbutton.js'); 
       $('#dspecies').change(function(){
         var valSel = $(this).children('option:selected').text();
         $.get(url+'/formdrop', {columnname: 'tissue', selected1: valSel, table:'targets', where1:'species', boxID:'dtissue'}, function(data){
