@@ -33,11 +33,11 @@ $(document).ready(function(){
     elem = $('#qry_id').val();
   }
   var pTable = $('#pep_table').dataTable({
-    'bJQueryUI': true,
+//    'bJQueryUI': true,
     'bProcessing': true,
     'bInfo': true,
     'bSearchable': true,
-    'sPaginationType': 'full_numbers',
+//    'sPaginationType': 'full_numbers',
     'bPaginate': true,
     'aaSorting': [[1, 'asc']],
     'aoColumnDefs':[{'aTargets':[1,2,3],
@@ -65,14 +65,14 @@ $(document).ready(function(){
   // initialzie datatables table
   var aTable = $('.prop_table').dataTable({
     'bPaginate': 'true',
-    'sPaginationType': 'full_numbers',
+ //   'sPaginationType': 'full_numbers',
     'bInfo': true,
     'aaSorting': [[5, 'desc']],
     'aoColumnDefs': [
       {'iDataSort': 6 , 'aTargets':[3]},
       {'bVisible': false , 'aTargets':[6]},
     ],
-    'bJQueryUI': true,
+  //  'bJQueryUI': true,
     'sDom': '<"H"lfrT>t<"F"ip>',
     'oTableTools':{
       'sSwfPath': url+'/copy_csv_xls_pdf.swf',
@@ -89,10 +89,10 @@ $(document).ready(function(){
 
 /* initialize second table on data browsing pages with searchable columns*/
   var qTable = $('#show_table').dataTable({
-    'bJQueryUI': true,
+   // 'bJQueryUI': true,
     //'sScrollX': '100%',
     'bInfo': true,
-    'sPaginationType': 'full_numbers',
+   // 'sPaginationType': 'full_numbers',
     'bPaginate': true,
     'sDom': '<"H"lfrT>t<"F"ip>',
     'oTableTools':{
@@ -114,12 +114,12 @@ $(document).ready(function(){
     sortCols.push({'bVisible':false, 'aTargets':[realDomCol]});
   }
   var peTable = $('#comppep_table').dataTable({
-    'bJQueryUI': true,
+   // 'bJQueryUI': true,
     //'sScrollX': '100%',
     'bInfo': true,
     'aaSorting':[[4,'desc'],[3, 'desc']],
     'aoColumnDefs':sortCols,
-    'sPaginationType': 'full_numbers',
+   // 'sPaginationType': 'full_numbers',
     'bPaginate': true,
     'sDom': '<"H"lfrT>t<"F"ip>',
     'oTableTools':{
@@ -140,12 +140,12 @@ $(document).ready(function(){
     sortCols.push({'bVisible':false, 'aTargets':[realDomCol]});
   }
   var clTable = $('#compcl_table').dataTable({
-    'bJQueryUI': true,
+   // 'bJQueryUI': true,
     //'sScrollX': '100%',
     'bInfo': true,
     'aaSorting':[[3,'desc'],[2, 'desc']],
     'aoColumnDefs':sortCols,
-    'sPaginationType': 'full_numbers',
+   // 'sPaginationType': 'full_numbers',
     'bPaginate': true,
     'sDom': '<"H"lfrT>t<"F"ip>',
     'oTableTools':{
@@ -177,14 +177,14 @@ $(document).ready(function(){
   /* motif-search motif table with collapsible detail rows*/
   var mTable = $('#motinfos').dataTable({
     'bPaginate': 'true',
-    'sPaginationType': 'full_numbers',
+   // 'sPaginationType': 'full_numbers',
     'bInfo': true,
     'bAutoWidth': false,
     'aoColumns': [
       {'sWidth': '5%'},
       {'sWidth': '95%'},
     ],
-    'bJQueryUI': true,
+   // 'bJQueryUI': true,
     'aoColumnDefs': [
       {'bSortable': false, 'aTargets': [0]},
       {'bVisible': false, 'aTargets':[2]},

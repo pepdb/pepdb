@@ -26,6 +26,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
   'use strict';
   var asInitVals = [];
   var url = $.baseDir();
+  
   $(objID + ' thead input').click( function(e){
     $.stopTableSorting(e);
   });
@@ -187,6 +188,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
       });
     }
   });
+  
 };
 
 
@@ -201,9 +203,9 @@ $(document).ready(function(){
   /* initialize first table with searchable columns*/
   var oTable = $('#select_table').dataTable({
     'bPaginate': 'true',
-    'sPaginationType': 'full_numbers',
+//    'sPaginationType': 'full_numbers',
     'bInfo': true,
-    'bJQueryUI': true,
+//    'bJQueryUI': true,
   });
   
   $.addTableFunctions('#select_table', oTable);

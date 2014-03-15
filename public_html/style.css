@@ -1,0 +1,18 @@
+// hide iframes
+iframe#notify {
+  frameBorder:0;
+  border:0;
+  width:100%;
+}
+
+iframe#propresults {
+  frameBorder:0;
+  border:0;
+  width:100%;
+}
+
+.tooltip-inner {
+  text-align:left !important;
+  //font-size:11px;
+  font-weight:normal;
+}

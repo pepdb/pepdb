@@ -2,13 +2,13 @@
   - if defined? dataset
     in dataset
     = dataset
-%table.ui-widget
-  %thead.ui-widget-header
+%table.table.table-bordered
+  %thead
     %tr
       %th{:colspan => 2}
         Summary of
         = element
-  %tbody.ui-widget-content
+  %tbody
     - data_to_display.each do |info|
       - info.each do |column|
         - if column[0] == :Origin

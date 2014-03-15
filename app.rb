@@ -15,6 +15,7 @@ require './modules/motifsearch'
 require './modules/compclustersearch'
 require './modules/columnfinder'
 require './modules/dbdelete'
+require './modules/tooltips'
 require 'digest/sha1'
 require 'date'
 require 'sass'
@@ -36,17 +37,17 @@ use Rack::Session::Cookie, :expire_after => 3600, :secret => 'Gh6hh91uhMEsmq05h0
 use Rack::Flash
 
 # column to select in later database queries to create less clutter in the routes
-library_columns = [:library_name___name, :carrier, :encoding_scheme, :insert_length]
+library_columns = [:library_name___Name, :carrier___Carrier, :encoding_scheme___Encoding_scheme, :insert_length___Insert_length]
 library_all = [:library_name___name, :encoding_scheme, :carrier, :produced_by, :date, :insert_length, :distinct_peptides, :peptide_diversity]
-selection_columns = [:selection_name___selection, :species, :tissue, :cell]
+selection_columns = [:selection_name___Name, :species___Species, :tissue___Tissue, :cell___Cell]
 selection_all_columns = [:selection_name___name, :selections__library_name___library, :selections__date, :carrier, :performed_by,:species, :tissue, :cell]
 selection_info_columns = [:selection_name___name, :library_name___library, :date, :performed_by,:species, :tissue, :cell]
 selection_edit_columns = [:selection_name___name, :library_name___library, :date, :performed_by,:targets__target_id___target]
-dataset_columns = [:dataset_name___name, :species, :tissue, :cell ]
+dataset_columns = [:dataset_name___Name, :species___Species, :tissue___Tissue, :cell___Cell ]
 dataset_info_columns = [:dataset_name___name, :libraries__library_name___library, :selection_name___selection, :sequencing_datasets__date, :species, :tissue, :cell, :selection_round, :carrier]
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistic_file]
 dataset_edit_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target, :statistic_file]
-peptide_columns = [:peptide_sequence, :rank, :reads , :dominance]
+peptide_columns = [:peptide_sequence___Petide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance]
 sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence, :rank, :reads , :dominance, :sequencing_datasets__dataset_name___dataset]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
@@ -59,7 +60,6 @@ dataset_info = [:dataset_name___Name, :date___Date, :produced_by___Peformed_by, 
 peptide_info = [:peptides_sequencing_datasets__peptide_sequence___Peptide, :sequencing_datasets__library_name___Library, :selection_name___Selection, :sequencing_datasets__dataset_name___Sequencing_dataset, :rank___Rank, :reads___Reads , :dominance___Dominance, :performance___Peptide_performance ]
 dna_info = [:dna_sequences_peptides_sequencing_datasets__dna_sequence___DNA_sequence, :reads___Reads]
 cluster_info = [:consensus_sequence___Consensus_sequence, :library_name___Library, :selection_name___Selection, :dataset_name___Sequencing_dataset, :dominance_sum___Dominance_sum, :parameters___Parameters]
-
 
 get '/' do
   login_required
@@ -229,7 +229,6 @@ get '/cluster-infos' do
     @cluster_infos = Cluster.select(*cluster_info).where(Sequel.lit(qry,*placeholder)).all
     @reads_sum, @cluster_peps = calc_cluster_read_sums(params)
   elsif request.referrer.include?("cluster-search")
-    puts params.inspect
     @cluster_infos = Cluster.where(:consensus_sequence => params[:selCl].to_s,:dataset_name => params[:selDS].to_s).select(*cluster_info).all
     @cluster_peps = DB[:clusters_peptides].join(:clusters, :cluster_id=>:cluster_id).select(:peptide_sequence).where(:consensus_sequence => params[:selCl].to_s, :dataset_name => params[:selDS].to_s).all
     @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:peptide_sequence]}).sum(:reads)

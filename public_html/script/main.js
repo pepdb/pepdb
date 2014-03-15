@@ -40,12 +40,12 @@ $(document).ready(function(){
   var species = ['#ss', '#ts'];
   var tissue = ['#st', '#tt'];
   var cell = ['#sc', '#tc'];
-
+/*
   $('.optbut').button();
   $('#navigation').menu();
   $('.editlink').button();
   $('.deletelink').button();
-
+*/
   $('#clear-button').click(function(){
     $('body').load(window.location.pathname);
   });
@@ -413,6 +413,7 @@ $(document).ready(function(){
     });
   });
 
+  $('.ttips').tooltip({ });
 
   /* -----------jsTree configuration------------------- */
   $('#clusterlist').bind('loaded.jstree', function(){
@@ -421,7 +422,7 @@ $(document).ready(function(){
       $('#clusterlist').jstree('open_node', this, false, true);
     });
   });
- 
+/*
   $('#clusterlist').bind('before.jstree', function(event,data){
     switch(data.plugin){
       case 'ui':
@@ -452,14 +453,44 @@ $(document).ready(function(){
       });
       return false;
     });
-  
+  */
+  $('#clusterlist').bind('before.jstree', function(event,data){
+    switch(data.plugin){
+      case 'ui':
+        if(!data.inst.is_leaf(data.args[0])){
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+  }).jstree({'plugins' : ['html_data','themes', 'ui'],
+      "themes":{"theme": "proton"}
+      })
+    .delegate('a', 'click', function(event, data){
+      if($('#clusterlist_sel').is(':visible')){
+        $('#clusterlist_sel').toggle();
+      }
+      if($('#clusterlist_pep').is(':visible')){
+        $('#clusterlist_pep').html('');
+      }
+      var cluster = $(this).attr('href').split('/')[2];
+      $.get(url+'/cluster-infos',{selCl:cluster}, function(data){
+        $('#clusterlist_sel').html(data);
+        $.getScript(url+'/script/initshowtable.js', function(){
+          $('#clusterlist_sel').toggle();
+        });
+      });
+      return false;
+    });
+
   $('#disp-res').bind('loaded.jstree', function(){
     var opennode = document.location.pathname.split('/').pop();
     $('#' + opennode).parents('.jstree-closed').each(function(){
       $('#disp-res').jstree('open_node', this, false, true);
     });
   });
- 
+ /*
   $('#disp-res').bind('before.jstree', function(event,data){
     switch(data.plugin){
       case 'ui':
@@ -471,6 +502,20 @@ $(document).ready(function(){
         break;
     }
   }).jstree( {'plugins' : ['html_data', 'ui', 'themeroller'],
+              'item_leaf': false, }).delegate('a', 'click', function(event, data){
+  });*/
+  $('#disp-res').bind('before.jstree', function(event,data){
+    switch(data.plugin){
+      case 'ui':
+        if(!data.inst.is_leaf(data.args[0])){
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+  }).jstree( {'plugins' : ['html_data', 'ui', 'themes'],
+              "themes": {"theme":"proton"},
               'item_leaf': false, }).delegate('a', 'click', function(event, data){
   });
 });

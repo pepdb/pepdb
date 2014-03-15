@@ -1,7 +1,5 @@
 %p
   %input{:type => "hidden", :id => "refele2", :value => "#{@element}"}
-  = @eletype 
-  information
   - if @eletype == "Peptide"
     = partial :info_tables, locals: {element:@element, data_to_display:@info_data, dna_data:@peptide_dna}
   - elsif @eletype == "Peptide Comparative"
@@ -11,4 +9,4 @@
   - else
     = partial :info_tables, locals: {element: params[:ele_name], data_to_display:@info_data, element:"#{h params[:ele_name]}", pep_count:@pep_count, type:@eletype}
   - if !@next.nil?
-    %input{:id => "continue",:type => "button", :action => "#{url '/'}" + @next ,:method => "get", :value => "continue with "+ @eletype}
+    %input.btn.btn-primary{:id => "continue",:type => "button", :action => "#{url '/'}" + @next ,:method => "get", :value => "continue with "+ @eletype}
