@@ -1,0 +1,48 @@
+++++ funktionen ++++++
+- form validation
+
+
+++++ toDo ++++++++
+- sequencing datasets auch von dateien nur mit peptide einlesen -> dbinsert anpassen
+- prop-search: helpers/partials
+- prop-search: k-neighbors mit blossum62
+- prop-search: zusammengehörige dropboxen, abhängig machen
+- cluster browsing: cluster nach dominance sortieren in ausgabe
+- form validation: zb 0.1 statt 0,1 prüfen
+- tooltips bei add/edit data
+- add data, mehrer queries durch group by ersetzten
+- dbinserter statt immer exception, testen ob id vorhanden, auch bei target kombi
+- iframe laden mit circle animation
+- formvalidation: erste/zweite zeile auf korrektes format prüfen
+- amino acid distribution in selection übersicht, echts von ds info
+- systemic search auf pep-tabel umstellen/limit einstellen
+- loading gifs bei langen ladezeiten, propsearch, comp-searches, seq ds peptide anzeige
+- motif csv einlesen, fehler schauen, "" illegal quoting
+-comp-search optimierung
+- cluster-clicks führen zu keinen infos
+- alle datatables prüfen auf layouting
+- button rand add/edit entfernen, hover-state wie github
+- menu links, disabled-state bearbeiten
+- scroll/checkboxen, vergrößern
+- alle tabellen prüfen, ob infos anzeigen bei klick
+- comp-pep-search, zeilen zusammenfassen: pepseq ds1 dom1 ds2 dom2...
+- listen (sys-search, etc) von post nach get
+- helper, um alle tabellenspalten, ob numerische werte und dann right-align class für spalte anlegen
+- propsearch-< neighbour search, sequencen von beiden seiten betrachten?
+- error(info boxes besser formatieren
+- formulieren verbessern
+- quellcode comments
+- motsearch, bei vielen motiven, pepitden > 100k, seeeehr langsam
+
+++++ bugs ++++++++++
+- result-insert: prüfen ob peptide vorhanden, bzw allgemein prüfen, ob primary keys vorhanden ,statt einfach einfügen
+- add-data: library beim ersten laden zeigt keine info box
+- cluster-browsing: fehler, wenn auswahl
+- blosum search, teilweise keine ergebnisse
+- wenn tabellen inhalt komplette gelöscht und cluster/motif eingefügt, probleme mit id, weil id-holen bei null und auto-id bei x
+- tabellen nochmalprüfen wegen spalten breite
+- comp-search: tabelle scroll-bart nicht
+- mot-search: aufklapp infos nur für erste seite funktional
+- mot-search: wenn von ausgewählter liste zu keiner ausgewählter liste auch anfrage an server -> fehler im hitnergrund
+- mot-search anzeige fehler bei mot-liste, wenn fehler bei optionsauswahl 
+-mot-search: ergebnisse column filter nur bei erstem muster...restliche?

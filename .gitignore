@@ -11,6 +11,6 @@ public_html/.directory
 .gitconfig
 test.rb
 *.bak
-known_issues
 *.log
 *.db
+sinatra-auth/

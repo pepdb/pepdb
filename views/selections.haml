@@ -1,20 +1,25 @@
 %h3 Browse by Selection
+%input{:type => "hidden", :id => "navbarsec", :value => "browse"}
 %input{:type => "hidden", :id => "reftype", :value => "Selection"}
-#selectdata
-  = partial :tables, locals: {table_class: "display", table_id:"select_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections}
-
-#showdata
-  #selectedinfo
-    - if params.size != 0
-      %p
-        = partial :info_tables, locals: {type:@eletype, data_to_display:@infodata.where(:selection_name => "#{params[:sel_name]}"), element: "#{h params[:sel_name]}"}
-  #selecteddata
+.row
+  .col-md-3
+    #selectedinfo
+      - if params.size != 0
+        %p
+          = partial :info_tables, locals: {type:@eletype, data_to_display:@infodata.where(:selection_name => "#{params[:sel_name]}"), element: "#{h params[:sel_name]}"}
+  .col-md-9
+    #selectdata
+      = partial :tables, locals: {table_class: "display", table_id:"select_table", choice:"#{params[:sel_name]}", first_data_to_display:@selections, second_data_to_display:@selections}
+.row
+  #showdata
+  .col-md-3
+    #datainfo
+  .col-md-9#selecteddata
     - if params.size != 0
       %p
         %input{:type => "hidden", :id => "refelem1", :value => "#{params[:ele_name]}"}
         Sequencing Datasets in Selection 
         = params[:sel_name]
-        = partial :tables, locals: {table_class: "display", table_id:"show_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets.where(:selection_name => "#{params[:sel_name]}")}  
+      = partial :tables, locals: {table_class: "display", table_id:"show_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets.where(:selection_name => "#{params[:sel_name]}")}  
 
-#datainfo
 

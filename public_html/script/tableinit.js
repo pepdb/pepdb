@@ -24,6 +24,7 @@ jQuery.stopTableSorting = function stopTableSorting(e) {
 
 jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
   'use strict';
+  $('.ttips').tooltip({});
   var asInitVals = [];
   var url = $.baseDir();
   
@@ -177,10 +178,11 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
         $('#selecteddata').hide();
         $('#datainfo').hide();
       }
-      $.get(url+'/info-tables', {infoElem:selectedID}, function(data){
+      $.get(url+'/info-tables', {infoElem:selectedID, ref:route}, function(data){
         $('#selectedinfo').html(data);
       });
       $.get(url+'/show_sn_table', {ele_name:selectedID, ref: route}, function(data){
+        //$('#selecteddata').html(data);
         $('#selecteddata').html(data);
         $.getScript(url+'/script/initshowtable.js', function(){
           $('#selecteddata').show();

@@ -1,22 +1,53 @@
 require 'sinatra/base'
+require 'xmlsimple'
 # this module adds some convenience methods
 
 module Sinatra
   module Tooltips
-    def get_tooltip_text(column_name)
-      case column_name
-      when /Name/ 
-        "designation of the individual library"
-      when /Carrier/ 
-        "Specifies the structure in which the peptides are embedded. For example, a phage or viral vector"
-      when /Insert_length/
-        "Length of the amino acid sequences that make up the library peptides"
-      when /Encoding_scheme/
-        "The encoding scheme reflects which codons were used to encode the randomized peptides. Examples are: <ul>
-        <li>NNN (N= G,A,T or C; All nucleotides possible at all positions in the codon)</li><li>NNK (K = G or T; G or T at the third position in the codon)</li><li>NNS (S = G or C; G or C at the third position in the codon)</li><li>NNB (B = G, C or T; G, C or T at the third position in the codon)</li><li>Trimer (One codon per amino acid possible)</li></ul>"
+    Tips = XmlSimple.xml_in('./modules/tooltips.xml', :ForceArray=> false)
+    def get_element_type
+      case request.path
+      when /libraries/
+        "library"
+      when /selections/
+        "selection"
+      when /datasets/
+        "sequencing_dataset"
+      when /cluster-infos/
+        "cluster"
+      when /info-tables/
+        request.params["ref"].tr(" ", "_").downcase
+      when /show_sn_table/
+        if request.params["ref"] == "Library"
+          "selection"
+        elsif request.params["ref"] == "Selection"
+          "sequencing_dataset"
+        elsif request.params["ref"] == "Sequencing Dataset"
+          "peptide"
+        end
+      when /show-info/
+        if request.params["ref"] == "Library"
+          "selection"
+        elsif request.params["ref"] == "Selection"
+          "sequencing_dataset"
+        elsif request.params["ref"] == "Sequencing Dataset"
+          "peptide"
+        elsif request.params["ref"] == "Clusters"
+          "peptide"
+        end
       else
-        "nuthin"
+        "nix"
       end
+    end
+
+    def get_tooltip_text(column_name)
+      type = get_element_type
+      puts "type: #{type}"
+      puts request.url
+      puts request.path
+      puts "column: #{column_name}"
+      #puts Tips.inspect
+      Tips[type][column_name.to_s]
     end
 
   end

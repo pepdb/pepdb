@@ -11,6 +11,9 @@ $(document).ready(function(){
     $('#search').off();
     $('#continue').off();
   }
+   $('.ttips').tooltip({});
+
+
  
   $('#continue').click(function(){
     var url2 = $(this).attr('action');

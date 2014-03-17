@@ -65,11 +65,11 @@ get '/' do
   login_required
   haml :main
 end
-
+=begin
 get '/*style.css' do
   scss :style
 end
-
+=end
 ########## Data Browsing #############
 get '/libraries' do
   login_required
@@ -108,11 +108,11 @@ end
 get '/selections' do
   login_required
   if current_user.admin?
-    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_columns)
   else
     allowed = []
     DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:selection_name])}
-    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => allowed)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_columns).where(:selection_name => allowed)
   end
   if @selections.empty?
     @message = "No selections found in database"
@@ -125,11 +125,11 @@ end
 get '/selections/:sel_name' do
   login_required
   if current_user.admin?
-    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_columns)
   elsif can_access?(:selections, params[:sel_name])
     allowed = []
     DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:selection_name])}
-    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_all_columns).where(:selection_name => allowed)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_columns).where(:selection_name => allowed)
   else
     redirect '/selections'
   end
@@ -142,11 +142,11 @@ end
 get '/datasets' do
   login_required
   if current_user.admin?
-    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_columns)
   else
     allowed = []
     DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
-    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_columns).where(:dataset_name => allowed)
   end
   if @datasets.empty?
     @message = "No sequencing datasets found in database"
@@ -159,11 +159,11 @@ end
 get '/datasets/:set_name' do
   login_required
   if current_user.admin?
-    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_info_columns)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_columns)
   elsif can_access?(:sequencing_datasets, params[:set_name])
     allowed = []
     DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
-    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_info_columns).where(:dataset_name => allowed)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_columns).where(:dataset_name => allowed)
   else
     redirect '/datasets'
   end

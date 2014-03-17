@@ -1,6 +1,10 @@
+%input{:type => "hidden", :id => "navbarsec", :value => "browse"}
 %h3 Browse by Cluster
-#clusterlist  
-  = partial :clusterlist, locals: {clusters:@clusters}
-#clbrresults
+.row
+  .col-md-3.max-scroll
+    #clusterlist  
+      = partial :clusterlist, locals: {clusters:@clusters}
+  #clbrresults
   #clusterlist_sel{:hidden=> true}
+.row
   #clusterlist_pep

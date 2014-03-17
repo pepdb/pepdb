@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tooltips>
+  <library> 
+    <Name>The designation of the individual library</Name>
+    <Carrier>Specifies the structure in which the peptides are embedded. For example, a phage or viral vector</Carrier>
+    <Insert_length>Length of the amino acid sequences that make up the library peptides</Insert_length>
+    <Encoding_scheme><![CDATA[The encoding scheme reflects which codons were used to encode the randomized peptides. Examples are:<ul><li>NNN (N= G,A,T or C; All nucleotides possible at all positions in the codon)</li><li>NNK (K = G or T; G or T at the third position in the codon)</li><li>NNS (S = G or C; G or C at the third position in the codon)</li><li>NNB (B = G, C or T; G, C or T at the third position in the codon)</li><li>Trimer (One codon per amino acid possible)</li></ul>]]></Encoding_scheme>
+    <Produced_by>Name of the scientist that produced the library</Produced_by>
+    <Date>Date of library production</Date>
+    <Distinct_peptides>The number of distinct peptide sequences observed in all analyses connected to this library. It will be automatically updated by pepDB, if new sequencing data are. This value does not reflect the total number of peptides in the library, but rather the fraction that has been observed so far.</Distinct_peptides>
+    <Peptide_diversity>Peptide Diversity is the estimated number of distinct peptides contained in the library, as determined by PeLiCa (http://www.pelica.org/).</Peptide_diversity>
+  </library>
+  <selection> 
+    <Name>Designation of the selection</Name>
+    <Date>Date when the selection was begun</Date>
+    <Performed_by>Scientist that performed the selection</Performed_by>
+    <Library>Peptide Library used to make the selection</Library>
+    <Selection_target>The selection was performed using the following material as target. Specified by species, tissue and/or cells</Selection_target>
+    <Species>The species from which the tissue or cells originate, that have been the target of the selection process</Species>
+    <Tissue>The tissue that was target of the selection or the tissue from which the cells that have been target of the selection originate from (e.g. “breast cancer” if a selection was performed using a breast cancer cell line).</Tissue>
+    <Cell>The cells that have been used as target of the selection. If the selection target was a tissue rather than a specific cell type, this field should remain empty.</Cell>
+  </selection>
+  <sequencing_dataset>
+    <Name>Specific name of the sequencing dataset</Name>
+    <Date>Date the sequencing results were received</Date>
+    <Peformed_by>Name of the scientist that prepared the samples for sequencing</Peformed_by>
+    <Statistics>Link to statistical analyses of the sequences in the sequencing dataset.</Statistics>
+    <Library>Library used in the selection</Library>
+    <Selection>The selection from which the sequencing dataset was generated</Selection>
+    <Overall_reads>Sum over all sequencing reads of every peptide in this sequencing dataset</Overall_reads>
+    <Selection_round>Material from this selection round was used for sequencing</Selection_round>
+    <Sequencing_target><![CDATA[The sequencing was performed using material from the following target. Specified by species, tissue and/or cells. The <i>sequencing</i> target is not necessarily identical to the <i>selection</i> target.]]></Sequencing_target>
+    <Species>The species from which the material originates that has been sequenced.</Species>
+    <Tissue>The tissue from which the material originates that has been sequenced.</Tissue>
+    <Cell>The cells from which the material originates that has been sequenced.</Cell> 
+    <Origin>Form of the genetic material that was used to generate samples for sequencing (e.g. Plasmid, PCR product or Genomic DNA)</Origin>
+    <Sequencer>ype of sequencer used to generate the data (e.g. ´standard´ for commercial standard sequencing applications, or specific designations for next generation sequencers).</Sequencer>
+    <Read_type>Indicates the technique used for sequencing. ´standard´: normal sequencing; ´single read´: next generation sequencing from one direction; ´paired end´: next generation sequencing from both ends.</Read_type>
+    <Read_length>Aproximate length of sequenced DNA. It depends on the used sequencer (e.g. standard sequencer or next generation sequencer) and the used protocol.</Read_length>
+    <Used_barcode>If next generation sequencing is used, barcode sequences (e.g. “ATCGATCG”) might be included into the sequenced DNA to associate the results with specific samples.</Used_barcode>
+  </sequencing_dataset> 
+  <peptide>
+    <Peptide_sequence>The amino acid sequence (single-letter code) of the peptide that has been observed in a specific sequencing dataset.</Peptide_sequence>
+    <DNA_sequences>The DNA sequence(s) that encode the peptide in the corresponding sequencing dataset.</DNA_sequences>
+    <Library>The library from which the peptide originates.</Library>
+    <Selection>The selection in which the peptide was observed.</Selection>
+    <Sequencing_dataset>The sequencing dataset in which the peptide was observed.</Sequencing_dataset>
+    <Rank>The rank reflects the position of the peptide among the peptides of one sequencing dataset. The peptide that was observed in highest abundance has rank 1.</Rank>
+    <Reads>The number of sequencing reads that encode the peptide within the sequencing dataset.</Reads>
+    <Dominance>The dominance indicates which fraction of all successful reads within a sequencing dataset encodes the peptide. A dominance of “1E+02” would indicate that 100% of all sequencing reads encode the peptide.</Dominance>
+    <Peptide_performance></Peptide_performance>
+  </peptide>
+  <cluster>
+    <Consensus_sequence>The consensus sequence is generated by comparing the peptides in the cluster position by position. Uppercase letters indicate a amino acid that was observed most frequently. Lowercase letters indicate that at the specifc position more than one amino acid with equal frenquencies were observed. The letter shown is one of these observations.</Consensus_sequence>
+    <Library>The library the clustered sequenced belong to.</Library>
+    <Selection>The selection in which the cluster was observed.</Selection>
+    <Sequencing_dataset>he sequencing dataset in which the cluster was observed.</Sequencing_dataset>
+    <Dominance_sum>The dominance sum is generated by summating the dominances of all peptides belonging to the cluster.</Dominance_sum>
+    <Reads_sum>The reads sum is generated by summating the reads of all individual peptides belonging to the cluster.</Reads_sum>
+    <Parameters>This indicates the program and settings used in the clustering process.</Parameters>
+  </cluster>
+</tooltips>

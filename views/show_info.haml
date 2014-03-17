@@ -1,6 +1,8 @@
 %p
   %input{:type => "hidden", :id => "refele2", :value => "#{@element}"}
-  - if @eletype == "Peptide"
+  - if params[:ref] == "Clusters"
+    = partial :info_tables_cluster, locals: {element:@element, data_to_display:@info_data, dna_data:@peptide_dna}
+  - elsif @eletype == "Peptide"
     = partial :info_tables, locals: {element:@element, data_to_display:@info_data, dna_data:@peptide_dna}
   - elsif @eletype == "Peptide Comparative"
     - @peptides_info.each do |peptide|

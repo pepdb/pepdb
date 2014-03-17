@@ -50,7 +50,8 @@ $(document).ready(function(){
     $('body').load(window.location.pathname);
   });
    
-
+  var navbarSec = $('#navbarsec').val();
+  $('#'+navbarSec).addClass('active');
   $.each(formAll, function(index, value){
     $(value).click(function(){
       var marked = this.checked;
@@ -413,7 +414,6 @@ $(document).ready(function(){
     });
   });
 
-  $('.ttips').tooltip({ });
 
   /* -----------jsTree configuration------------------- */
   $('#clusterlist').bind('loaded.jstree', function(){
@@ -422,9 +422,9 @@ $(document).ready(function(){
       $('#clusterlist').jstree('open_node', this, false, true);
     });
   });
-/*
+
   $('#clusterlist').bind('before.jstree', function(event,data){
-    switch(data.plugin){
+ /*   switch(data.plugin){
       case 'ui':
         if(!data.inst.is_leaf(data.args[0])){
           return false;
@@ -432,40 +432,8 @@ $(document).ready(function(){
         break;
       default:
         break;
-    }
-  }).jstree({'themeroller': {'item_leaf': false,
-                              'item_clsd': false,
-                              'item_open':false  },
-              'plugins' : ['html_data',  'themeroller'],})
-    .delegate('a', 'click', function(event, data){
-      if($('#clusterlist_sel').is(':visible')){
-        $('#clusterlist_sel').toggle();
-      }
-      if($('#clusterlist_pep').is(':visible')){
-        $('#clusterlist_pep').html('');
-      }
-      var cluster = $(this).attr('href').split('/')[2];
-      $.get(url+'/cluster-infos',{selCl:cluster}, function(data){
-        $('#clusterlist_sel').html(data);
-        $.getScript(url+'/script/initshowtable.js', function(){
-          $('#clusterlist_sel').toggle();
-        });
-      });
-      return false;
-    });
-  */
-  $('#clusterlist').bind('before.jstree', function(event,data){
-    switch(data.plugin){
-      case 'ui':
-        if(!data.inst.is_leaf(data.args[0])){
-          return false;
-        }
-        break;
-      default:
-        break;
-    }
-  }).jstree({'plugins' : ['html_data','themes', 'ui'],
-      "themes":{"theme": "proton"}
+    }*/
+  }).jstree({'plugins' : ['html_data', 'ui'],
       })
     .delegate('a', 'click', function(event, data){
       if($('#clusterlist_sel').is(':visible')){
@@ -490,9 +458,8 @@ $(document).ready(function(){
       $('#disp-res').jstree('open_node', this, false, true);
     });
   });
- /*
   $('#disp-res').bind('before.jstree', function(event,data){
-    switch(data.plugin){
+   /* switch(data.plugin){
       case 'ui':
         if(!data.inst.is_leaf(data.args[0])){
           return false;
@@ -500,22 +467,14 @@ $(document).ready(function(){
         break;
       default:
         break;
-    }
-  }).jstree( {'plugins' : ['html_data', 'ui', 'themeroller'],
-              'item_leaf': false, }).delegate('a', 'click', function(event, data){
-  });*/
-  $('#disp-res').bind('before.jstree', function(event,data){
-    switch(data.plugin){
-      case 'ui':
-        if(!data.inst.is_leaf(data.args[0])){
-          return false;
-        }
-        break;
-      default:
-        break;
-    }
-  }).jstree( {'plugins' : ['html_data', 'ui', 'themes'],
-              "themes": {"theme":"proton"},
+    }*/
+  }).jstree( {'plugins' : ['html_data', 'ui'],
               'item_leaf': false, }).delegate('a', 'click', function(event, data){
   });
+  
+/*
+  $('#clusterlist').jstree({
+    'plugins': ['html_data','ui','themes','crrm'],
+    'themes': {'theme':'proton'}
+  });*/
 });

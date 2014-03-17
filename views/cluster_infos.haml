@@ -14,11 +14,11 @@
     - index += 1
   %input{:type=>"hidden", :id =>"clamt", :value => index+1}
 - else
-  .clsearchinfo
+  .clsearchinfo.col-md-5
     %p 
       infos on selected cluster
       = partial :info_tables, locals: {reads_sum:@reads_sum, data_to_display:@cluster_infos , element:@cluster_infos[0][:Consensus_sequence]}
-  .clsearchpeps
+  .clsearchpeps.col-md-4
     %p 
       all peptides in this cluster
       = partial :tables, locals: {table_class: "display", table_id:"show_table", choice:"", first_data_to_display:@cluster_peps, second_data_to_display:@cluster_peps }
