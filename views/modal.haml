@@ -1,0 +1,12 @@
+.modal.fade#infomodal{:tabindex=>-1, :role=>"dialog", "aria-labelledby" => "infomodallabel", "aria-hidden" => true}
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{"data-dismiss"=>"modal", "aria-hidden" => true}
+        %h4.modal-title#infomodallabel  
+          = modal_title
+      .modal-body
+        = get_modal_text(modal_category, modal_type)
+      .modal-footer
+        %button.btn.btn-default{"data-dismiss" => "modal"} Close
+

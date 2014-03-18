@@ -1,8 +1,6 @@
 - errors.each do |error|
-  .ui-widget
-    %div{:class => "ui-state-error ui-corner-all", :id=> "errorbox"}
-      %p
-        %span{:class => "ui-icon ui-icon-alert", :id => "errorspan"}
-        %strong Error:
-        = error[1]
+  .alert.alert-danger.alert-dismissable
+    %button.close{:type => "button", "data-dismiss"=>"alert", "aria-hidden" => true} &times;
+    %strong Error:
+    = error[1]
 

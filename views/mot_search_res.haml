@@ -1,46 +1,53 @@
 %input{:type => "hidden", :id => "listsize", :value => @motlists.count}
-#motpepinfos
-  Peptide information
-#motacc
-  - if @pep_per_mots.empty?
-    = "No results found."
-  - else
-    - index = 0
-    - @pep_per_mots.each_key do |motif|
-      %h3 
-        = "#{motif} hits: #{@pep_per_mots[motif].size} <br />target: #{@mot_infos[motif][:target]} <br />receptor: #{@mot_infos[motif][:receptor]}"
-      %div
-        %table{:id=>"mot_table#{index}"}
-          %thead.ui-widget-header
-            %tr
-              %th 
-                peptide
-                %br
-                %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-              
-              %th 
-                dominance 
-                %br
-                %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-              %th 
-                raw dominance 
-                %br
-                %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-              %th 
-                dataset 
-                %br
-                %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-          %tbody.ui-widget-content
-            - @uniq_pep_per_mots[motif].each do |peptide|
-              - @dom_per_peps[peptide].each do |row|
-                %tr
-                  %td<> 
-                    = peptide
-                  %td.alnright<>
-                    = format_dominance(row[:dominance])
-                  %td<>
-                    = row[:dominance]
-                  %td<>
-                    = row[:dataset_name]
-      - index += 1
-    %input{:type => "hidden", :id =>"resamt", :value => index+1}            
+.col-md-5
+  #motpepinfos
+    Peptide information
+.col-md-7
+  #motacc
+    - if @pep_per_mots.empty?
+      = "No results found."
+    - else
+      - index = 0
+      .panel-group#accordion
+        - @pep_per_mots.each_key do |motif|
+          .panel.panel-default
+            .panel-heading
+              %h4.panel-title 
+                %a{"data-toggle" => "collapse", "data-parent" => "#accordion", :href => "#collapse#{index}"}
+                  = "#{motif} hits: #{@pep_per_mots[motif].size} <br />target: #{@mot_infos[motif][:target]} <br />receptor: #{@mot_infos[motif][:receptor]}"
+          %div.panel-collapse.collapse{:id => "collapse#{index}"}
+            .panel-body
+              %table.table.table-bordered.table-striped.table-hover{:id=>"mot_table#{index}"}
+                %thead
+                  %tr
+                    %th 
+                      peptide
+                      %br
+                      %input{:type => "text", :class => "text_filter", :placeholder => "filter",:size=>5}
+                    
+                    %th 
+                      dominance 
+                      %br
+                      %input{:type => "text", :class => "text_filter", :placeholder => "filter",:size=>5}
+                    %th 
+                      raw dominance 
+                      %br
+                      %input{:type => "text", :class => "text_filter", :placeholder => "filter",:size=>5}
+                    %th 
+                      dataset 
+                      %br
+                      %input{:type => "text", :class => "text_filter", :placeholder => "filter",:size=>5}
+                %tbody
+                  - @uniq_pep_per_mots[motif].each do |peptide|
+                    - @dom_per_peps[peptide].each do |row|
+                      %tr
+                        %td<> 
+                          = peptide
+                        %td.text-right<>
+                          = format_dominance(row[:dominance])
+                        %td<>
+                          = row[:dominance]
+                        %td<>
+                          = row[:dataset_name]
+          - index += 1
+        %input{:type => "hidden", :id =>"resamt", :value => index+1}            

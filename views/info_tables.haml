@@ -85,7 +85,7 @@
                 = column[1]
         - else
           %tr
-            %td.text-center
+            %td
               = column[0].to_s.tr('_', ' ')
               %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(column[0])}
                 %span.glyphicon.glyphicon-info-sign

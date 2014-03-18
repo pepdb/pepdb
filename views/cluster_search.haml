@@ -1,16 +1,24 @@
 %input{:type => "hidden", :id => "navbarsec", :value => "clusearch"}
-#test
-  %h3 cluster search
-  #clinput
-    %form{:id => "cl-search", :action => "#{url '/cluster-results'}", :method => 'get'}
+= partial :modal, locals: {modal_title:"Cluster peptide search details", modal_category:"cluster-search", modal_type:"Peptide-search"}
+.page-header
+  %h2
+    Cluster peptide search
+    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} more info
+
+%form.form-horizontal{:id => "cl-search", :action => "#{url '/cluster-results'}", :method => 'get'}
+  .form-group
+    .col-md-3
       %label{:for=>"pep-seq"} peptide sequence
-      %input{:type => "text", :name => "pep-seq", :id => "pep-seq", :size => 8}
-      %input{:type => "submit", :id => "pep-search",:value => "search"}
-  #clpepresults.cllist{:hidden => true}
-
-#clsearch{:hidden => true}
-  #clprop
-
-
-
-  #clusterlist_pep
+      %input.form-control{:type => "text", :name => "pep-seq", :id => "pep-seq", :size => 8}
+  .form-group
+    .col-md-1
+      %input.btn{:type => "submit", :id => "pep-search",:value => "search"}
+.row
+  .col-md-4
+    #clprop.clsearch
+  .col-md-8
+    #clpepresults.cllist{:hidden => false}
+.row
+  .col-md-12
+    .clsearch{:hidden => false}
+      #clusterlist_pep

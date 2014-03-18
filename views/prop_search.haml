@@ -1,86 +1,117 @@
 %input{:type => "hidden", :id => "navbarsec", :value => "pepsearch"}
-%h3 peptide property search
-#searchbox{:class => "div-table"}
-  %form{:id => "propsearch", :action => "#{url '/property-results'}", :method => "get"}
-    #top
-      #seqselect
-        %select{:id => "type", :name => "type", :value => "#{params['type']}"}
+= partial :modal, locals: {modal_title:"Peptide property search details", modal_category:"peptide-search", modal_type:"Property-search"}
+.page-header
+  %h2
+    Peptide property search
+    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} more info
+
+%form.form-horizontal{:id => "propsearch", :action => "#{url '/property-results'}", :method => "get", :role=>"form"}
+  .form-group
+    #seqselect
+      .col-md-3
+        %label.control-label{:for=>"type"} search type
+        %select.form-control{:id => "type", :name => "type", :value => "#{params['type']}"}
           %option complete sequence
           %option partial sequence
           %option wildcard sequence
           %option reverse wildcard sequence
-        %input.ui-corner-all{:type => "text", :id => "seq", :size => 15, :name => "seq"}
-      #blossum
-        %label similiar neighbour sequences 
-        %input.ui-corner-all{:type => "text", :id => "blos", :size => 5, :name => "blos"}
-        %label min. similarity quotient 
-        %input.ui-corner-all{:type => "text", :id => "sq", :size => 5, :name => "sq", :value => 0.5}
-      #bshelp
-        %span{ :class => " ui-icon ui-icon-help", :id => "bsicon", :title => "Calculates for the given sequence the given number of similiar sequences.| Similarity is based on a summarized similarity score using a BLOSUM62 matrix.| Search length scales liniarily with search space."}
-      #wchelp{:hidden => true}
-        %span{ :class => " ui-icon ui-icon-help", :id => "wcicon", :title => "possible symbols|X = any amino acid| + = postive (KRH)|-  = negative (DE)| B = hydrophilic (TSGCNQY)|Z = hydrophobic (AVLIPMFW)|< = tiny, MW < 110 Da (AGS)|J = small, MW < 140 Da (ANDCGILPSTV)|> = bulky, MW > 140 Da (REQHKMFWY)| U = aromatic (HFWY)| e.g. [+M] => at this position K,R,H or M"}
-    %fieldset#first.ui-widget-content 
-      %legend general properties
-      %p
-        %label{:for => "l"}
-          library
-          = partial :formdrop, locals:{para: "l", values:@libraries, column: :library_name, required: false}
-      %p
-        %label{:for => "s"}
-          selection
-          = partial :formdrop, locals:{para: "s", values:@selections, column: :selection_name, required: false}
-      %p
-        %label{:for => "ds"}
-          sequencing dataset
-          = partial :formdrop, locals:{para: "ds", values:@datasets, column: :dataset_name, required: false}
+      .col-md-2
+        %label.control-label{:for => "seq"} query sequence
+        %input.form-control{:placeholder => "query sequence", :type => "text", :id => "seq", :size => 15, :name => "seq"}
+    #blossum
+      .col-md-3
+        %label.control-label{:for => "blos"} 
+          number of similar sequences 
+          %a.ttips{"data-toggle"=> "tooltip", "data-placement" => "bottom","data-html" => "true",:title => "Calculates for the given sequence the given number of similiar sequences.<br> Similarity is based on a summarized similarity score using a BLOSUM62 matrix. Search length scales linearly with search space.<br> If left blank, neighbour search is disabled."}
+            %span.glyphicon.glyphicon-info-sign
 
-    %fieldset#third.ui-widget-content
-      %legend selection target
-      %p.right-align
-        %label{:for => "ts"}
-          species
-          = partial :formdrop, locals:{para: "ts", values:@targets.distinct.select(:species), column: :species, required: false}
-      %p
-        %label{:for => "tt"}
-          tissue
-          = partial :formdrop, locals:{para: "tt", values:@targets.distinct.select(:tissue), column: :tissue, required: false}
-      %p
-        %label{:for => "tc"}
-          cell
-          = partial :formdrop, locals:{para: "tc", values:@targets.distinct.select(:cell), column: :cell, required: false}
-    %fieldset#fourth.ui-widget-content
-      %legend sequencing target 
-      %p
-        %label{:for => "ss"}
-          species
-          = partial :formdrop, locals:{para: "ss", values:@targets.distinct.select(:species), column: :species, required: false}
-      %p
-        %label{:for => "st"}
-          tissue
-          = partial :formdrop, locals:{para: "st", values:@targets.distinct.select(:tissue), column: :tissue, required: false}
-      %p
-        %label{:for => "sc"}
-          cell 
-          = partial :formdrop, locals:{para: "sc", values:@targets.distinct.select(:cell), column: :cell, required: false}
-    %fieldset#fifth.ui-widget-content
-      %legend peptide properties
-      %p
-        %label max rank
-        %input.ui-corner-all{:type => "text", :id => "ralt", :size => 5, :name => "ralt"}
-      %p
-        %label min reads 
-        %input.ui-corner-all{:type => "text", :size => 5, :id => "regt", :name => "regt"}
-      %p
-        %label min dominance 
-        %input.ui-corner-all{:type => "text", :size => 5, :id => "dgt", :name => "dgt", :value => 0.0001}
+        %input.form-control{:type => "text", :id => "blos", :size => 5, :name => "blos"}
+      .col-md-2
+        %label.control-label{:for => "sq"} min. similarity quotient 
+        %input.form-control{:type => "text", :id => "sq", :size => 5, :name => "sq", :value => 0.5}
+    #wchelp{:hidden => true}
+      .col-md-4
+        %table.table.table-bordered.table-condensed
+          %thead
+            %tr
+              %th symbol
+              %th translation 
+              %th symbol
+              %th translation
+              %th symbol
+              %th translation
+          %tbody
+            %tr
+              %td X
+              %td any amino acid
+              %td +
+              %td positive (KRH)
+              %td - 
+              %td negative (DE)
+            %tr
+              %td B 
+              %td hydrophilic (TSGCNQY)
+              %td Z
+              %td hydrophobic (AVLIPMFW)
+              %td &lt; 
+              %td tiny, MW &lt; 110 Da (AGS)
+            %tr
+              %td J 
+              %td small, MW &lt; 140 Da (ANDCGILPSTV)
+              %td &gt;
+              %td bulky, MW &gt; 140 Da (REQHKMFWY)
+              %td U
+              %td aromatic (HFWY)
+  .form-group
+    .col-md-3
+      %fieldset.search-params#first 
+        %legend.search-params general properties
+        %label.control-label{:for => "l"} library
+        = partial :formdrop, locals:{para: "l", values:@libraries, column: :library_name, required: false}
+        %label.control-label{:for => "s"} selection
+        = partial :formdrop, locals:{para: "s", values:@selections, column: :selection_name, required: false}
+        %label.control-label{:for => "ds"} sequencing dataset
+        = partial :formdrop, locals:{para: "ds", values:@datasets, column: :dataset_name, required: false}
 
-    #bottom
-      %p
-        %input{:type => "checkbox", :id => "tp",:name => "tp", :checked => params['tp']}
-        %label only tested peptides
-        %br
-      %input{:type => "submit", :value => "search"}
+    .col-md-3
+      %fieldset.search-params#third
+        %legend.search-params selection target
+        %label.control-label{:for => "ts"} species
+        = partial :formdrop, locals:{para: "ts", values:@targets.distinct.select(:species), column: :species, required: false}
+        %label.control-label{:for => "tt"} tissue
+        = partial :formdrop, locals:{para: "tt", values:@targets.distinct.select(:tissue), column: :tissue, required: false}
+        %label.control-label{:for => "tc"} cell
+        = partial :formdrop, locals:{para: "tc", values:@targets.distinct.select(:cell), column: :cell, required: false}
+    .col-md-3
+      %fieldset.search-params#fourth
+        %legend.search-params sequencing target 
+        %label.control-label{:for => "ss"} species
+        = partial :formdrop, locals:{para: "ss", values:@targets.distinct.select(:species), column: :species, required: false}
+        %label.control-label{:for => "st"} tissue
+        = partial :formdrop, locals:{para: "st", values:@targets.distinct.select(:tissue), column: :tissue, required: false}
+        %label.control-label{:for => "sc"} cell 
+        = partial :formdrop, locals:{para: "sc", values:@targets.distinct.select(:cell), column: :cell, required: false}
+    .col-md-3
+      %fieldset.search-params#fifth
+        %legend.search-params peptide properties
+        %label.control-label{:for=>"ralt"} max rank
+        %input.form-control{:type => "text", :id => "ralt", :size => 5, :name => "ralt"}
+        %label.control-label{:for =>"regt"} min reads 
+        %input.form-control{:type => "text", :size => 5, :id => "regt", :name => "regt"}
+        %label.control-label{:for=>"dgt"} min dominance 
+        %input.form-control{:type => "text", :size => 5, :id => "dgt", :name => "dgt", :value => 0.0001}
+
+  .form-group
+    .col-md-2
+      .checkbox
+        %label 
+          only tested peptides
+          %input{:type => "checkbox", :id => "tp",:name => "tp", :checked => params['tp']}
+    .col-md-4
+      %input.btn{:type => "submit", :value => "search"}
       = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
-
-#propresults{:hidden => true}
-#infos
+.row
+  .col-md-12
+    #propresults{:hidden => true}
+.row
+  #infos

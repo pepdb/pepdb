@@ -1,59 +1,69 @@
 %input{:type => "hidden", :id => "navbarsec", :value => "clusearch"}
-%h3 comparative cluster search
-#compclform
-  %p investigated sequencing dataset
-  %input{:type =>"hidden", :value => "comparative", :id => "reftype"}
-  %form{:id => "compclsub", :action => "#{url '/comparative-cluster-results'}", :method => 'get'}
-    .comp-select#comp-library
-      %fieldset.checklist
-        %input{:type => "checkbox", :id => "c_all_lib",:value => "all_lib"}/
-        all
-        %br
+%input{:type =>"hidden", :value => "comparative", :id => "reftype"}
+= partial :modal, locals: {modal_title:"Comparative cluster search details", modal_category:"cluster-search", modal_type:"Comparative-search"} 
+.page-header
+  %h2 
+    comparative cluster search 
+    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} more info
+%h4 investigated sequencing dataset
+%form.form-horizontal{:id => "compclsub", :action => "#{url '/comparative-cluster-results'}", :method => 'get'}
+  .form-group
+    .col-md-3.check-select#comp-library
+      %fieldset
+        .checkbox
+          %label
+            all
+            %input{:type => "checkbox", :id => "c_all_lib",:value => "all_lib"}/
         - @libraries.each do |elem|
-          %input{:type => "checkbox", :id => "c_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
-          = elem[:library_name]
-          %br
+          .checkbox
+            %label
+              = elem[:library_name]
+              %input{:type => "checkbox", :id => "c_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+      
+    .col-md-3.check-select#comp-selection
 
-    .comp-select#comp-selection
+    .col-md-3.check-select#comp-dataset
+    .col-md-3
+      %fieldset.search-params
+        %legend.search-params dominance
+        %label.control-label{:for=>"ds_dom_min"} min.
+        %input.form-control{:type => "text", :name => "ds_dom_min", :id => "ds_dom_min", :value => 0.0001}
 
-    .comp-select#comp-dataset
-    %fieldset
-      %legend dominance
-      %label min.
-      %input{:type => "text", :size => 5, :name => "ds_dom_min", :id => "ds_dom_min", :value => 0.0001}
 
-
-    #ref-data
-      %p references 
-      .ref-select#ref-library
-        %fieldset.checklist
-          %input{:type => "checkbox", :id => "r_all_lib",:value => "all_lib"}/
-          all
-          %br
-          - @libraries.each do |elem|
-            %input{:type => "checkbox", :id => "r_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
-            = elem[:library_name]
-            %br
-
-      .ref-select#ref-selection
-
-      .ref-select#ref-dataset
-      %fieldset
-        %legend dominance
-        %label min.
-        %input{:type => "text", :size => 5,:name => "ref_dom_min", :id => "ref_dom_min", :value => 0.000001}
-
-    #comp-buttons
-      %fieldset
-        %legend
-          search options:   
-        %ul
-          %li
-            %label{:for => "simsc"} min. similarity score:
-            %input{:type => "text", :name => "simsc", :id=> "simsc", :size => 5, :value => 0.6 }
+  .form-group
+    %h4 references 
+    .col-md-3.check-select#ref-library
       %fieldset.checklist
-        %input{:type => "submit", :id => "ccsearchb", :value => "compare"}
-        %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+        .checkbox
+          %label
+            all
+            %input{:type => "checkbox", :id => "r_all_lib",:value => "all_lib"}/
+        - @libraries.each do |elem|
+          .checkbox
+            %label
+              = elem[:library_name]
+              %input{:type => "checkbox", :id => "r_" << "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+
+    .col-md-3.check-select#ref-selection
+
+    .col-md-3.check-select#ref-dataset
+    .col-md-3
+      %fieldset.search-params
+        %legend.search-params dominance
+        %label.control-label{:for => "ref_dom_min"} min.
+        %input.form-control{:type => "text", :name => "ref_dom_min", :id => "ref_dom_min", :value => 0.000001}
+
+  .form-group
+    .col-md-3 
+      %fieldset.search-params
+        %legend.search-params search options:   
+        %label.control-label{:for => "simsc"} min. similarity score:
+        %input.form-control{:type => "text", :name => "simsc", :id=> "simsc", :value => 0.6 }
+  .form-group
+    .col-md-3
+      %fieldset.checklist
+        %input.btn{:type => "submit", :id => "ccsearchb", :value => "compare"}
+        %input.btn{:type => "button", :id => "clear-button",:value => "clear selection"}
         = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
 #compclresults
 

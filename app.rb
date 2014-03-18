@@ -48,10 +48,10 @@ dataset_info_columns = [:dataset_name___name, :libraries__library_name___library
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistic_file]
 dataset_edit_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target, :statistic_file]
 peptide_columns = [:peptide_sequence___Petide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance]
-sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence, :rank, :reads , :dominance, :sequencing_datasets__dataset_name___dataset]
+sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence___Peptide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance, :peptides_sequencing_datasets__dataset_name___Dataset]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
-clsearch_results = [:consensus_sequence___consensus, :library_name___library, :selection_name___selection, :dataset_name___dataset]
+clsearch_results = [:consensus_sequence___Consensus_sequence, :library_name___Library, :selection_name___Selection, :dataset_name___Sequencing_dataset]
 
 # Order and naming for info columns shown in the browsing options
 library_info = [:library_name___Name, :carrier___Carrier, :insert_length___Insert_length, :encoding_scheme___Encoding_scheme, :produced_by___Produced_by, :date___Date, :distinct_peptides___Distinct_peptides, :peptide_diversity___Peptide_diversity]
@@ -217,7 +217,7 @@ get '/clusters/:sel_cluster/:pep_seq' do
   end
   @cluster_info = Cluster.select(:consensus_sequence, :dominance_sum, :parameters)
  @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
-  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
+  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :clusters
 end
 
@@ -345,7 +345,7 @@ end
 
 get '/systemic-results' do
   login_required
-  @peptides = Observation.select(:peptide_sequence,:rank, :reads, :dominance, :dataset_name).where(:dataset_name => params['sysDS'])
+  @peptides = Observation.select(*sys_peptide_columns).where(:Dataset => params['sysDS'])
   haml :peptide_results, :layout => false
 end
 
@@ -365,7 +365,7 @@ end
 
 get '/property-results' do
   login_required
-  @results = Observation.join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
+  @results = Observation.join(SequencingDataset, :dataset_name => :dataset_name).join(Selection, :selection_name => :selection_name).join(Library, :sequencing_datasets__library_name => :libraries__library_name).left_join(PeptidePerformance, :sequencing_datasets__library_name => :peptide_performances__library_name, :peptides_sequencing_datasets__peptide_sequence => :peptide_performances__peptide_sequence).left_join(:targets___sel_target, :selections__target_id => :sel_target__target_id).left_join(:targets___seq_target, :sequencing_datasets__target_id => :seq_target__target_id).select(*sys_peptide_columns)
   begin
     @querystring, @placeholders = build_property_array(params)
     if option_selected?(params[:blos])
@@ -398,7 +398,7 @@ get '/comparative-search' do
     @libraries, @selections, @datasets = get_allowed_lib_sel_ds(current_user) 
   end
   @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*sys_peptide_columns)
-  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Result, :peptides_sequencing_datasets__result_id => :results__result_id).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
+  @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :comp_search
 
 end
@@ -497,6 +497,7 @@ get '/peptide-infos' do
   @eletype = "Peptide"
   
   if request.referrer.include?('comparative-search')
+    puts request.referrer
     puts params[:refDS].inspect
     @eletype = "Peptide Comparative"
     @peptides_info = []
@@ -597,15 +598,7 @@ get '/comparative-cluster-results' do
     @match_cl = Cluster.select(:consensus_sequence, :dominance_sum, :dataset_name).where(:consensus_sequence => @matches, :dataset_name => params[:ref_ds].to_a.map{|s| s.to_s}).to_hash_groups(:consensus_sequence)
     @max_length = get_max_row_length(@cluster_to_matches, @match_cl)
     @clusters = Cluster.select(:dataset_name, :dominance_sum)
-    #puts @scores.inspect
-    #puts "-------------------------------------------------------"
-    #puts @match_cl.inspect
-    puts "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    #puts @cluster_to_matches.inspect
     @tab_rows, @header, @is_numeric_cell = format_comp_cl_data(@investigated_cl, @cluster_to_matches, @match_cl,@scores, @max_length)
-    puts @tab_header.inspect
-    puts @tab_rows.inspect
-    puts @is_numeric_cell.inspect
     haml :comparative_cluster_results, :layout => false
   else
     haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}

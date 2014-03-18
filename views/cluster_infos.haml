@@ -3,9 +3,7 @@
   - index = 0
   - @cluster_infos.each do |cl|  
     .clsearchinfo
-      %p 
-        infos on selected cluster
-        = partial :info_tables, locals: {reads_sum:@reads_sum[index], data_to_display:[cl] , element:[cl][0][:Consensus_sequence]}
+      = partial :info_tables, locals: {reads_sum:@reads_sum[index], data_to_display:[cl] , element:[cl][0][:Consensus_sequence]}
     .clsearchpeps{:display => "none"}
       %p 
         all peptides in this cluster
@@ -15,11 +13,9 @@
   %input{:type=>"hidden", :id =>"clamt", :value => index+1}
 - else
   .clsearchinfo.col-md-5
-    %p 
-      infos on selected cluster
-      = partial :info_tables, locals: {reads_sum:@reads_sum, data_to_display:@cluster_infos , element:@cluster_infos[0][:Consensus_sequence]}
+    = partial :info_tables, locals: {reads_sum:@reads_sum, data_to_display:@cluster_infos , element:@cluster_infos[0][:Consensus_sequence]}
   .clsearchpeps.col-md-4
     %p 
       all peptides in this cluster
-      = partial :tables, locals: {table_class: "display", table_id:"show_table", choice:"", first_data_to_display:@cluster_peps, second_data_to_display:@cluster_peps }
+      = partial :tables, locals: {table_class: "", table_id:"show_table", choice:"", first_data_to_display:@cluster_peps, second_data_to_display:@cluster_peps }
 

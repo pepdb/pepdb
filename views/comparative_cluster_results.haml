@@ -1,20 +1,22 @@
 #clustertab
   %input{:id => "max_len", :type => "hidden", :value => @max_length}
-  %table{:id=>"compcl_table",:class => "ui-widget"}<
-    %thead.ui-widget-header
+  %table.table.table-bordered.table-striped.table-hover{:id=>"compcl_table",:class => "ui-widget"}<
+    %thead
       %tr
         - @header.each do |cell|
           %th<>
-            = cell
+            = cell.tr("_"," ")
+            %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(cell)}
+              %span.glyphicon.glyphicon-info-sign
             %br
             %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-    %tbody.ui-widget-content
+    %tbody
       - @tab_rows.each_value do |row|
         - index = 0
         %tr
           - row.each do |cell|
             - if @is_numeric_cell[index]
-              %td.alnright<>
+              %td.text-right<>
                 = cell
             - else
               %td<>

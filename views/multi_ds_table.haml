@@ -1,13 +1,17 @@
 %input{:type =>"hidden", :id => "max_len", :value => maxlen}
-%table{:id=>"#{table_id}",:class => "ui-widget", :data=>{:first_choice => "#{choice}"}}<
-  %thead.ui-widget-header
+%table.table.table-striped.table-bordered.table-hover{:id=>"#{table_id}", :data=>{:first_choice => "#{choice}"}}<
+  %thead
     %tr
       %th<>
-        peptide
+        Peptide
+        %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Peptide")}
+          %span.glyphicon.glyphicon-info-sign
         %br
         %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
-          dataset
+          Dataset
+          %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Dataset_inv")}
+            %span.glyphicon.glyphicon-info-sign
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
@@ -15,16 +19,22 @@
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
-          dominance 
+          Dominance 
+          %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Dominance")}
+            %span.glyphicon.glyphicon-info-sign
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
-          general spec. 
+          General specifity 
+          %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("General_specifity")}
+            %span.glyphicon.glyphicon-info-sign
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
       - params[:ref_ds].each do
         %th<>
-          dataset
+          Dataset
+          %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Dataset_ref")}
+            %span.glyphicon.glyphicon-info-sign
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
@@ -32,34 +42,38 @@
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
-          dominance 
+          Dominance 
+          %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Dominance")}
+            %span.glyphicon.glyphicon-info-sign
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
-          spec. score 
+          Specifity score 
+          %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Specifity_score")}
+            %span.glyphicon.glyphicon-info-sign
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-  %tbody.ui-widget-content
+  %tbody
     - @results.each do |row|
       %tr
         %td<>
           =row[:peptide_sequence]
         %td<>
           = params[:radio_ds]
-        %td.alnright<>
+        %td.text-right<>
           = @first_ds[row[:peptide_sequence]][0]
-        %td.alnright<>
+        %td.text-right<>
           = format_dominance(@first_ds[row[:peptide_sequence]][0])
-        %td.alnright<>
+        %td.text-right<>
           = format_score(calc_gen_spec(@first_ds[row[:peptide_sequence]][0], @specs[row[:peptide_sequence]], false))
         - Observation.where(:dataset_name => params[:ref_ds], :peptide_sequence => row[:peptide_sequence] ).all.each do |cell|
           %td<>
             = cell[:dataset_name]
-          %td.alnright<>
+          %td.text-right<>
             = cell[:dominance]
-          %td.alnright<>
+          %td.text-right<>
             = format_dominance(cell[:dominance])
-          %td.alnright<>
+          %td.text-right<>
             = format_score(calc_spec_score(@first_ds[row[:peptide_sequence]][0],cell[:dominance]))
     - @uniq_peptides.all.each do |row| 
       %tr
@@ -67,11 +81,11 @@
           = row[:peptide_sequence]
         %td<>
           = params[:radio_ds]
-        %td.alnright<>
+        %td.text-right<>
           = @first_ds[row[:peptide_sequence]][0]
-        %td.alnright<>
+        %td.text-right<>
           = format_dominance(@first_ds[row[:peptide_sequence]][0])
-        %td.alnright<>
+        %td.text-right<>
           1.00000
         - params[:ref_ds].each do |ds|
           %td<>

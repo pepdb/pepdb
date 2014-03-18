@@ -1,42 +1,51 @@
 %input{:type => "hidden", :id => "navbarsec", :value => "pepsearch"}
-%h3 motif search
-#checkboxes
-  %p sequencing datasets
-  %form{:id => "motsearch", :action => "#{url '/motif-search-results'}", :method => 'get'}
-    .check-select#ref-library
+= partial :modal, locals: {modal_title:"Motif search details", modal_category:"peptide-search", modal_type:"Motif-search"}
+.page-header
+  %h2
+    Motif search
+    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} more info
+
+%h4 sequencing datasets
+%form.form-horizontal{:id => "motsearch", :action => "#{url '/motif-search-results'}", :method => 'get'}
+  .form-group
+    .col-md-3.check-select#ref-library
       %fieldset.checklist
-        %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
-        all
-        %br 
+        .checkbox
+          %label
+            all
+            %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
         - @libraries.each do |elem|
-          %input{:type => "checkbox", :name => "checked_lib[]", :id => "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
-          = elem[:library_name]
-          %br
+          .checkbox 
+            %label
+              = elem[:library_name]
+              %input{:type => "checkbox", :name => "checked_lib[]", :id => "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
 
-    .check-select#ref-selection
+    .col-md-3.check-select#ref-selection
 
-    .check-select#ref-dataset
-    %fieldset
-      %legend dominance
-      %label max.
-      %input{:type => "text", :size => 5, :name => "ds_dom_max",:id => "ds_dom_max"}
-      %label min.
-      %input{:type => "text", :size => 5, :name => "ds_dom_min", :id => "ds_dom_min", :value => 0.0001}
-
-    #motif-select
-      %p motifs
+    .col-md-3.check-select#ref-dataset
+    .col-md-3
+      %fieldset.search-params
+        %legend.search-params dominance
+        %label.control-label{:for => "rs_dom_max"} max.
+        %input{:type => "text", :size => 5, :name => "ds_dom_max",:id => "ds_dom_max"}
+        %label.control-label{:for => "rs_dom_min"} min.
+        %input{:type => "text", :size => 5, :name => "ds_dom_min", :id => "ds_dom_min", :value => 0.0001}
+  .form-group
+    .col-md-3
+      %h4 motifs
       .check-select#motif-list
         %fieldset.checklist
           - @motiflists.each do |elem|
-            %input{:type => "radio", :name => "checked_motl[]", :id => "#{elem[:list_name]}",:value => "#{elem[:list_name]}"}/
-            = elem[:list_name]
-            %br
-      #motifs
-
-    #comp-buttons
+            .radio
+              %label
+                = elem[:list_name]
+                %input{:type => "radio", :name => "checked_motl[]", :id => "#{elem[:list_name]}",:value => "#{elem[:list_name]}"}/
+    .col-md-9#motifs
+  .form-group
+    .col-md-3
       %fieldset.checklist
-        %input{:type => "submit", :id => "msearchb", :value => "search"}
-        %input{:type => "button", :id => "clear-button",:value => "clear selection"}
+        %input.btn{:type => "submit", :id => "msearchb", :value => "search"}
+        %input.btn{:type => "button", :id => "clear-button",:value => "clear selection"}
         = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
-
-#motresults
+.row
+  #motresults
