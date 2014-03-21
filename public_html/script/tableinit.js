@@ -27,6 +27,9 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
   $('.ttips').tooltip({});
   var asInitVals = [];
   var url = $.baseDir();
+    
+  $(objID + '_length').find("select").addClass('form-control');
+  $(objID + '_length').children().addClass('control-label');
   
   $(objID + ' thead input').click( function(e){
     $.stopTableSorting(e);
@@ -208,10 +211,8 @@ $(document).ready(function(){
 /* --------------DataTables configuration----------------  */
   /* initialize first table with searchable columns*/
   var oTable = $('#select_table').dataTable({
-    'bPaginate': 'true',
-//    'sPaginationType': 'full_numbers',
-    'bInfo': true,
-//    'bJQueryUI': true,
+      'bPaginate': 'true',
+      'bInfo': true,
   });
   
   $.addTableFunctions('#select_table', oTable);
