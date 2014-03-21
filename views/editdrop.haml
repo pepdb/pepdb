@@ -1,5 +1,5 @@
-%label select element to edit
-%select{:name => "editselect", :id => "editselect" }
+%label.control-label{:for => "editselect"} select element to edit
+%select.form-control{:name => "editselect", :id => "editselect" }
   %option{:value => params[:table].to_s.tr('_','-')}< 
     &nbsp;
   - if params[:table] == "targets"

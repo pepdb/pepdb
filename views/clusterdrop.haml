@@ -1,5 +1,5 @@
-%label select cluster to edit
-%select{:name => "clusterselect", :id => "clusterselect" }
+%label.control-label{:for=>"clusterselect"} select cluster to edit
+%select.form-control{:name => "clusterselect", :id => "clusterselect" }
   %option
     &nbsp;
   - @clusters.each do |elem|

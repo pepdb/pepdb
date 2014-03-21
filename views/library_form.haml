@@ -1,38 +1,35 @@
-%h3 Add Library
-%form{:id => "adddata", :action => "#{url '/validate-data'}", :method => "post", :target => "notify"}
-  %input{:type => "hidden", :value => "library", :name => "submittype", :id =>"submittype"}
-  %fieldset.libform
-    %legend 
-      library information:
-    %p
-      %label{:for => "libname"}
-        %span name:
-        %input.ui-corner-all{:type => "text", :name => "libname", :id => "libname", :required => true} 
-        %strong
-          %abbr{:title => "required"}*
-    %p
+%form.form-horizontal{:id => "adddata", :action => "#{url '/validate-data'}", :method => "post", :target => "notify"}
+  %input{:role => "form",:type => "hidden", :value => "library", :name => "submittype", :id =>"submittype"}
+  %fieldset.search-params
+    %legend.search-params library information
+    .form-group
+      %label.col-md-3.control-label{:for => "libname"} name:
+      .col-md-9
+        %input.form-control{:type => "text", :name => "libname", :id => "libname", :required => true} 
+        %span.help-block required
+    .form-group  
       = partial :datalist, locals: {req: false, label:"enc", fieldname:"encoding scheme:", listname:"enclist", listlabel:"fbenc", dbdata:@schemes, columnname: :encoding_scheme} 
-    %p
+    .form-group
       = partial :datalist, locals: {req: false, label:"ca", fieldname:"carrier:", listname:"calist", listlabel:"fbca", dbdata:@carriers, columnname: :carrier} 
-    %p
+    .form-group
       = partial :datalist, locals: {req: false, label:"prod", fieldname:"produced by:", listname:"prodlist", listlabel:"fbprod", dbdata:@producers, columnname: :produced_by} 
-    %p
-      %label{:for => "insert"}
-        %span insert length:
-        %input{:type => "text", :name => "insert", :id => "insert"} 
-    %p
-      %label{:for => "diversity"}
-        %span peptide diversity:
-        %input{:type => "text", :name => "diversity", :id => "diversity"} 
-    %p
-      %label{:for => "date"}
-        %span date:
-        %input{:type => "text", :name => "date", :id => "date", :placeholder => "yyyy-mm-dd"} 
-          
-        
-  %input{:type => "submit", :value => "add library"}
-  %input{:type => "reset", :value => "reset fields"}
-
+    .form-group
+      %label.col-md-3.control-label{:for => "insert"} insert length:
+      .col-md-9
+        %input.form-control{:type => "text", :name => "insert", :id => "insert"} 
+    .form-group
+      %label.col-md-3.control-label{:for => "diversity"} peptide diversity:
+      .col-md-9
+        %input.form-control{:type => "text", :name => "diversity", :id => "diversity"} 
+    .form-group
+      %label.col-md-3.control-label{:for => "date"} date:
+      .col-md-9
+        %input.form-control{:type => "text", :name => "date", :id => "date", :placeholder => "yyyy-mm-dd"} 
+    .form-group
+      .col-md-3
+        %input.btn.btn-primary{:type => "submit", :value => "add library"}
+      .col-md-3
+        %input.btn{:type => "reset", :value => "reset fields"}
 #respage
   %iframe{:name => "notify", :id =>"notify"}
 

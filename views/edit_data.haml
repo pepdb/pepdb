@@ -1,20 +1,26 @@
 %input{:type => "hidden", :id => "navbarsec", :value => "dataman"}
-#dataselection
-  %label select datatype to edit 
-  %select{:name => "edittype", :id => "edittype"}
-    %option 
-      &nbsp;
-    %option{:value => :libraries} library
-    %option{:value => :selections} selection 
-    %option{:value => :sequencing_datasets} sequencing dataset
-    %option{:value => :clusters} cluster 
-    %option{:value => :targets} target
-    %option{:value => :peptide_performances} peptide performance
-    %option{:value => :motif_lists} motif list 
+.page-header
+  %h2
+    Edit Data
+.row
+  .col-md-3
+    #dataselection
+      %label.control-label{:for => "edittype"} select datatype to edit 
+      %select.form-control{:name => "edittype", :id => "edittype"}
+        %option 
+          &nbsp;
+        %option{:value => :libraries} library
+        %option{:value => :selections} selection 
+        %option{:value => :sequencing_datasets} sequencing dataset
+        %option{:value => :clusters} cluster 
+        %option{:value => :targets} target
+        %option{:value => :peptide_performances} peptide performance
+        %option{:value => :motif_lists} motif list 
 
-  #elementselection
-  #clusterselection 
-  #peptideselection
-
-#editform
+      #elementselection
+      #clusterselection 
+      #peptideselection
+  .col-md-8
+    #editform
+  .col-md-1
 

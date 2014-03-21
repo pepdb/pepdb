@@ -104,10 +104,10 @@ module Sinatra
     end
 
     def format_comp_cl_data(investigated_cl, cl_to_matches, matched_cl_info, sim_scores, max_row_len)
-      table_header = ["sequence", "real dom.","dominance sum", "gen. spec."]
+      table_header = ["Consensus_sequence", "real dom.","Dominance_sum", "General_specifity"]
       table_row = {}
       is_numeric_cell = [false,true,true,true]
-      0.upto(max_row_len-1) {|header_cells| table_header.push("sequence", "dataset", "spec. score", "real dom","dominance sum", "sim. score")}
+      0.upto(max_row_len-1) {|header_cells| table_header.push("Consensus_sequence", "Dataset", "Specifity_score", "real dom", "Dominance_sum", "Similarity_score")}
       investigated_cl.each do |invest|
         invest_cons = invest[:consensus_sequence]
         invest_dom = format_dominance(invest[:dominance_sum])

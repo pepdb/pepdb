@@ -1,0 +1,114 @@
+%form.form-horizontal{:role => "form",:id => "editdata", :action => "#{url '/validate-data'}", :method => "post", :enctype => "multipart/form-data",:target => "notify"}
+  %input{:type => "hidden", :value => @form_type, :name => "submittype", :id =>"submittype"}
+  %input{:type => "hidden", :value => params[:selElem], :name => "eleid",:id =>"eleid"}
+  %input{:type => "hidden", :value => @form_table, :name => "tab",:id =>"tab"}
+  -if @form_table == :clusters
+    %input{:type => "hidden", :value => params[:selElem], :name => "cluster", :id =>"cluster"}
+  %fieldset.search-params
+    %legend.search-params 
+      = "#{@form_type} information"
+
+    - @form_fields.each do |key,field| 
+      - if (field[:type] == "statfile" && !@values[field[:col]].nil?)
+        .form-group
+          %input{:type => "hidden", :name => field[:path], :id => field[:path], :value => @values[field[:col]]}
+          %label.control-label.col-md-3{:for => "showfile"} current statistics file
+          .col-md-9
+            = link_to("Statistic file" ,"stats/"+params[:selElem], :target => "_blank", :class => "btn btn-link")
+      .form-group
+        - if field[:type] == "editlist"
+          = partial :editlist, locals: {selected:@values[field[:col]],req: field[:required], label:key, fieldname:field[:label], listname:"#{key}list", listlabel:"fb#{key}", dbdata:field[:db_data], columnname: field[:col]} 
+        - elsif field[:type] == "date"
+          %label.col-md-3.control-label{:for => key}
+            = field[:label] 
+          .col-md-9
+            %input.form-control{:type => "text", :name => key, :id => key, :placeholder => "yyyy-mm-dd", :value => @values[field[:col]]}
+        - elsif field[:type] == "target"
+          %label.col-md-3.control-label{:for => key}
+            = field[:label] 
+          .col-md-9
+            %select.form-control{:name => key, :id => key}
+              %option
+                &nbsp;
+              - Target.order(:species).all do |tar|
+                - if @values[:target] == tar[:target_id]
+                  %option{:selected => true}<
+                    = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
+                -else
+                  %option<
+                    = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
+        - elsif field[:type] == "related"
+          %label.col-md-3.control-label{:for => key}
+            = field[:label]
+          .col-md-9
+            - if @form_table == :peptide_performances
+              %input{:type => "hidden", :name => key, :id => key, :value => @values[field[:col]]}
+              = partial :editformdrop, locals: {disabled:true,selected: @values[field[:col]],para:"libid",values:field[:db_data],column:field[:col], required:field[:required]}  
+            -else
+              = partial :editformdrop, locals: {disabled:false,selected: @values[field[:col]],para:key,values:field[:db_data],column:field[:col], required:field[:required]}  
+              
+            - if field[:required]  
+              %span.help-block required
+        - elsif field[:type] == "area"
+          %label.col-md-3.control-label{:for => key}
+            = field[:label] 
+          .col-md-9
+            %textarea.form-control{:rows => 3, :form => "editdata", :name => key, :id => key}
+              = @values[field[:col]]
+        - elsif field[:type] == "statfile"
+          %label.col-md-3.control-label{:for => key} statistics file:
+          .col-md-9
+            %input{:type => "file", :name => key, :id => key}
+
+        -elsif field[:type] == "peptides"
+          - @peptides.each_with_index do |pep,idx|
+            .form-group
+              %label.control-label.col-md-3{:for => "peptide#{idx+1}"} 
+                = "peptide #{idx+1}"
+              .col-md-9
+                %input.form-control{:type => "text", :value => pep[:peptide_sequence], :disabled => true}
+        -elsif field[:type] == "motifs"
+          - @motlist.each_with_index do |mot, idx|
+            .form-group
+              .col-md-12
+                .alert.alert-info
+                  .text-center
+                    = "motif #{idx+1}: #{mot[:motif_sequence]}"
+            .form-group
+              %label.control-label.col-md-3{:for => "mt#{idx+1}"} target
+              .col-md-9
+                %textarea.form-control{:rows => 3, :form => "editdata", :id => "mt#{idx}", :name => "mt#{idx}"}
+                  = mot[:target]
+            .form-group
+              %label.control-label.col-md-3{:for => "mr#{idx+1}"} receptor
+              .col-md-9
+                %textarea.form-control{:rows => 3, :form => "editdata", :id => "mr#{idx}", :name => "mr#{idx}"}
+                  = mot[:receptor]
+            .form-group
+              %label.control-label.col-md-3{:for => "ms#{idx+1}"} source
+              .col-md-9
+                %textarea.form-control{:rows => 3, :form => "editdata", :id => "ms#{idx}", :name => "ms#{idx}"}
+                  = mot[:source]
+
+        - else 
+          %label.col-md-3.control-label{:for => key}
+            =field[:label]
+          .col-md-9
+            - if field[:type] == "id_field"
+              %input{:type => "hidden", :name => key, :id => key, :value => @values[field[:col]]}
+              %input.form-control{:type => "text", :disabled => true, :value => @values[field[:col]]}
+            - else
+              %input.form-control{:type => field[:type], :name => key, :id => key, :required => field[:required], :value => @values[field[:col]]}
+
+
+    .form-group
+      .col-md-3
+        %input.btn.btn-primary{:type => "submit", :value => "update entry"}
+      .col-md-3
+        %input.btn.btn-danger{:type => "button", :id =>"delbut",:value => "delete entry"}
+.row
+  .col-md-12
+    #respage
+      %iframe{:name => "notify", :id =>"notify"}
+
+

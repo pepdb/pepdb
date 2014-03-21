@@ -1,20 +1,23 @@
 %input{:type => "hidden", :id => "refelem1", :value=> params[:selCl].to_s}
 - if request.referrer.include?("comparative-cluster")
   - index = 0
+  - puts @cluster_infos.inspect
   - @cluster_infos.each do |cl|  
-    .clsearchinfo
-      = partial :info_tables, locals: {reads_sum:@reads_sum[index], data_to_display:[cl] , element:[cl][0][:Consensus_sequence]}
-    .clsearchpeps{:display => "none"}
-      %p 
-        all peptides in this cluster
+    .row
+      .col-md-3
+        .clsearchinfo
+          = partial :info_tables, locals: {reads_sum:@reads_sum[index], data_to_display:[cl] , element:[cl][0][:Consensus_sequence]}
+      .col-md-3.clsearchpeps{:display => "none"}
+        %h4 all peptides in this cluster
         = partial :cluster_tables, locals: {index: index, table_id:"clpeptab#{index}", dataset:[cl][0][:Sequencing_dataset], table_class: "display", choice:"",first_data_to_display:@cluster_peps[index], second_data_to_display:@cluster_peps[index] }
-    %div{:id => "clpepinfos#{index}"}
-    - index += 1
+      .col-md-6
+        %div{:id => "clpepinfos#{index}"}
+      - index += 1
   %input{:type=>"hidden", :id =>"clamt", :value => index+1}
 - else
-  .clsearchinfo.col-md-5
+  .clsearchinfo.col-md-7
     = partial :info_tables, locals: {reads_sum:@reads_sum, data_to_display:@cluster_infos , element:@cluster_infos[0][:Consensus_sequence]}
-  .clsearchpeps.col-md-4
+  .clsearchpeps.col-md-5
     %p 
       all peptides in this cluster
       = partial :tables, locals: {table_class: "", table_id:"show_table", choice:"", first_data_to_display:@cluster_peps, second_data_to_display:@cluster_peps }

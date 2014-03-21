@@ -1,25 +1,26 @@
-#clustertab
-  %input{:id => "max_len", :type => "hidden", :value => @max_length}
-  %table.table.table-bordered.table-striped.table-hover{:id=>"compcl_table",:class => "ui-widget"}<
-    %thead
-      %tr
-        - @header.each do |cell|
-          %th<>
-            = cell.tr("_"," ")
-            %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(cell)}
-              %span.glyphicon.glyphicon-info-sign
-            %br
-            %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-    %tbody
-      - @tab_rows.each_value do |row|
-        - index = 0
+.row
+  #clustertab.col-md-12
+    %input{:id => "max_len", :type => "hidden", :value => @max_length}
+    %table.table.table-bordered.table-striped.table-hover{:id=>"compcl_table",:class => "ui-widget"}<
+      %thead
         %tr
-          - row.each do |cell|
-            - if @is_numeric_cell[index]
-              %td.text-right<>
-                = cell
-            - else
-              %td<>
-                = cell
-            - index += 1
+          - @header.each do |cell|
+            %th<>
+              = cell.tr("_"," ")
+              %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(cell)}
+                %span.glyphicon.glyphicon-info-sign
+              %br
+              %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
+      %tbody
+        - @tab_rows.each_value do |row|
+          - index = 0
+          %tr
+            - row.each do |cell|
+              - if @is_numeric_cell[index]
+                %td.text-right<>
+                  = cell
+              - else
+                %td<>
+                  = cell
+              - index += 1
 #clusterinfos

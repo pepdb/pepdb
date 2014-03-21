@@ -1,50 +1,40 @@
-#sinatra_authentication
-  - if Rack.const_defined?('Flash') && flash[:notice]
-    #sinatra_authentication_flash= flash[:notice]
-  - if Rack.const_defined?('Flash') && flash[:error]
-    #sinatra_authentication_flash= flash[:error]
-  %h3
-    Edit
-    - if @user.id == current_user.id
-      account
+- if Rack.const_defined?('Flash') && flash[:notice]
+  #sinatra_authentication_flash= flash[:notice]
+- if Rack.const_defined?('Flash') && flash[:error]
+  #sinatra_authentication_flash= flash[:error]
+%h4
+  Edit
+  - if @user.id == current_user.id
+    account
+  - else
+    - if @user.username
+      = @user.username
     - else
-      - if @user.username
-        = @user.username
-      - else
-        account
-  %form{:id => "editdata", :action => "/users/#{@user.id}/edit", :method => "post"}
-    %fieldset 
-      %legend 
-        User data:
-      %p
-        %label{:for => "user_username"} 
-          %span Username
-          %input{ :id => "user_username", :name => "user[username]", :size => 30, :type => "text", :value => @user.username }
-      %p
-        %label{:for => "user_password"} 
-          %span New password
-          %input{ :id => "user_password", :name => "user[password]", :size => 30, :type => "password" }
-      %p
-        %label{:for => "user_password_confirmation"} 
-          %span Confirm
-          %input{ :id => "user_password_confirmation", :name => "user[password_confirmation]", :size => 30, :type => "password" }
-      -# don't render permission field if admin and editing yourself so you don't shoot yourself in the foot
-      - if current_user.admin? && current_user.id != @user.id
-        %p
-          %label{:for => 'permission_level'}  
-            Permission level
-            %select{ :id => "permission_level", :name => "user[permission_level]" }
-              %option{:value => -1, :selected => @user.admin?}
-                Admin
-              %option{:value => 1, :selected => @user.permission_level == 1}
-                Authenticated user
-    - unless @user.admin?
-      %fieldset
-        %legend accessible selections
-        %p.checklist
-          - @selections.each do |sel|
-            %input{:type => "checkbox", :id => "sel_access", :name => "selections[]", :value => sel[:selection_name].to_s, :checked => @access_selections.include?(sel[:selection_name])}
-            = sel[:selection_name]
-            %br
-    .buttons
-      %input{ :value => "Update", :type => "submit" }
+      account
+%form{:role=>"form",:id => "editdata", :action => "/users/#{@user.id}/edit", :method => "post"}
+  %fieldset.search-params 
+    %legend.search-params User data
+    %label.control-label{:for => "user_username"} Username 
+    %input.form-control{ :id => "user_username", :name => "user[username]", :type => "text", :value => @user.username } 
+    %label.control-label{:for => "user_password"} New password
+    %input.form-control{ :id => "user_password", :name => "user[password]", :type => "password" }
+    %label.control-label{:for => "user_password_confirmation"} Confirm password 
+    %input.form-control{ :id => "user_password_confirmation", :name => "user[password_confirmation]", :size => 30, :type => "password" }
+    -# don't render permission field if admin and editing yourself so you don't shoot yourself in the foot
+    - if current_user.admin? && current_user.id != @user.id
+      %label.control-label{:for => 'permission_level'} Permission level
+      %select.form-control{ :id => "permission_level", :name => "user[permission_level]" }
+        %option{:value => -1, :selected => @user.admin?}
+          Admin
+        %option{:value => 1, :selected => @user.permission_level == 1}
+          Authenticated user
+  - unless @user.admin?
+    %fieldset.search-params
+      %legend.search-params accessible selections
+      .check-select
+        - @selections.each do |sel|
+          .checkbox
+            %label
+              = sel[:selection_name]
+              %input{:type => "checkbox", :id => "sel_access", :name => "selections[]", :value => sel[:selection_name].to_s, :checked => @access_selections.include?(sel[:selection_name])}
+  %input.btn.btn-primary{ :value => "Update", :type => "submit" }

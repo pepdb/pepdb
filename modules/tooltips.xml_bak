@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tooltips>
+  <tip type="library"> 
+      <field name="name">The designation of the individual library</field>
+    <field>
+      <name>Carrier</name>
+      <text>Specifies the structure in which the peptides are embedded. For example, a phage or viral vector</text> 
+    </field>
+    <field>
+      <name>Insert length</name>
+      <text>Length of the amino acid sequences that make up the library peptides</text>
+    </field>
+    <field>
+      <name>Encoding scheme</name>
+      <text><![CDATA[The encoding scheme reflects which codons were used to encode the randomized peptides. Examples are:<ul><li>NNN (N= G,A,T or C; All nucleotides possible at all positions in the codon)</li><li>NNK (K = G or T; G or T at the third position in the codon)</li><li>NNS (S = G or C; G or C at the third position in the codon)</li><li>NNB (B = G, C or T; G, C or T at the third position in the codon)</li><li>Trimer (One codon per amino acid possible)</li></ul>]]></text>
+    </field>
+    <field>
+      <name>Produced by</name>
+      <text>Name of the scientist that produced the library</text>
+    </field>
+    <field>
+      <name>Date</name>
+      <text>Date of library production</text>
+    </field>
+    <field>
+      <name>Distinct peptides</name>
+      <text>The number of distinct peptide sequences observed in all analyses connected to this library. It will be automatically updated by pepDB, if new sequencing data are. This value does not reflect the total number of peptides in the library, but rather the fraction that has been observed so far.</text>
+    </field>
+    <field>
+      <name>Peptide Diversity</name>
+      <text>Peptide Diversity is the estimated number of distinct peptides contained in the library, as determined by PeLiCa (http://www.pelica.org/).</text>
+    </field>
+  </tip>
+  <tip> 
+    <type></type>
+    <field>
+      <name></name>
+      <text> </text>
+    </field>
+  </tip>
+</tooltips>

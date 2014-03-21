@@ -1,10 +1,10 @@
-%label{:for => label}
-  %span
-    = fieldname 
-%input{:type => "text", :name => label, :id => label, :list => listname, :value => selected}
-%datalist{:id => listname}
-  %label{:for => listlabel}
-    or pick exisiting 
-    = fieldname
-    = partial :formdrop, locals: {para: listlabel, values: dbdata, column: columnname, required:false}
+%label.control-label.col-md-3{:for => label}
+  = fieldname 
+.col-md-9
+  %input.form-control{:type => "text", :name => label, :id => label, :list => listname, :value => selected}
+  %datalist{:id => listname}
+    %label.control-label{:for => listlabel}
+      or pick exisiting 
+      = fieldname
+      = partial :formdrop, locals: {para: listlabel, values: dbdata, column: columnname, required:false}
 

@@ -1,0 +1,57 @@
+%form.form-horizontal{:role => "form",:id => "adddata", :action => "#{url '/validate-data'}", :method => "post", :enctype => "multipart/form-data",:target => "notify"}
+  %input{:type => "hidden", :value => @form_type, :name => "submittype", :id =>"submittype"}
+  %fieldset.search-params
+    %legend.search-params 
+      = "#{@form_type} information"
+
+    - @form_fields.each do |key,field| 
+      .form-group
+        - if field[:type] == "datalist"
+          = partial :datalist, locals: {req: field[:required], label:key, fieldname:field[:label], listname:"#{key}list", listlabel:"fb#{key}", dbdata:field[:db_data], columnname: field[:col]} 
+        - elsif field[:type] == "date"
+          %label.col-md-3.control-label{:for => key}
+            = field[:label] 
+          .col-md-9
+            %input.form-control{:type => "text", :name => key, :id => key, :placeholder => "yyyy-mm-dd"}
+        - elsif field[:type] == "target"
+          %label.col-md-3.control-label{:for => key}
+            = field[:label] 
+          .col-md-9
+            %select.form-control{:name => key, :id => key}
+              %option
+                &nbsp;
+              - Target.order(:species).all do |tar|
+                %option<
+                  = "" << tar[:species] << " - " << tar[:tissue] << " - " << tar[:cell]
+        - elsif field[:type] == "related"
+          %label.col-md-3.control-label{:for => key}
+            = field[:label]
+          .col-md-9
+            = partial :formdrop, locals: {para:key,values:field[:db_data],column:field[:col], required:field[:required]}  
+            - if field[:required]  
+              %span.help-block required
+        - elsif field[:type] == "area"
+          %label.col-md-3.control-label{:for => key}
+            = field[:label] 
+          .col-md-9
+            %textarea.form-control{:rows => 3, :form => "adddata", :name => field[:id], :id => field[:id]}
+        - else 
+          %label.col-md-3.control-label{:for => key}
+            =field[:label]
+          .col-md-9
+            -if field[:type] == "file"
+              %input{:type => field[:type], :name => key, :id => key, :required => field[:required]}
+            - else
+              %input.form-control{:type => field[:type], :name => key, :id => key, :required => field[:required]}
+            - if field[:required]  
+              %span.help-block required
+
+
+    .form-group
+      .col-md-3
+        %input.btn.btn-primary{:type => "submit", :value => "add #{@form_type}"}
+      .col-md-3
+        %input.btn{:type => "reset", :value => "reset fields"}
+#respage
+  %iframe{:name => "notify", :id =>"notify"}
+

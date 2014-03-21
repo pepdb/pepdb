@@ -1,16 +1,21 @@
 %input{:type => "hidden", :id => "navbarsec", :value => "dataman"}
-#dataselection
-  %label select datatype to add
-  %select{:name => "datatype", :id => "datatype"}
-    %option 
-      &nbsp;
-    %option library
-    %option selection 
-    %option sequencing dataset
-    %option cluster 
-    %option target
-    %option peptide performance 
-    %option motif list 
-
-#dataform
-
+.page-header
+  %h2
+    Add Data 
+.row
+  .col-md-3
+    #dataselection
+      %label.control-label{:for => "datatype"} select datatype to add
+      %select.form-control{:name => "datatype", :id => "datatype"}
+        %option 
+          &nbsp;
+        %option library
+        %option selection 
+        %option sequencing dataset
+        %option cluster 
+        %option target
+        %option peptide performance 
+        %option motif list 
+  .col-md-8
+    #dataform
+  .col-md-1

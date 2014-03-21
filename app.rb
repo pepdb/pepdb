@@ -38,15 +38,15 @@ use Rack::Flash
 
 # column to select in later database queries to create less clutter in the routes
 library_columns = [:library_name___Name, :carrier___Carrier, :encoding_scheme___Encoding_scheme, :insert_length___Insert_length]
-library_all = [:library_name___name, :encoding_scheme, :carrier, :produced_by, :date, :insert_length, :distinct_peptides, :peptide_diversity]
+library_all = [:library_name, :encoding_scheme, :carrier, :produced_by, :date, :insert_length, :distinct_peptides, :peptide_diversity]
 selection_columns = [:selection_name___Name, :species___Species, :tissue___Tissue, :cell___Cell]
 selection_all_columns = [:selection_name___name, :selections__library_name___library, :selections__date, :carrier, :performed_by,:species, :tissue, :cell]
 selection_info_columns = [:selection_name___name, :library_name___library, :date, :performed_by,:species, :tissue, :cell]
-selection_edit_columns = [:selection_name___name, :library_name___library, :date, :performed_by,:targets__target_id___target]
+selection_edit_columns = [:selection_name, :library_name, :date, :performed_by,:targets__target_id___target]
 dataset_columns = [:dataset_name___Name, :species___Species, :tissue___Tissue, :cell___Cell ]
 dataset_info_columns = [:dataset_name___name, :libraries__library_name___library, :selection_name___selection, :sequencing_datasets__date, :species, :tissue, :cell, :selection_round, :carrier]
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistic_file]
-dataset_edit_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target, :statistic_file]
+dataset_edit_columns = [:dataset_name, :library_name, :selection_name, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target, :statistic_file]
 peptide_columns = [:peptide_sequence___Petide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance]
 sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence___Peptide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance, :peptides_sequencing_datasets__dataset_name___Dataset]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
@@ -61,15 +61,127 @@ peptide_info = [:peptides_sequencing_datasets__peptide_sequence___Peptide, :sequ
 dna_info = [:dna_sequences_peptides_sequencing_datasets__dna_sequence___DNA_sequence, :reads___Reads]
 cluster_info = [:consensus_sequence___Consensus_sequence, :library_name___Library, :selection_name___Selection, :dataset_name___Sequencing_dataset, :dominance_sum___Dominance_sum, :parameters___Parameters]
 
+# hashes containing the descriptions for add data forms
+library_form = {
+  :libname => {:label => "name", :type => "text", :required => true }, 
+  :enc => {:label => "encoding scheme", :type => "datalist", :required => false, :col => :encoding_scheme, :db_data => nil}, 
+  :ca => {:label => "carrier", :type => "datalist", :required => false, :col => :carrier, :db_data=> nil}, 
+  :prod => {:label => "produced by", :type => "datalist", :required => false, :col => :produced_by, :db_data => nil}, 
+  :insert => {:label => "insert length", :type => "text", :required => false}, 
+  :diversity => {:label => "peptide diversity", :type => "text", :required => false}, 
+  :date => {:label => "date", :type => "date"}} 
+
+selection_form = {
+  :selname => {:label => "name", :type => "text", :required => true }, 
+  :date => {:label => "date", :type => "date"}, 
+  :perf => {:label => "performed by", :type => "datalist", :required => false, :col => :performed_by, :db_data=> nil}, 
+  :dtar => {:label => "target", :type => "target", :required => false}, 
+  :dlibname => {:label => "related library", :type => "related", :required => true, :db_data => nil, :col => :library_name}} 
+
+dataset_form = {
+  :dsname => {:label => "name", :type => "text", :required => true }, 
+  :date => {:label => "date", :type => "date"}, 
+  :rt => {:label => "read type", :type => "datalist", :required => false, :col => :read_type, :db_data=> nil}, 
+  :ui => {:label => "used barcode", :type => "datalist", :required => false, :col => :used_indices, :db_data=> nil}, 
+  :or => {:label => "origin", :type => "datalist", :required => false, :col => :origin, :db_data=> nil}, 
+  :prod => {:label => "produced by", :type => "datalist", :required => false, :col => :produced_by, :db_data=> nil}, 
+  :seq => {:label => "sequencer", :type => "datalist", :required => false, :col => :sequencer, :db_data=> nil}, 
+  :selr => {:label => "selection round", :type => "datalist", :required => false, :col => :selection_round, :db_data=> nil}, 
+  :seql => {:label => "sequence length", :type => "datalist", :required => false, :col => :sequence_length, :db_data=> nil}, 
+  :dtar => {:label => "target", :type => "target", :required => false}, 
+  :dselname => {:label => "related selection", :type => "related", :required => true, :db_data => nil, :col => :selection_name}, 
+  :pepfile => {:label => "peptide sequence file", :type => "file", :required => true }, 
+  :statfile => {:label => "statistics file", :type => "file", :required => false } 
+}
+
+cluster_form = {
+  :paras => {:label => "parameters", :type => "text", :required => false }, 
+  :ddsname => {:label => "related sequencing dataset", :type => "related", :required => true, :db_data => nil, :col => :dataset_name}, 
+  :clfile => {:label => "cluster file", :type => "file", :required => true } 
+}
+
+target_form = {
+  :sp => {:label => "species", :type => "datalist", :required => false, :col => :species, :db_data=> nil}, 
+  :tis => {:label => "tissue", :type => "datalist", :required => false, :col => :tissue, :db_data=> nil}, 
+  :cell => {:label => "cell", :type => "datalist", :required => false, :col => :cell, :db_data=> nil}, 
+}
+performance_form = {
+  :perf => {:label => "performance", :type => "area", :required => false }, 
+  :dlibname => {:label => "related library", :type => "related", :required => true, :db_data => nil, :col => :library_name}, 
+  :pseq => {:label => "peptide sequence", :type => "text", :required => true }, 
+}
+
+motif_form = {
+  :mlname => {:label => "name", :type => "text", :required => true }, 
+  :motfile => {:label => "motif list file", :type => "file", :required => true } 
+}
+
+# hashes containing the information necessary for the edit data forms
+library_edit = {
+  :libname => {:label => "name", :type => "id_field", :required => true, :col => :library_name }, 
+  :enc => {:label => "encoding scheme", :type => "editlist", :required => false, :col => :encoding_scheme, :db_data => nil}, 
+  :ca => {:label => "carrier", :type => "editlist", :required => false, :col => :carrier, :db_data=> nil}, 
+  :prod => {:label => "produced by", :type => "editlist", :required => false, :col => :produced_by, :db_data => nil}, 
+  :insert => {:label => "insert length", :type => "text", :required => false, :col => :insert_length}, 
+  :diversity => {:label => "peptide diversity", :type => "text", :required => false, :col => :peptide_diversity}, 
+  :date => {:label => "date", :type => "date", :col => :date} 
+}
+
+selection_edit = {
+  :selname => {:label => "name", :type => "id_field", :required => true, :col => :selection_name }, 
+  :date => {:label => "date", :type => "date", :col => :date}, 
+  :perf => {:label => "performed by", :type => "datalist", :required => false, :col => :performed_by, :db_data=> nil}, 
+  :dtar => {:label => "target", :type => "target", :required => false, :col => :target}, 
+  :dlibname => {:label => "related library", :type => "related", :required => true, :db_data => nil, :col => :library_name}
+}
+
+dataset_edit = {
+  :dsname => {:label => "name", :type => "id_field", :required => true, :col => :dataset_name }, 
+  :date => {:label => "date", :type => "date", :col => :date}, 
+  :rt => {:label => "read type", :type => "editlist", :required => false, :col => :read_type, :db_data=> nil}, 
+  :ui => {:label => "used barcode", :type => "editlist", :required => false, :col => :used_indices, :db_data=> nil}, 
+  :or => {:label => "origin", :type => "editlist", :required => false, :col => :origin, :db_data=> nil}, 
+  :prod => {:label => "produced by", :type => "editlist", :required => false, :col => :produced_by, :db_data=> nil}, 
+  :seq => {:label => "sequencer", :type => "editlist", :required => false, :col => :sequencer, :db_data=> nil}, 
+  :selr => {:label => "selection round", :type => "editlist", :required => false, :col => :selection_round, :db_data=> nil}, 
+  :seql => {:label => "sequence length", :type => "editlist", :required => false, :col => :sequence_length, :db_data=> nil}, 
+  :dtar => {:label => "target", :type => "target", :required => false, :col => :target}, 
+  :dselname => {:label => "related selection", :type => "related", :required => true, :db_data => nil, :col => :selection_name}, 
+  :statfile => {:label => "statistics file", :type => "statfile", :required => false, :col => :statistic_file, :path => "statpath" } 
+}
+
+target_edit = {
+  :sp => {:label => "species", :type => "editlist", :required => false, :col => :species, :db_data=> nil}, 
+  :tis => {:label => "tissue", :type => "editlist", :required => false, :col => :tissue, :db_data=> nil}, 
+  :cell => {:label => "cell", :type => "editlist", :required => false, :col => :cell, :db_data=> nil}, 
+}
+
+performance_edit = {
+  :perf => {:label => "performance", :type => "area", :required => false, :col => :performance }, 
+  :dlibname => {:label => "related library", :type => "related", :required => true, :db_data => nil, :col => :library_name}, 
+  :pseq => {:label => "peptide sequence", :type => "id_field", :required => true , :col => :peptide_sequence} 
+}
+
+cluster_edit = {
+  :paras => {:label => "parameters", :type => "text", :required => false, :col => :parameters }, 
+  :ddsname => {:label => "related sequencing dataset", :type => "related", :required => true, :db_data => nil, :col => :dataset_name}, 
+  :peptides => {:type => "peptides"}
+}
+
+motif_edit = {
+  :mlname => {:label => "name", :type => "id_field", :required => true, :col => :list_name },
+  :motifs => {:type => "motifs"}
+}
+
 get '/' do
   login_required
   haml :main
 end
-=begin
+
 get '/*style.css' do
   scss :style
 end
-=end
+
 ########## Data Browsing #############
 get '/libraries' do
   login_required
@@ -635,56 +747,73 @@ end
 get '/addlibrary' do
   login_required
   redirect "/" unless current_user.admin?
-  @schemes = Library.distinct.select(:encoding_scheme)
-  @carriers = Library.distinct.select(:carrier)
-  @producers = Library.distinct.select(:produced_by)
-  haml :library_form, :layout => false
+  @form_fields = library_form
+  @form_fields[:enc][:db_data] = Library.distinct.select(:encoding_scheme).all
+  @form_fields[:ca][:db_data] = Library.distinct.select(:carrier).all
+  @form_fields[:prod][:db_data] =  Library.distinct.select(:produced_by).all
+  @form_type = "library"
+  
+  #haml :library_form, :layout => false
+  haml :add_data_form, :layout => false
 end
 get '/addselection' do
   login_required
   redirect "/" unless current_user.admin?
-  @libraries = Library.distinct.select(:library_name)
-  @performs = Selection.distinct.select(:performed_by)
-  @species = Target.distinct.select(:species)
-  haml :selection_form, :layout => false
+  @form_fields = selection_form
+  @form_fields[:dlibname][:db_data] = Library.distinct.select(:library_name).all
+  @form_fields[:perf][:db_data] = Selection.distinct.select(:performed_by).all
+  @form_type = "selection"
+  haml :add_data_form, :layout => false
 end
 get '/adddataset' do
   login_required
   redirect "/" unless current_user.admin?
-  @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
-  @libraries = Library
-  @selections = Selection
-  @species = Target.distinct.select(:species)
-  haml :dataset_form, :layout => false
+  @form_fields = dataset_form
+  @form_fields[:rt][:db_data] = SequencingDataset.distinct.select(:read_type).all
+  @form_fields[:ui][:db_data] = SequencingDataset.distinct.select(:used_indices).all
+  @form_fields[:or][:db_data] = SequencingDataset.distinct.select(:origin).all
+  @form_fields[:prod][:db_data] = SequencingDataset.distinct.select(:produced_by).all
+  @form_fields[:seq][:db_data] = SequencingDataset.distinct.select(:sequencer).all
+  @form_fields[:selr][:db_data] = SequencingDataset.distinct.select(:selection_round).all
+  @form_fields[:seql][:db_data] = SequencingDataset.distinct.select(:sequence_length).all
+  @form_fields[:dselname][:db_data] = Selection.distinct.select(:selection_name).all
+  @form_type = "dataset"
+  haml :add_data_form, :layout => false
 end
 get '/addperformance' do
   login_required
   redirect "/" unless current_user.admin?
-  @libraries = Library
-  haml :performance_form, :layout => false
+  @form_fields = performance_form
+  @form_fields[:dlibname][:db_data] = Library.distinct.select(:library_name).all
+  @form_type = "performance"
+  haml :add_data_form, :layout => false
 end
 get '/addtarget' do
   login_required
   redirect "/" unless current_user.admin?
-  @species = Target.distinct.select(:species)
-  @tissues = Target.distinct.select(:tissue)
-  @cells = Target.distinct.select(:cell)
-  haml :target_form, :layout => false
+  @form_fields = target_form
+  @form_fields[:sp][:db_data] = Target.distinct.select(:species).all
+  @form_fields[:tis][:db_data] = Target.distinct.select(:tissue).all
+  @form_fields[:cell][:db_data] = Target.distinct.select(:cell).all
+  @form_type = "target"
+  haml :add_data_form, :layout => false
 end
 
 get '/addcluster' do
   login_required
   redirect "/" unless current_user.admin?
-  @libraries = Library
-  @selection = Selection
-  @datasets = SequencingDataset
-  haml :cluster_form, :layout => false
+  @form_fields = cluster_form
+  @form_fields[:ddsname][:db_data] = SequencingDataset.distinct.select(:dataset_name).all
+  @form_type = "cluster"
+  haml :add_data_form, :layout => false
 end
 
 get '/addmotif' do
   login_required
   redirect "/" unless current_user.admin?
-  haml :motif_form, :layout => false
+  @form_fields = motif_form
+  @form_type = "motif list"
+  haml :add_data_form, :layout => false
 end
 
 ######### Edit Data ##################
@@ -697,15 +826,17 @@ end
 get '/editlibraries' do
   login_required
   redirect "/" unless current_user.admin?
-  puts params[:selElem].inspect
   if params[:selElem].match(/^[[:space:]]$/) 
     haml :empty, :layout => false
-  elsif
-    @schemes = Library.distinct.select(:encoding_scheme)
-    @carriers = Library.distinct.select(:carrier)
-    @producers = Library.distinct.select(:produced_by)
-    @library = Library.select(*library_all).where(:library_name => params[:selElem].to_s).first 
-    haml :edit_libraries, :layout => false
+  else
+    @form_type = "library"
+    @form_table = :libraries
+    @form_fields = library_edit
+    @form_fields[:enc][:db_data] =  Library.distinct.select(:encoding_scheme).all
+    @form_fields[:ca][:db_data] = Library.distinct.select(:carrier).all
+    @form_fields[:prod][:db_data] =  Library.distinct.select(:produced_by).all
+    @values = Library.select(*library_all).where(:library_name => params[:selElem].to_s).first 
+    haml :edit_data_form, :layout => false
   end
 end
 
@@ -714,13 +845,14 @@ get '/editselections' do
   redirect "/" unless current_user.admin?
   if params[:selElem].match(/^[[:space:]]$/) 
     haml :empty, :layout => false
-  elsif
-    @species = Target.distinct.select(:species)
-    @performs = Selection.distinct.select(:performed_by)
-    @selection = Selection.select(*selection_edit_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
-    @target = @selection[:target]
-    @libraries = Library.all
-    haml :edit_selections, :layout => false
+  else
+    @form_fields = selection_edit
+    @form_fields[:dlibname][:db_data] = Library.distinct.select(:library_name).all
+    @form_fields[:perf][:db_data] = Selection.distinct.select(:performed_by).all
+    @form_type = "selection"
+    @values = Selection.select(*selection_edit_columns).left_join(Target, :target_id => :target_id).where(:selection_name => params[:selElem].to_s).first
+    @form_table = :selections
+    haml :edit_data_form, :layout => false
   end
 end
 
@@ -729,13 +861,20 @@ get '/editsequencing-datasets' do
   redirect "/" unless current_user.admin?
   if params[:selElem].match(/^[[:space:]]$/) 
     haml :empty, :layout => false
-  elsif
-    @dataset = SequencingDataset.select(*dataset_edit_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
-    @libraries = Library
-    @selections = Selection
-    @ds_infos = SequencingDataset.select(:read_type , :used_indices, :origin, :produced_by, :sequencer, :selection_round, :sequence_length)
-    @target = @dataset[:target]
-    haml :edit_datasets, :layout => false
+  else
+    @form_fields = dataset_edit
+    @form_fields[:rt][:db_data] = SequencingDataset.distinct.select(:read_type).all
+    @form_fields[:ui][:db_data] = SequencingDataset.distinct.select(:used_indices).all
+    @form_fields[:or][:db_data] = SequencingDataset.distinct.select(:origin).all
+    @form_fields[:prod][:db_data] = SequencingDataset.distinct.select(:produced_by).all
+    @form_fields[:seq][:db_data] = SequencingDataset.distinct.select(:sequencer).all
+    @form_fields[:selr][:db_data] = SequencingDataset.distinct.select(:selection_round).all
+    @form_fields[:seql][:db_data] = SequencingDataset.distinct.select(:sequence_length).all
+    @form_fields[:dselname][:db_data] = Selection.distinct.select(:selection_name).all
+    @form_type = "dataset"
+    @values = SequencingDataset.select(*dataset_edit_columns).left_join(Target, :target_id => :target_id).where(:dataset_name => params[:selElem].to_s).first
+    @form_table = :sequencing_datasets
+    haml :edit_data_form, :layout => false
   end
 end
 
@@ -744,12 +883,15 @@ get '/edittargets' do
   redirect "/" unless current_user.admin?
   if params[:selElem].match(/^[[:space:]]$/) 
     haml :empty, :layout => false
-  elsif
-    @target = Target.select(:species, :tissue, :cell).where(:target_id => params[:selElem].to_i).first
-    @species = Target.distinct.select(:species)
-    @tissues = Target.distinct.select(:tissue)
-    @cells = Target.distinct.select(:cell)
-    haml :edit_targets, :layout => false
+  else
+    @form_fields = target_edit
+    @form_fields[:sp][:db_data] = Target.distinct.select(:species).all
+    @form_fields[:tis][:db_data] = Target.distinct.select(:tissue).all
+    @form_fields[:cell][:db_data] = Target.distinct.select(:cell).all
+    @form_type = "target"
+    @values = Target.select(:species, :tissue, :cell).where(:target_id => params[:selElem].to_i).first
+    @form_table = :targets
+    haml :edit_data_form, :layout => false
   end
 end
 get '/editperformances' do
@@ -757,10 +899,13 @@ get '/editperformances' do
   redirect "/" unless current_user.admin?
   if (params[:selElem].match(/^[[:space:]]$/) || params[:selLib].match(/^[[:space:]]$/) )
     haml :empty, :layout => false
-  elsif
-    @performance = PeptidePerformance.select(:performance, :library_name, :peptide_sequence).where(:library_name => params[:selLib].to_s, :peptide_sequence => params[:selElem].to_s).first
-    @libraries = Library
-    haml :edit_performances, :layout => false
+  else
+    @form_fields = performance_edit
+    @form_fields[:dlibname][:db_data] = Library.distinct.select(:library_name).all
+    @form_type = "performance"
+    @form_table = :peptide_performances
+    @values = PeptidePerformance.select(:performance, :library_name, :peptide_sequence).where(:library_name => params[:selLib].to_s, :peptide_sequence => params[:selElem].to_s).first
+    haml :edit_data_form, :layout => false
   end
 end
 
@@ -769,9 +914,13 @@ get '/editmotif-lists' do
   redirect "/" unless current_user.admin?
   if params[:selElem].match(/^[[:space:]]$/) 
     haml :empty, :layout => false
-  elsif
+  else
+    @form_fields = motif_edit
+    @form_type = "motif list"
+    @form_table = :motif_lists
+    @values = DB[:motif_lists].select(:list_name).where(:list_name => params[:selElem].to_s).first
     @motlist = DB[:motifs_motif_lists].select(:motif_sequence, :target, :receptor, :source).where(:list_name => params[:selElem].to_s)
-    haml :edit_motiflists, :layout => false
+    haml :edit_data_form, :layout => false
   end
 end
 
@@ -780,11 +929,14 @@ get '/editclusters' do
   redirect "/" unless current_user.admin?
   if params[:selElem].match(/^[[:space:]]$/) 
     haml :empty, :layout => false
-  elsif
-    @datasets = SequencingDataset.all
-    @cluster = Cluster.select(:parameters, :dataset_name, :cluster_id).where(:cluster_id => params[:selElem]).first
-    @peptides = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => params[:selElem])
-    haml :edit_clusters, :layout => false
+  else
+    @form_fields = cluster_edit
+    @form_fields[:ddsname][:db_data] = SequencingDataset.distinct.select(:dataset_name).all
+    @form_type = "cluster"
+    @form_table = :clusters
+    @values = Cluster.select(:parameters, :dataset_name, :cluster_id).where(:cluster_id => params[:selElem]).first
+    @peptides = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => params[:selElem]).all
+    haml :edit_data_form, :layout => false
   end
 end
 
@@ -825,7 +977,6 @@ end
 post '/validate-data' do
   login_required
   redirect "/" unless current_user.admin?
-  
   @errors = validate(params)
   @values = params
   unless params[:statfile].nil?

@@ -13,8 +13,10 @@ module Sinatra
         "selection"
       when /datasets/
         "sequencing_dataset"
-      when /cluster-infos/
+      when /cluster/
         "cluster"
+      when /comparative-results/
+        "comparative-results"
       when /info-tables/
         request.params["ref"].tr(" ", "_").downcase
       when /show_sn_table/
@@ -34,18 +36,28 @@ module Sinatra
           "peptide"
         elsif request.params["ref"] == "Clusters"
           "peptide"
+        else 
+          "peptide"
         end
       else
-        "nix"
+        "peptide"
       end
+    end
+    
+    def get_modal_text(category,type)
+     # puts Tips.inspect
+     # puts category
+     # puts type 
+     # puts Tips[category][type]
+      Tips[category][type]
     end
 
     def get_tooltip_text(column_name)
       type = get_element_type
-      puts "type: #{type}"
-      puts request.url
-      puts request.path
-      puts "column: #{column_name}"
+     # puts "type: #{type}"
+     # puts request.url
+     # puts request.path
+     # puts "column: #{column_name}"
       #puts Tips.inspect
       Tips[type][column_name.to_s]
     end

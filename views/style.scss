@@ -1,510 +1,136 @@
-// variables
-$sidebar-color: #A0A0A0;
-// general
-html{
-  height:100%;
-  width:100%;
-}
-#logoutbox{
-  margin-left:0.5em;
-}
-
-
-#top {
-  width:100%;
-}
-#blossum{
-  width:60%;
-  float:left;
-}
-#seqselect{
-  width:40%;
-  float:left;
-}
-#bshelp{
- // width:10%;
-  //float:left;
-}
-
-.ui-button-text {
-#  background-color:#1bf011;
-  color: #fff;
-  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
-  background-color: #60b044;
-  background-image: -moz-linear-gradient(#8add6d, #60b044);
-  background-image: -webkit-linear-gradient(#8add6d, #60b044);
-  background-image: linear-gradient(#8add6d, #60b044);
-  background-repeat: repeat-x;
-  border-color: #5ca941;
-}
-
+//add additional body padding when using fixed navbar
 body {
-  color: black;
-  background-color: white;
-  font-size: small;
-  font-family: Helvetica,Arial,sans-serif;
-  margin: 0;
-  width: 100%;
-  height:100%;
-  overflow:auto;
- // padding: 1em;
-
+  padding-top:70px;
 }
 
-.alnright {
-  text-align:right;
-}
-
-li.ui-state-disabled{
-  background-color:#dfffff;
-}
-
-a.ui-corner-all {
-  color:black;
-}
-
-img#logo {
-  height: 50px;
-  width:150px;
-  margin-left:2.1em;
-  margin-top: 2.2em;
-}
-
-/* #### Login #####    */
-.login-box {
-  border: solid 1px black;
-  position:fixed;
-  left:50%;
-  top:50%;
-  z-index:100;
- 
-  height:250px;
-  margin-top:-200px;
-
-  width:600px;
-  margin-left:-300px; 
-}
-
-.login-text {
-  width:70%;
-  margin:0 auto; 
-}
-
-#loginlogo{
-  float:left;
-  height: 100%;
-  width:30%;
-  img {
-    margin-left:0.8em;
-    margin-top: 6em;
-    height:50px;
-    width:150px;
-  }
-}
-
-/***** User management  ********/
-#overview {
-  width: 100%;
-  height:100%;
-}
-
-#existing , #newusers{
-  float:left;
-  width:50%;
-}
-
-
-fieldset {
-  &.selform, &.libform, &.mlform, &.dsform, &.resform, &.tarform, &.clform, &.mlform{
-    width:75%;
-  }
-}
-#selectdata {
-  overflow:auto;
-}
-#infos {
-  clear:both;
-}
-
-.formfield * {
-  vertical-align:middle;
-}
-
-fieldset.checklist {
-  border: 0;
-  padding: 0;
-}
-
-//library browsing
-#selectedinfo{
-  float:left;
-  width: 30%;
-}
-#selecteddata{
-  float:left;
-  width: 70%;
-  overflow-x:scroll;
-}
-
-
-// prop-search
-#properties {
-  border:1px;
-  float:left;
-  width: 33%;
-}
-
-#disp-res {
-  border: 1px;
-  float:left;
-  width:66%;
-}
-
-fieldset#first{
-  float:left;
-  width: 15%;
-  clear:left;
-  p select {
-    #text-align:right;
-    display:block;
-  }
-}
-fieldset#third{
-  float:left;
-  width: 15%;
-  p select {
-    #text-align:right;
-    display:block;
-  }
-}
-fieldset#fourth{
-  float:left;
-  width: 15%;
-  p select {
-    #text-align:right;
-    display:block;
-  }
-}
-fieldset#fifth{
-  //clear:both;
-  width: 15%;
-  float:left;
-  input {
-    float:right;
-  }
-}
-fieldset#sixth{
-  float:left;
-}
-fieldset#seventh{
-  float:left;
-}
-
-#bottom {
-  clear:both;
-}
-
-fieldset p {
-  clear:both;
-  padding: 1px;
-  margin: 1px;
-}
-
-div#checkboxes {
-  position: relative;
-  width: 100%;
-}
-
-div {
-  &.ref-select, &.comp-select, &.check-select{
-    position: relative;
-    border: 1px solid #ccc;
-    width: 6em;
-    height: 6.5em;
-    overflow-y: scroll;
-  }
-}
-
-#ref-data {
-  clear:both;
-}
-
-#comp-buttons {
-  clear:both;
-  width: 45%;
-}
-
-#comp-library, #comp-selection, #comp-dataset, #ref-library, #ref-selection, #ref-dataset, #check-library, #check-selection, #check-dataset {
-  width: 25%;
-  position: relative;
-  float: left;
-}
-
-.highlight td{
-  background-color: #b3ffb3;
-  cursor: pointer;
-}
-
-ul {
-  list-style-type:none;
-}
-
-/* comparative peptide search */
-#comppepresults{
-  width:100%;
-  overflow-y:auto;
-}
-#compinfos {
-  width:100%;
-}
-.ref_ds_pep {
-  float:left;
-  margin-right:10px;
-}
-
-/* cluster browsing */
-#clusterlist {
-  border:none;
-  float:left;
-  width:25%;
-  overflow-y:auto;
-  height:500px;
-}
-
-#clbrresults {
-  float:left;
-  width:75%;
-}
-#clusterlist_sel{
-    float:left;
-    width:100%;
-}
-#clusterlist_pep {
-    overflow-x:scroll;  
-    clear:both;
-}
-/* cluster pep-seq search*/
-#clprop {
-  width:100%;
-}
-#clsearchinfo{
-  float:left;
-  width:40%;
-  overflow:hide;
-}
-#clsearchpeps {
-  float:left;
-  width:40%;
-  overflow:hide;
-}
-
-ul#navigation{
-  margin-right:0.5em;
-  margin-left:0.5em;
-  margin-top:0.5em;
-}
-
-#left {
-  float:left;
-  overflow:hidden;
-  width:17%;
-}
-#right {
-  float: left;
-  width: 80%;
-  overflow:hidden;
-}
-div#results{
-  float:left;
-  width: 50%;
-}
-div#clinput {
-  float:left;
-  width:15%;
-  #pep-search{
-    float:left;
-  }
-  #pep-seq, label{
-    display:block;
-  }
-
-}
-#seqselect {
-  float:left;
-}
-#dataselection {
-  float:left;
-  width: 30%;
-}
-
-#dataform {
-  float:left;
-  width: 70%;
-}
-
-#editform {
-  float:left;
-  width: 70%;
-}
-
-#content {
-  width: 100%;
-  height: 100%;
- # overflow:auto;
-}
-
-.text_filter {
-  width:100%;
-}
-
-#clsearch{
-  clear:both;
-}
-
-#clinfos{
-  float:left;
-  width: 30%;
-}
- 
-#clpeps {
-  float:left;
-  width: 40%;
-}
-/* motif search  */
-#motif-select {
-  clear:left;
-} 
-
-div#motif-list {
-  float:left;
-  width: 10em;
-}
-
-#motifs {
-  overflow:scroll;
-  width:65%;
-  //height:50em;
-  td {
-    word-wrap:break-word;
-    white-space: normal;
-    border-width:2px;
-  }
- /* table {
-    width:100%;
-    table-layout:fixed;
-    word-wrap:break-word;
-  }
-  col {
-    width:15%;
-  }*/
-}
-
-#motresults {
-  width:100%;
-}
-
-#motpepinfos {
-  float:left;
-  width:30%;
-}
-
-#motacc {
-  float:left;
-  width:70%;
-}
-
-
-td.details {
-  background-color:#d1cfd0;
-  border:2px solid #A19B9E;
-}
-
-.detailtab {
-  border-spacing:0;
-  border-collapse:separate;
-  padding-left:50px;
-  
-}
-
-#datalinks {
-  position:absolute;
-  right:0;
-  bottom:0;
-}
-
-#elementselection {
-  clear:left;
-}
-
-#topbar {
-  position:relative;
-  height: 100px;
-  width: 100%;
-  //background-color: grey;
-  background: rgb(240,249,255); /* Old browsers */
-background: -moz-linear-gradient(left, rgba(240,249,255,1) 0%, rgba(203,235,255,1) 47%, rgba(161,219,255,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(240,249,255,1)), color-stop(47%,rgba(203,235,255,1)), color-stop(100%,rgba(161,219,255,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(left, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(left, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(left, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* IE10+ */
-background: linear-gradient(to right, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f9ff', endColorstr='#a1dbff',GradientType=1 ); /* IE6-9 */
-}
-
-
-// add forms
-#adddata, #editdata {
-  label span {
-    display: inline-block;
-    width: 10em;
-    text-align: right;
-  }
-}
-p.reqfield {
-  font-size:small;
-}
-
-div{
-  &#errorbox, &#highlighbox{
-  padding: 0 .2em;
-  }
-}
-
-#errorspan , #highlightspan{
-  float:left;
-  margin-right: .3em;
-}
-
+// hide iframes
 iframe#notify {
+  frameBorder:0;
+  border:none;
+  border:0;
+  width:100%;
+}
+
+#respage {
   frameBorder:0;
   border:0;
   width:100%;
 }
-#show-res {
-  height:100%;
-}
+
 iframe#propresults {
   frameBorder:0;
   border:0;
   width:100%;
 }
-/* Data browsing   */
-.seltar {
-  font-weight:bold;
-  text-align:center;
+
+.tooltip-inner {
+  text-align:left !important;
+  font-size:13px;
+  font-weight:normal;
+  max-width: 470px;
+  z-index: 9999;
+  -webkit-box-shadow: 0 0 5px #aaa;
+  box-shadow: 0 0 5px #aaa;
 }
 
-
-/* cluster browsing */
-#clustertab {
-  overflow:auto;  
+.max-scroll {
+  height:400px;
+  overflow:auto;
 }
 
-/*** Boostrap redesing ***/
-// Login page
+.check-select {
+  border:1px solid #ccc;
+  height:100px;
+  overflow-y:scroll;
+  padding:4px;
+  padding-top:0;
+  margin-top:2px;
+}
 
+fieldset.search-params {
+  border:1px groove #ddd !important;
+  padding:0 1.4em 1.4em 1.4em !important;
+  margin: 0 0 1.5em 0 !important;
+  -webkit-box-shadow:  0px 0px 0px 0px #000;
+          box-shadow:  0px 0px 0px 0px #000;
+}
 
+legend.search-params {
+  font-size: 1.2em !important;
+  text-align: left !important;
+  font-weight:bold !important;
+  width:auto;
+  padding:0 10px;
+  border-bottom:none;
+  margin-bottom:0;
+}
+/* disable navbar responsiveness*/
+.navbar-header {
+  float: left;
+}
 
+/* Undo the collapsing navbar */
+.navbar-collapse {
+  display: block !important;
+  height: auto !important;
+  padding-bottom: 0;
+  overflow: visible !important;
+}
 
+.navbar-toggle {
+  display: none;
+}
+.navbar-collapse {
+  border-top: 0;
+}
 
+.navbar-brand {
+  margin-left: -15px;
+}
 
+/* Always apply the floated nav */
+.navbar-nav {
+  float: left;
+  margin: 0;
+}
+.navbar-nav > li {
+  float: left;
+}
+.navbar-nav > li > a {
+  padding: 15px;
+}
+
+/* Redeclare since we override the float above */
+.navbar-nav.navbar-right {
+  float: right;
+}
+
+/* Undo custom dropdowns */
+.navbar .navbar-nav .open .dropdown-menu {
+  position: absolute;
+  float: left;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .15);
+  border-width: 0 1px 1px;
+  border-radius: 0 0 4px 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+.navbar-default .navbar-nav .open .dropdown-menu > li > a {
+  color: #333;
+}
+.navbar .navbar-nav .open .dropdown-menu > li > a:hover,
+.navbar .navbar-nav .open .dropdown-menu > li > a:focus,
+.navbar .navbar-nav .open .dropdown-menu > .active > a,
+.navbar .navbar-nav .open .dropdown-menu > .active > a:hover,
+.navbar .navbar-nav .open .dropdown-menu > .active > a:focus {
+  color: #fff !important;
+  background-color: #428bca !important;
+}
+.navbar .navbar-nav .open .dropdown-menu > .disabled > a,
+.navbar .navbar-nav .open .dropdown-menu > .disabled > a:hover,
+.navbar .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+  color: #999 !important;
+  background-color: transparent !important;
+}

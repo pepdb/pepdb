@@ -67,13 +67,13 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
     var path = document.location.pathname;
     if (path == url+'/cluster-search' && objID == '#select_table'){
       var selectedDS = $(this).find('td:nth-child(4)').html();
-      if($('#clsearch').is(':visible')){
-        $('#clsearch').toggle();
+      if($('.clsearch').is(':visible')){
+        $('.clsearch').toggle();
       }
       $.get(url+'/cluster-infos', {selCl:selectedID, selDS:selectedDS}, function(data){
         $('#clprop').html(data);
         $.getScript(url+'/script/initshowtable.js', function(){
-          $('#clsearch').toggle();
+          $('.clsearch').toggle();
         });
       });
     } else if (path == url+'/motif-search' ) {
@@ -81,6 +81,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
         var selectedDS = $(this).find('td:nth-child(3)').html();
         $.get(url +'/peptide-infos', {selDS: selectedDS, selSeq: selectedPep}, function(data){
           $('#motpepinfos').html(data);
+          $('.ttips').tooltip({});
         });
     // dealing with a server-side dataTable
     } else if (objID == '#pep_table'){
@@ -90,6 +91,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
       if (path == url +'/systemic-search' || path == url+'/property-search'){
         $.get(url+'/peptide-infos', {selSeq: selectedID, selDS: selectedDS}, function(data){
           $('#infos').html(data);
+          $('.ttips').tooltip({});
         });
       } else {
         $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
@@ -129,6 +131,8 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
       if (path.match(/clusters/) !== null ){
         $.get(url+'/show-info', {ele_name: selectedID, ref:'Clusters', ele_name2: firstChoice}, function(data){
           $('#clusterlist_pep').html(data);
+          $('#clusterlist_pep').toggle();
+          
         });
       } else if (path == url+'/cluster-search'){
         $.get(url+'/show-info', {ele_name: selectedID, ref:'Clustersearch', ele_name2: firstChoice}, function(data){
@@ -149,7 +153,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
       selectedDS.push($('#comp-dataset input[type="radio"]:checked').val());
       selectedSeq.push($(this).find('td:first').html());
       for(var cluster = 0; cluster < maxLen; cluster++){
-        var seqCell = 5 + cluster * 6;
+        var seqCell = 4 + cluster * 5;
         var dsCell = seqCell+1;
         var seq = $(this).find('td:nth-child('+seqCell+')').html();
         var ds = $(this).find('td:nth-child('+dsCell+')').html();

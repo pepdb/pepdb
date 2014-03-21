@@ -166,9 +166,12 @@ $(document).ready(function(){
     if($('#clpepresults').is(':visible')){
       $('#clpepresults').toggle();
     }
-    if($('#clsearch').is(':visible')){
-      $('#clsearch').toggle();
-    }
+    /*
+    if($('.clsearch').is(':visible')){
+      $('.clsearch').toggle();
+    }*/
+    
+    $('.clsearch').html('');
     $('#clpepresults').html('');
     $('.clsearchpeps').html('');
     $.ajax({
@@ -179,12 +182,14 @@ $(document).ready(function(){
         $.get(url+'/error', {error:error2},function(response){
           $('#clpepresults').html(response);
           $('#clpepresults').toggle();
+         // $('.clsearch').toggle();
           $('.loading').toggle();
         });
       },
       success: function(response){
         $('#clpepresults').html(response);
         $.getScript(url+'/script/tableinit.js', function(){
+          //$('.clsearch').toggle();
           $('#clpepresults').toggle();
         });
       }

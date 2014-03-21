@@ -62,11 +62,21 @@ $(document).ready(function(){
         checkedDS.push(elemVal);
       }
     });
-    $.get(url+'/systemic-results',{sysDS: checkedDS}, function(data){
+    //$.get(url+'/systemic-results',{sysDS: checkedDS}, function(data){
+    $.get(url+'/systemic-results',{sysDS: checkedDS}).success(function(data){
       $('#sysresults').html(data);
-      $.getScript(url +'/script/initshowtable.js', function(){
+     // $.getScript(url +'/script/initshowtable.js', function(){
+      $.getScript(url +'/script/initshowtable.js').success(function(result){
         $('.loading').toggle();
         $('#sysresults').toggle();
+      }).error(function(jqXHR, textStatus, errorThrown){
+        alert(errorThrown);
+      });
+    }).error(function(jqXHR, textStatus, errorThrown){
+      $.get(url+'/error', {error:errorThrown},function(response){
+        $('#sysresults').html(response);
+        $('.loading').toggle();
+        $('#sysresults').show();
       });
     });
   });
@@ -80,6 +90,5 @@ $(document).ready(function(){
       }
     }
   }); 
-
 
 });

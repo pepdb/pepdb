@@ -1,11 +1,26 @@
 %input{:type => "hidden", :id => "navbarsec", :value => "userman"}
-#overview
-  #existing
-    %h2 existing users
+.page-header
+  %h2
+    User Managment
+.row
+  .col-md-12
+    - if Rack.const_defined?('Flash') && flash[:error]
+      .alert.alert-danger.alert-dismissable
+        %button.close{:type => "button", "data-dismiss"=>"alert", "aria-hidden" => true} &times;
+        %strong Error:
+        = flash[:error]
+    - if Rack.const_defined?('Flash') && flash[:notice] && !flash[:notice].include?("successful")
+      .alert.alert-success
+        %strong Success:
+        = flash[:notice]
+
+.row
+  .col-md-6
+    %h3 existing users
     #allusers
       = partial :existing_users, locals:{users:@users}
     #editusers
-  #newusers
-    %h2 add new user
+  .col-md-6
+    %h3 add new user
     = partial :add_user, locals:{selections:@selections}
 

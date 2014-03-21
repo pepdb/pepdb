@@ -25,9 +25,7 @@ $(document).ready(function(){
     var tabID = '#clpeptab'+count;
     tables[count] = $(tabID).dataTable({
       'bPaginate': 'true',
-      'sPaginationType': 'full_numbers',
       'bInfo': true,
-      'bJQueryUI': true,
       'sDom': '<"H"lfrT>t<"F"ip>',
       'oTableTools':{
         'sSwfPath': url+'/copy_csv_xls_pdf.swf',

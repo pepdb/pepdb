@@ -132,8 +132,8 @@ module Sinatra
       end
 
       if option_selected?(params['tp'])
-        querystring << 'AND results.result_id NOT NULL ' if querystring.length > 0
-        querystring << 'results.result_id NOT NULL ' if querystring.length == 0
+        querystring << 'AND performance NOT NULL ' if querystring.length > 0
+        querystring << 'performance NOT NULL ' if querystring.length == 0
       end
 
       return querystring, placeholders

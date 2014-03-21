@@ -468,33 +468,38 @@ module Sinatra
       end #init
 
       def update
-        unless @table == :motifs_motif_lists 
-          DB[@table].where(@id_column => @row_id).update(@update_hash)
-        else
+        if @table == :motifs_motif_lists 
+          puts @mot_updates.inspect
           @mot_updates.each do |upd|
             DB[@table].where(upd[0]).update(upd[1])
           end
+        elsif @table == :peptide_performances
+          DB[@table].where(@perf_update[0]).update(@perf_update[1])
+        else
+          DB[@table].where(@id_column => @row_id).update(@update_hash)
         end 
         @errors
       end
       private
       def select_upd_type
       case @table.to_s
-      when "libraries"
-        up_library
-      when "selections"
-        up_selection
-      when "sequencing_datasets"
-        up_dataset
-      when "clusters"
-        up_cluster
-      when "results"
-        up_result
-      when  "targets"
-        up_target
-      when "motif_lists"
-        up_motlist
-      end
+        when "libraries"
+          up_library
+        when "selections"
+          up_selection
+        when "sequencing_datasets"
+          up_dataset
+        when "clusters"
+          up_cluster
+        when "results"
+          up_result
+        when  "targets"
+          up_target
+        when "motif_lists"
+          up_motlist
+        when "peptide_performances"
+          up_performance
+        end
       end #select_upd_t
 
       def up_library
@@ -547,21 +552,22 @@ module Sinatra
         @update_hash[:cell] = @values[:cell]
       end
       
-      def up_result
-        @update_hash[:performance] = es @values[:perf].to_s
-        @update_hash[:target_id] = find_target
-        @row_id.to_i
-        Observation.where(:dataset_name => @values[:ddsname].to_s, :peptide_sequence => @values[:pseq].to_s).update(:result_id => @row_id)
-      end
-
       def up_motlist
+        puts "motsssssssssssssssssssssss"
         @table = :motifs_motif_lists
         @row_id.to_s
-        DB[:motifs_motif_lists].select(:motif_sequence).where(:list_name => @row_id).each_with_index do |motif, index|
+        puts @row_id
+        DB[:motifs_motif_lists].select(:motif_sequence).where(:list_name => @row_id).all.each_with_index do |motif, index|
           where_hash = {:list_name => @row_id, :motif_sequence => motif[:motif_sequence].to_s}
-          upd_hash = {:target => "#{es @values["mt"<< index.to_s].to_s}", :receptor => "#{es @values["mr"<< index.to_s].to_s}", :source => "#{es @values["ms"<< index.to_s].to_s}" }
+          upd_hash = {:target => "#{es @values["mt#{index}"].to_s}", :receptor => "#{es @values["mr#{index}"].to_s}", :source => "#{es @values["ms#{index}"].to_s}" }
           @mot_updates[index] = [where_hash, upd_hash]
         end
+      end
+      
+      def up_performance
+        where_hash = {:library_name => @values[:dlibname], :peptide_sequence => @values[:eleid]}
+        upd_hash = {:performance => @values[:perf]}
+        @perf_update = [where_hash, upd_hash]
       end
 
       def find_target

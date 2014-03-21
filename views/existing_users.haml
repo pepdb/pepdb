@@ -1,9 +1,10 @@
-#sinatra_authentication
-  %table
+%table.table.table-bordered
+  %thead
     %tr
-      %th
-      - if current_user.admin?
-        %th permission level
+      %th user
+      %th permission level
+      %th.text-center{:colspan => 2} options 
+  %tbody
     - users.each do |user|
       %tr
         %td
@@ -11,14 +12,11 @@
             = user.username
           - else
             "user #{user.id}"
-        - if current_user.admin?
-          %td.text-right= user.permission_level
-        - if current_user.admin?
-          %td
-            %a{:href => "/users/#{user.id}/edit", :class => "editlink"} edit
-          %td
-            -# this doesn't work for tk
-            - if !user.site_admin?
-              %a.deletelink{:href => "/users/#{user.id}/delete", :onclick => "return confirm('Are you sure?')"} delete
-            - else
-              site admin
+        %td.text-right= user.permission_level
+        %td.text-center
+          %a.btn.btn-success{:href => "/users/#{user.id}/edit", :class => "editlink"} edit
+        %td.text-center
+          - if !user.site_admin?
+            %a.btn.btn-danger.deletelink{:href => "/users/#{user.id}/delete", :onclick => "return confirm('Are you sure?')"} delete
+          - else
+            site admin
