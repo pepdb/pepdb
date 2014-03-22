@@ -18,7 +18,6 @@
   .clsearchinfo.col-md-7
     = partial :info_tables, locals: {reads_sum:@reads_sum, data_to_display:@cluster_infos , element:@cluster_infos[0][:Consensus_sequence]}
   .clsearchpeps.col-md-5
-    %p 
-      all peptides in this cluster
-      = partial :tables, locals: {table_class: "", table_id:"show_table", choice:"", first_data_to_display:@cluster_peps, second_data_to_display:@cluster_peps }
+    %h4 all peptides in this cluster
+    = partial :tables, locals: {table_class: "", table_id:"show_table", choice:"", first_data_to_display:@cluster_peps, second_data_to_display:@cluster_peps }
 

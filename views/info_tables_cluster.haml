@@ -2,7 +2,7 @@
   - if defined? dataset
     in dataset
     = dataset
-.col-md-8
+.col-md-7
   %table.table.table-bordered
     %thead
       %tr
@@ -32,7 +32,7 @@
                 Overall reads
                 %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(:Overall_reads)}
                   %span.glyphicon.glyphicon-info-sign
-              %td 
+              %td.text-right 
                 = pep_count
             %tr
               %td
@@ -50,14 +50,14 @@
                 = column[0].to_s.tr('_', ' ')
                 %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(column[0])}
                   %span.glyphicon.glyphicon-info-sign
-              %td= format_dominance(column[1])
+              %td.text-right= format_dominance(column[1])
           - elsif column[0] == :Parameters
             %tr
               %td 
                 Reads sum 
                 %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(:Reads_sum)}
                   %span.glyphicon.glyphicon-info-sign
-              %td= reads_sum
+              %td.text-right= reads_sum
             %tr
               %td
                 = column[0].to_s.tr('_', ' ')
@@ -90,11 +90,13 @@
                 = column[0].to_s.tr('_', ' ')
                 %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(column[0])}
                   %span.glyphicon.glyphicon-info-sign
-
-              %td= column[1]
+              -if align_right?(column[0])
+                %td.text-right= column[1]
+              -else
+                %td= column[1]
 - if defined? dna_data 
   - if dna_data.size != 0
-    .col-md-4
+    .col-md-5
       %table.table.table-bordered
         %thead
           %tr
@@ -106,4 +108,4 @@
           - dna_data.each_pair do |seq,reads|
             %tr
               %td= seq
-              %td= reads
+              %td.text-right= reads

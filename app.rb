@@ -49,7 +49,7 @@ dataset_info_columns = [:dataset_name___name, :libraries__library_name___library
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistic_file]
 dataset_edit_columns = [:dataset_name, :library_name, :selection_name, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target, :statistic_file]
 peptide_columns = [:peptide_sequence___Peptide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance]
-sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence___Peptide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance, :peptides_sequencing_datasets__dataset_name___Dataset]
+sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence___Peptide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance, :peptides_sequencing_datasets__dataset_name___Sequencing_dataset]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
 clsearch_results = [:consensus_sequence___Consensus_sequence, :library_name___Library, :selection_name___Selection, :dataset_name___Sequencing_dataset]
@@ -343,12 +343,12 @@ get '/cluster-infos' do
     @reads_sum, @cluster_peps = calc_cluster_read_sums(params)
   elsif request.referrer.include?("cluster-search")
     @cluster_infos = Cluster.where(:consensus_sequence => params[:selCl].to_s,:dataset_name => params[:selDS].to_s).select(*cluster_info).all
-    @cluster_peps = DB[:clusters_peptides].join(:clusters, :cluster_id=>:cluster_id).select(:peptide_sequence).where(:consensus_sequence => params[:selCl].to_s, :dataset_name => params[:selDS].to_s).all
-    @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:peptide_sequence]}).sum(:reads)
+    @cluster_peps = DB[:clusters_peptides].join(:clusters, :cluster_id=>:cluster_id).select(:peptide_sequence___Peptide_sequence).where(:consensus_sequence => params[:selCl].to_s, :dataset_name => params[:selDS].to_s).all
+    @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:Peptide_sequence]}).sum(:reads)
   else
     @cluster_infos = Cluster.where(:cluster_id => "#{params[:selCl]}").select(*cluster_info).all
-    @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence).where(:cluster_id => "#{params[:selCl]}").all
-    @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:peptide_sequence]}).sum(:reads)
+    @cluster_peps = DB[:clusters_peptides].select(:peptide_sequence___Peptide_sequence).where(:cluster_id => "#{params[:selCl]}").all
+    @reads_sum = Observation.where(:dataset_name => @cluster_infos[0][:Sequencing_dataset], :peptide_sequence => @cluster_peps.map{|pep| pep[:Peptide_sequence]}).sum(:reads)
   end
   haml :cluster_infos, :layout => false
 end
@@ -458,7 +458,7 @@ end
 
 get '/systemic-results' do
   login_required
-  @peptides = Observation.select(*sys_peptide_columns).where(:Dataset => params['sysDS'])
+  @peptides = Observation.select(*sys_peptide_columns).where(:Sequencing_dataset => params['sysDS'])
   haml :peptide_results, :layout => false
 end
 

@@ -8,7 +8,12 @@
   .col-md-3.max-scroll
     #clusterlist  
       = partial :clusterlist, locals: {clusters:@clusters}
-  #clbrresults
-  #clusterlist_sel{:hidden=> true}
+  .col-md-9
+    #clbrresults
+    #clusterlist_sel{:hidden=> true}
+    .row
+      .col-md-12
+        #clusterlist_pep
+      
 .row
-  #clusterlist_pep
+  .col-md-9.col-md-offset-3

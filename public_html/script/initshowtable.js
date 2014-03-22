@@ -41,7 +41,7 @@ $(document).ready(function(){
     'bPaginate': true,
     'aaSorting': [[1, 'asc']],
     'aoColumnDefs':[{'aTargets':[1,2,3],
-                    'sClass': 'alignRight'
+                    'sClass': 'text-right'
       },
     ],
     'sDom': '<"H"lfrT>t<"F"ip>',

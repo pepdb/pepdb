@@ -418,7 +418,16 @@ $(document).ready(function(){
       $('#editusers').html(response);
     });
   });
+/*
+  $('#clusterlist').jstree({
+    'plugins': ['html_data','ui','themes','crrm'],
+    'themes': {'theme':'proton',
+                'dots':true,
+                'icons':false,
+                'url': './themes/proton/style.css'
+              } 
 
+  });*/
 
   /* -----------jsTree configuration------------------- */
   $('#clusterlist').bind('loaded.jstree', function(){
@@ -429,7 +438,7 @@ $(document).ready(function(){
   });
 
   $('#clusterlist').bind('before.jstree', function(event,data){
- /*   switch(data.plugin){
+    switch(data.plugin){
       case 'ui':
         if(!data.inst.is_leaf(data.args[0])){
           return false;
@@ -437,24 +446,34 @@ $(document).ready(function(){
         break;
       default:
         break;
-    }*/
-  }).jstree({'plugins' : ['html_data', 'ui'],
+    }
+  }).jstree({'plugins' : ['html_data', 'ui', 'themes'],
+    'themes': {'theme':'proton',
+                'dots':true,
+                'icons':false,
+                'url': './themes/proton/style.css'
+              } 
       })
     .delegate('a', 'click', function(event, data){
-      if($('#clusterlist_sel').is(':visible')){
-        $('#clusterlist_sel').toggle();
-      }
-      if($('#clusterlist_pep').is(':visible')){
-        $('#clusterlist_pep').html('');
-      }
-      var cluster = $(this).attr('href').split('/')[2];
-      $.get(url+'/cluster-infos',{selCl:cluster}, function(data){
-        $('#clusterlist_sel').html(data);
-        $.getScript(url+'/script/initshowtable.js', function(){
+      var link = $(this).attr("href");
+      if (link !== "#"){
+        if($('#clusterlist_sel').is(':visible')){
           $('#clusterlist_sel').toggle();
+        }
+        if($('#clusterlist_pep').is(':visible')){
+          $('#clusterlist_pep').html('');
+        }
+        var cluster = $(this).attr('href').split('/')[2];
+        $.get(url+'/cluster-infos',{selCl:cluster}, function(data){
+          $('#clusterlist_sel').html(data);
+          $.getScript(url+'/script/initshowtable.js', function(){
+            $('#clusterlist_sel').toggle();
+          });
         });
-      });
-      return false;
+        return false;
+      } else {
+        return false;
+      }
     });
 
   $('#disp-res').bind('loaded.jstree', function(){
@@ -464,7 +483,7 @@ $(document).ready(function(){
     });
   });
   $('#disp-res').bind('before.jstree', function(event,data){
-   /* switch(data.plugin){
+    switch(data.plugin){
       case 'ui':
         if(!data.inst.is_leaf(data.args[0])){
           return false;
@@ -472,14 +491,15 @@ $(document).ready(function(){
         break;
       default:
         break;
-    }*/
-  }).jstree( {'plugins' : ['html_data', 'ui'],
+    }
+  }).jstree( {'plugins' : ['html_data', 'ui', 'themes'],
+    'themes': {'theme':'proton',
+                'dots':true,
+                'icons':false,
+                'url': './themes/proton/style.css'
+              }, 
               'item_leaf': false, }).delegate('a', 'click', function(event, data){
   });
   
-/*
-  $('#clusterlist').jstree({
-    'plugins': ['html_data','ui','themes','crrm'],
-    'themes': {'theme':'proton'}
-  });*/
+
 });

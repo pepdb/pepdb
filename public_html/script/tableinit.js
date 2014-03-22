@@ -134,7 +134,8 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
       if (path.match(/clusters/) !== null ){
         $.get(url+'/show-info', {ele_name: selectedID, ref:'Clusters', ele_name2: firstChoice}, function(data){
           $('#clusterlist_pep').html(data);
-          $('#clusterlist_pep').toggle();
+          //$('#clusterlist_pep').toggle();
+          $('.ttips').tooltip({});
           
         });
       } else if (path == url+'/cluster-search'){

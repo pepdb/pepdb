@@ -27,7 +27,7 @@ module Sinatra
 
     # align numerical values right 
     def align_right?(column)
-      numeric_columns = [:Date, :Insert_length, :Distinct_peptides, :Peptide_diversity, :Selection_round, :Sequence_length, :Reads_sum, :Dominance_sum, :Rank, :Reads, :Dominance]
+      numeric_columns = [:Read_length, :Date, :Insert_length, :Distinct_peptides, :Peptide_diversity, :Selection_round, :Sequence_length, :Reads_sum, :Dominance_sum, :Rank, :Reads, :Dominance]
       numeric_columns.include?(column)
     end
   

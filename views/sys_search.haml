@@ -5,33 +5,31 @@
     Systemic peptide search
     %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} more info
 
-.row
-  %form{:id => "libform", :action => "#{url '/sys-search'}", :method => 'get', :role => "form"}
+%form.form-horizontal{:id => "libform", :action => "#{url '/sys-search'}", :method => 'get', :role => "form"}
+  .form-group
+    .col-md-3.col-md-offset-2.check-select#ref-library
+      %fieldset.checklist
+        .checkbox
+          %label
+            %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
+            all
+            %br 
+        - @libraries.each do |elem|
+          .checkbox
+            %label
+              %input{:type => "checkbox", :name => "checked_lib[]", :id => "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
+              = elem[:library_name]
+              %br
+
+    .check-select.col-md-3#ref-selection
+
+    .check-select.col-md-3#ref-dataset
+  .form-group
     .col-md-3.col-md-offset-2
-      #checkboxes
-        .check-select.form-group#ref-library
-          %fieldset.checklisto
-            .checkbox
-              %label
-                %input{:type => "checkbox", :name => "checked_lib[]", :id => "all_lib",:value => "all_lib"}/ 
-                all
-                %br 
-            - @libraries.each do |elem|
-              .checkbox
-                %label
-                  %input{:type => "checkbox", :name => "checked_lib[]", :id => "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
-                  = elem[:library_name]
-                  %br
-
-    .check-select.form-group.col-md-3#ref-selection
-
-    .check-select.form-group.col-md-3#ref-dataset
-.row
-  .col-md-3.col-md-offset-2
-    #comp-buttons    
-      %input.btn{:type => "button", :id => "search", :value => "search"}
-      %input.btn{:type => "button", :id => "clear-button",:value => "clear selection"}
-      = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
+      #comp-buttons    
+        %input.btn.btn-primary{:type => "button", :id => "search", :value => "search"}
+        %input.btn{:type => "button", :id => "clear-button",:value => "clear selection"}
+        = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
 
 .row
   .col-md-12
