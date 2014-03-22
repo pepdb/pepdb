@@ -1,9 +1,5 @@
-%p
-  %input{:type => "hidden", :id => "refelem1", :value => "#{params[:ele_name]}"}
-  %h4
-    = @eletype 
-    in
-    = params[:ref] 
-    = params[:ele_name] 
-  = partial :tables, locals: {table_id:@id, choice:"#{params[:sel_name]}", first_data_to_display:@data, second_data_to_display:@data.where(@column => "#{params[:ele_name]}").limit(10)}    
+%input{:type => "hidden", :id => "refelem1", :value => "#{params[:ele_name]}"}
+%h4
+  = "#{@eletype} in #{params[:ref]} #{params[:ele_name]}"
+= partial :tables, locals: {table_id:@id, choice:"#{params[:sel_name]}", first_data_to_display:@data, second_data_to_display:@data.where(@column => "#{params[:ele_name]}").limit(10)}    
 

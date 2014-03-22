@@ -2,8 +2,8 @@
 <tooltips>
   <library> 
     <Name>The designation of the individual library</Name>
-    <Carrier>Specifies the structure in which the peptides are embedded. For example, a phage or viral vector</Carrier>
-    <Insert_length>Length of the amino acid sequences that make up the library peptides</Insert_length>
+    <Carrier>Specifies the structure in which the peptides are embedded. For example, a phage or viral vector.</Carrier>
+    <Insert_length>Length of the amino acid sequences that make up the library peptides.</Insert_length>
     <Encoding_scheme><![CDATA[The encoding scheme reflects which codons were used to encode the randomized peptides. Examples are:<ul><li>NNN (N= G,A,T or C; All nucleotides possible at all positions in the codon)</li><li>NNK (K = G or T; G or T at the third position in the codon)</li><li>NNS (S = G or C; G or C at the third position in the codon)</li><li>NNB (B = G, C or T; G, C or T at the third position in the codon)</li><li>Trimer (One codon per amino acid possible)</li></ul>]]></Encoding_scheme>
     <Produced_by>Name of the scientist that produced the library</Produced_by>
     <Date>Date of library production</Date>
@@ -12,29 +12,30 @@
   </library>
   <selection> 
     <Name>Designation of the selection</Name>
-    <Date>Date when the selection was begun</Date>
-    <Performed_by>Scientist that performed the selection</Performed_by>
-    <Library>Peptide Library used to make the selection</Library>
-    <Selection_target>The selection was performed using the following material as target. Specified by species, tissue and/or cells</Selection_target>
-    <Species>The species from which the tissue or cells originate, that have been the target of the selection process</Species>
+    <Date>Date when the selection was begun.</Date>
+    <Performed_by>Scientist that performed the selection.</Performed_by>
+    <Library>Peptide Library used to make the selection.</Library>
+    <Selection_target>The selection was performed using the following material as target. Specified by species, tissue and/or cells.</Selection_target>
+    <Species>The species from which the tissue or cells originate, that have been the target of the selection process.</Species>
     <Tissue>The tissue that was target of the selection or the tissue from which the cells that have been target of the selection originate from (e.g. “breast cancer” if a selection was performed using a breast cancer cell line).</Tissue>
     <Cell>The cells that have been used as target of the selection. If the selection target was a tissue rather than a specific cell type, this field should remain empty.</Cell>
   </selection>
   <sequencing_dataset>
     <Name>Specific name of the sequencing dataset</Name>
-    <Date>Date the sequencing results were received</Date>
-    <Peformed_by>Name of the scientist that prepared the samples for sequencing</Peformed_by>
+    <Date>Date the sequencing results were received.</Date>
+    <Peformed_by>Name of the scientist that prepared the samples for sequencing.</Peformed_by>
     <Statistics>Link to statistical analyses of the sequences in the sequencing dataset.</Statistics>
-    <Library>Library used in the selection</Library>
-    <Selection>The selection from which the sequencing dataset was generated</Selection>
-    <Overall_reads>Sum over all sequencing reads of every peptide in this sequencing dataset</Overall_reads>
-    <Selection_round>Material from this selection round was used for sequencing</Selection_round>
+    <Amino_acid_dist>needs description</Amino_acid_dist>
+    <Library>Library used in the selection.</Library>
+    <Selection>The selection from which the sequencing dataset was generated.</Selection>
+    <Overall_reads>Sum over all sequencing reads of every peptide in this sequencing dataset.</Overall_reads>
+    <Selection_round>Material from this selection round was used for sequencing.</Selection_round>
     <Sequencing_target><![CDATA[The sequencing was performed using material from the following target. Specified by species, tissue and/or cells. The <i>sequencing</i> target is not necessarily identical to the <i>selection</i> target.]]></Sequencing_target>
     <Species>The species from which the material originates that has been sequenced.</Species>
     <Tissue>The tissue from which the material originates that has been sequenced.</Tissue>
     <Cell>The cells from which the material originates that has been sequenced.</Cell> 
-    <Origin>Form of the genetic material that was used to generate samples for sequencing (e.g. Plasmid, PCR product or Genomic DNA)</Origin>
-    <Sequencer>ype of sequencer used to generate the data (e.g. ´standard´ for commercial standard sequencing applications, or specific designations for next generation sequencers).</Sequencer>
+    <Origin>Form of the genetic material that was used to generate samples for sequencing (e.g. Plasmid, PCR product or Genomic DNA).</Origin>
+    <Sequencer>Type of sequencer used to generate the data (e.g. ´standard´ for commercial standard sequencing applications, or specific designations for next generation sequencers).</Sequencer>
     <Read_type>Indicates the technique used for sequencing. ´standard´: normal sequencing; ´single read´: next generation sequencing from one direction; ´paired end´: next generation sequencing from both ends.</Read_type>
     <Read_length>Aproximate length of sequenced DNA. It depends on the used sequencer (e.g. standard sequencer or next generation sequencer) and the used protocol.</Read_length>
     <Used_barcode>If next generation sequencing is used, barcode sequences (e.g. “ATCGATCG”) might be included into the sequenced DNA to associate the results with specific samples.</Used_barcode>
@@ -67,6 +68,12 @@
     <Dataset_ref>tba</Dataset_ref>
     <Specifity_score>tba</Specifity_score>
   </comparative-results>
+  <data-browsing>
+  <Library><![CDATA[This section allows you to browse all peptide libraries in the database.<br><br> Selecting an entry from the table brings up all relevant information on the specific library and all selections that are related to this library.]]></Library>
+    <Selection><![CDATA[This section allows you to browse all selections stored in the database.<br><br> Selecting an entry form the table brings up all relevant information on the specific selection and displays all sequencing datasets related to this selection.]]></Selection>
+    <Sequencing_dataset><![CDATA[This section displays all sequencing datasets stored in the database. <br><br> By selecting an entry all relevant information describing the specific sequencing dataset will be brought up. Additionally information on all peptides within this sequencing dataset can be examined.]]> </Sequencing_dataset>
+    <Cluster><![CDATA[This section displays all clusters stored in the database. <br><br> The navigation within the data is done via the tree structure that represents all clusters by their relation to sequencing datasets, selections and libraries. Clusters within a certain sequencing dataset branch are order by their domaince sum (sum of all peptide dominances).]]> </Cluster>
+  </data-browsing>
   <peptide-search>
     <Systemic-search><![CDATA[The systemic search allows you to search the database for specific peptides by selecting Library-> Selection -> Sequencing dataset.]]></Systemic-search>
     <Property-search><![CDATA[There are four possibilities to search for peptides by their sequence properties. It is recommended to restrict the search to relevant libraries/selections/sequencing datasets and/or to the selection or sequencing target (as defined by species/tissue/cells). Further it is possible to exclusively search among peptides that meet a minimum prominence (can be defined by maximal rank, minimal number of reads or minimal dominance). 

@@ -1,27 +1,27 @@
+= partial :modal, locals: {id:"infomodal",modal_title:"Sequencing dataset browsing details", modal_category:"data-browsing", modal_type:"Sequencing_dataset"}
 .page-header
   %h2
     Browse by Sequencing dataset
+    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} more details
 
 %input{:type => "hidden", :id => "navbarsec", :value => "browse"}
 %input{:type => "hidden", :id => "reftype", :value => "Sequencing Dataset"}
 .row
-  .col-md-3
+  .col-md-4
     #selectedinfo
       - if params.size != 0
-        %p
-          = partial :info_tables, locals: {data_to_display:@infodata.where(:dataset_name => "#{params[:set_name]}"), element: "#{h params[:set_name]}", pep_count:@pep_count, type:@eletype}
-  .col-md-9 
+        = partial :info_tables, locals: {data_to_display:@infodata.where(:dataset_name => "#{params[:set_name]}"), element: "#{h params[:set_name]}", pep_count:@pep_count, type:@eletype}
+  .col-md-8 
     #selectdata
       = partial :tables, locals: {table_class: "display", table_id:"select_table", choice:"#{params[:set_name]}", first_data_to_display:@datasets, second_data_to_display:@datasets}
 .row
   #showdata
   .col-md-4
     #datainfo
-  .col-md-4#selecteddata
+  .col-md-8#selecteddata
     - if params.size != 0
-      %p
-        %input{:type => "hidden", :id => "refelem1", :value => "#{params[:set_name]}"}
-        Peptides in Sequencing Dataset 
-        = params[:set_name]
+      %input{:type => "hidden", :id => "refelem1", :value => "#{params[:set_name]}"}
+      %h4
+        = "Peptides in Sequencing Dataset #{params[:set_name]}"
       = partial :tables, locals: {table_id:"pep_table", choice:"#{params[:pep_seq]}", first_data_to_display:@peptides, second_data_to_display:@peptides.where(:sequencing_datasets__dataset_name => "#{params[:set_name]}").limit(10)}
 

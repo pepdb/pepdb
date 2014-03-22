@@ -1,12 +1,15 @@
-.modal.fade#infomodal{:tabindex=>-1, :role=>"dialog", "aria-labelledby" => "infomodallabel", "aria-hidden" => true}
+.modal.fade{:id => id,:tabindex=>-1, :role=>"dialog", "aria-labelledby" => "#{id}label", "aria-hidden" => true}
   .modal-dialog
     .modal-content
       .modal-header
         %button.close{"data-dismiss"=>"modal", "aria-hidden" => true}
-        %h4.modal-title#infomodallabel  
+        %h4.modal-title{:id => "#{id}label"}  
           = modal_title
       .modal-body
-        = get_modal_text(modal_category, modal_type)
+        - if modal_category == "amino-acid-dist"
+          = partial :amino_dist_table, locals: {distribution:get_amino_acid_dist(dataset)} 
+        - else
+          = get_modal_text(modal_category, modal_type)
       .modal-footer
         %button.btn.btn-default{"data-dismiss" => "modal"} Close
 

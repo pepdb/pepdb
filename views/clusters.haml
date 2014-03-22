@@ -1,7 +1,8 @@
+= partial :modal, locals: {id:"infomodal",modal_title:"Cluster browsing details", modal_category:"data-browsing", modal_type:"Cluster"}
 .page-header
   %h2
     Browse by Cluster
-
+    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} more details
 %input{:type => "hidden", :id => "navbarsec", :value => "browse"}
 .row
   .col-md-3.max-scroll

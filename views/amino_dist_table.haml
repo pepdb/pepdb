@@ -1,0 +1,18 @@
+%table.table.table-bordered
+  %thead
+    %tr
+      - distribution.each_value do |row|
+        %th 
+        - row.each_key do |position|
+          %th.text-center 
+            = position
+        - break
+  %tbody
+    - distribution.each_pair do |acid, dist|
+      %tr
+        %td 
+          = acid
+        - dist.each_value do |value|
+          %td{:class => "text-right #{get_cell_color(value)}"} 
+            = value
+      

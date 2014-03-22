@@ -1,3 +1,5 @@
+- if (data_to_display.class == Sequel::SQLite::Dataset && !data_to_display.all[0][:Statistics].nil?)
+  = partial :modal, locals: {dataset: element, id:"aminodist",modal_title:"amino acid distribution in #{element}", modal_category:"amino-acid-dist", modal_type:""}
 %p 
   - if defined? dataset
     in dataset
@@ -18,11 +20,11 @@
           %tr
             %td.text-center.info{:colspan => 2}
               -if type == "Selection"
-                = "Selection target"
+                = "Selection target "
                 %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(:Selection_target)}
                   %span.glyphicon.glyphicon-info-sign
               -elsif type == "Sequencing Dataset"
-                = "Sequencing target" 
+                = "Sequencing target " 
                 %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(:Sequencing_target)}
                   %span.glyphicon.glyphicon-info-sign
         - if column[0] == :Statistics
@@ -42,7 +44,14 @@
               %td no statistic file available
             - else
               %td= link_to("Statistic file" ,"stats/"+element, :target => "_blank")
-
+          - unless column[1].nil?
+            %tr
+              %td 
+                Amino acid distribution 
+                %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Amino_acid_dist")}
+                  %span.glyphicon.glyphicon-info-sign
+              %td 
+                %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#aminodist"} show 
         - elsif column[0] == :Dominance || column[0] == :Dominance_sum
           %tr
             %td
@@ -74,7 +83,7 @@
         - elsif column[0] == :Peptide_performance
           %tr
             %td.info.text-center{:colspan => 2}
-              Peptide performance
+              Peptide performance 
               %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(:Peptide_performance)}
                 %span.glyphicon.glyphicon-info-sign
           %tr
@@ -90,7 +99,10 @@
               %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(column[0])}
                 %span.glyphicon.glyphicon-info-sign
 
-            %td= column[1]
+            - if align_right?(column[0])
+              %td.text-right= column[1]
+            -else
+              %td= column[1]
     - if defined? dna_data 
       - if dna_data.size != 0
         %tr

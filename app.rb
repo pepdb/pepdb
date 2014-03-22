@@ -16,6 +16,7 @@ require './modules/compclustersearch'
 require './modules/columnfinder'
 require './modules/dbdelete'
 require './modules/tooltips'
+require './modules/aminoaciddist'
 require 'digest/sha1'
 require 'date'
 require 'sass'
@@ -47,7 +48,7 @@ dataset_columns = [:dataset_name___Name, :species___Species, :tissue___Tissue, :
 dataset_info_columns = [:dataset_name___name, :libraries__library_name___library, :selection_name___selection, :sequencing_datasets__date, :species, :tissue, :cell, :selection_round, :carrier]
 dataset_all_columns = [:dataset_name___name, :library_name___library, :selection_name___selection, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :species, :tissue, :cell, :statistic_file]
 dataset_edit_columns = [:dataset_name, :library_name, :selection_name, :date, :selection_round, :sequence_length, :read_type, :used_indices, :origin, :sequencer, :produced_by, :targets__target_id___target, :statistic_file]
-peptide_columns = [:peptide_sequence___Petide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance]
+peptide_columns = [:peptide_sequence___Peptide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance]
 sys_peptide_columns = [:peptides_sequencing_datasets__peptide_sequence___Peptide_sequence, :rank___Rank, :reads___Reads , :dominance___Dominance, :peptides_sequencing_datasets__dataset_name___Dataset]
 cluster_peptide_columns = [:clusters_peptides__peptide_sequence, :rank, :reads , :peptides_sequencing_datasets__dominance]
 peptide_all_columns = [:peptides__peptide_sequence, :sequencing_datasets__dataset_name, :selection_name, :library_name, :rank, :reads, :dominance, :performance, :species, :tissue, :cell ]
