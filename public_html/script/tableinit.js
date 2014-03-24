@@ -69,6 +69,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
     var route = $('#reftype').val();
     var path = document.location.pathname;
     if (path == url+'/cluster-search' && objID == '#select_table'){
+      $('#clusterlist_pep').html('');
       var selectedDS = $(this).find('td:nth-child(4)').html();
       if($('.clsearch').is(':visible')){
         $('.clsearch').toggle();
@@ -104,7 +105,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
           });
         });
       }
-    } else if (objID == '.prop_table'){
+    } else if (objID == '#prop_table'){
       var selectedDS = $(this).find('td:nth-child(5)').html();
       var dataType = $('#reftype').val();
       var firstChoice = $('#refelem1').val();
@@ -126,6 +127,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
       }
       $.get(url+'/peptide-infos', {selSeq: selectedID, refDS: refDS}, function(data){
         $('#infos').html(data);
+        $('.ttips').tooltip({});
       });
     } else if (objID == '#show_table'){
       var selectedDS = $(this).find('td:nth-child(2)').html();
@@ -179,6 +181,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
         var idx = $(objID).data('idx');
         $.get(url +'/peptide-infos', {selDS: selectedDS, selSeq: selectedPep}, function(data){
           $('#clpepinfos'+idx).html(data);
+          $('.ttips').tooltip({});
         });
       
     } else {

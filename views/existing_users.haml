@@ -12,7 +12,7 @@
             = user.username
           - else
             "user #{user.id}"
-        %td.text-right= user.permission_level
+        %td=get_permission_description(user)
         %td.text-center
           %a.btn.btn-success{:href => "/users/#{user.id}/edit", :class => "editlink"} edit
         %td.text-center

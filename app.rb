@@ -483,6 +483,7 @@ get '/property-results' do
     @querystring, @placeholders = build_property_array(params)
     if option_selected?(params[:blos])
       raise ArgumentError, "similarity quotient must be between 0 and 1" if (params[:sq].to_f < 0 || params[:sq].to_f > 1)
+      raise ArgumentError, "query sequence must only contain characters a-z" if params[:seq].to_s.match(/[^a-zA-Z]/)
       @sim_quots = find_neighbours(params[:seq].to_s.upcase, params[:blos].to_i, params[:sq].to_f,@querystring, @placeholders)
     end
     DB.create_table?(:propqry, :temp => true) do

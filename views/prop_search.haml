@@ -3,7 +3,7 @@
 .page-header
   %h2
     Peptide property search
-    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} more info
+    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} details 
 
 %form.form-horizontal{:id => "propsearch", :action => "#{url '/property-results'}", :method => "get", :role=>"form"}
   .form-group
@@ -18,16 +18,13 @@
       .col-md-2
         %label.control-label{:for => "seq"} query sequence
         %input.form-control{:placeholder => "query sequence", :type => "text", :id => "seq", :size => 15, :name => "seq"}
-    #blossum
+    #blosum
       .col-md-3
         %label.control-label{:for => "blos"} 
           number of similar sequences 
-          %a.ttips{"data-toggle"=> "tooltip", "data-placement" => "bottom","data-html" => "true",:title => "Calculates for the given sequence the given number of similiar sequences.<br> Similarity is based on a summarized similarity score using a BLOSUM62 matrix. Search length scales linearly with search space.<br> If left blank, neighbour search is disabled."}
-            %span.glyphicon.glyphicon-info-sign
-
         %input.form-control{:type => "text", :id => "blos", :size => 5, :name => "blos"}
-      .col-md-2
-        %label.control-label{:for => "sq"} min. similarity quotient 
+      .col-md-3
+        %label.control-label{:for => "sq"} minimal similarity quotient 
         %input.form-control{:type => "text", :id => "sq", :size => 5, :name => "sq", :value => 0.5}
     #wchelp{:hidden => true}
       .col-md-4
@@ -94,21 +91,21 @@
     .col-md-3
       %fieldset.search-params#fifth
         %legend.search-params peptide properties
-        %label.control-label{:for=>"ralt"} max rank
+        %label.control-label{:for=>"ralt"} maximal rank
         %input.form-control{:type => "text", :id => "ralt", :size => 5, :name => "ralt"}
-        %label.control-label{:for =>"regt"} min reads 
+        %label.control-label{:for =>"regt"} minimal number of reads 
         %input.form-control{:type => "text", :size => 5, :id => "regt", :name => "regt"}
-        %label.control-label{:for=>"dgt"} min dominance 
+        %label.control-label{:for=>"dgt"} minimal dominance 
         %input.form-control{:type => "text", :size => 5, :id => "dgt", :name => "dgt", :value => 0.0001}
-
   .form-group
     .col-md-2
       .checkbox
         %label 
           only tested peptides
           %input{:type => "checkbox", :id => "tp",:name => "tp", :checked => params['tp']}
+  .form-group
     .col-md-4
-      %input.btn{:type => "submit", :value => "search"}
+      %input.btn.btn-primary{:type => "submit", :value => "search"}
       = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
 .row
   .col-md-12

@@ -1,10 +1,8 @@
-- if !@error.nil?
-  .ui-widget
-    %div{:class => "ui-state-error ui-corner-all", :id => "errorbox" }
-      %p
-        %span{:class => "ui-icon ui-icon-alert", :id => "errorspan"}
-        %strong Error:
-        = @error
+- unless @error.nil?
+  .alert.alert-danger
+    %p
+      %strong Error:
+      = @error
 -else
   %input{:type => "hidden", :id=> "qry_id",:value => @qry_id}
   - if option_selected?(params[:blos])

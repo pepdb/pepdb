@@ -3,7 +3,7 @@
 .page-header
   %h2
     Motif search
-    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} more info
+    %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} details 
 
 %h4 sequencing datasets
 %form.form-horizontal{:id => "motsearch", :action => "#{url '/motif-search-results'}", :method => 'get'}
@@ -33,7 +33,7 @@
   .form-group
     .col-md-3
       %h4 motifs
-      .check-select#motif-list
+      .mot-select#motif-list
         %fieldset.checklist
           - @motiflists.each do |elem|
             .radio
@@ -44,7 +44,7 @@
   .form-group
     .col-md-3
       %fieldset.checklist
-        %input.btn{:type => "submit", :id => "msearchb", :value => "search"}
+        %input.btn.btn-primary{:type => "submit", :id => "msearchb", :value => "search"}
         %input.btn{:type => "button", :id => "clear-button",:value => "clear selection"}
         = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
 .row

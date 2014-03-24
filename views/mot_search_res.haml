@@ -1,7 +1,6 @@
 %input{:type => "hidden", :id => "listsize", :value => @motlists.count}
 .col-md-5
-  #motpepinfos
-    Peptide information
+  #motpepinfos{"data-spy"=>"affix", "data-offset-top" => 300}
 .col-md-7
   #motacc
     - if @pep_per_mots.empty?
@@ -14,29 +13,29 @@
             .panel-heading
               %h4.panel-title 
                 %a{"data-toggle" => "collapse", "data-parent" => "#accordion", :href => "#collapse#{index}"}
-                  = "#{motif} hits: #{@pep_per_mots[motif].size} <br />target: #{@mot_infos[motif][:target]} <br />receptor: #{@mot_infos[motif][:receptor]}"
+                  = "#{motif} <span class='glyphicon glyphicon-arrow-right'></span> #{@pep_per_mots[motif].size} hits <br />target: #{@mot_infos[motif][:target]} <br />receptor: #{@mot_infos[motif][:receptor]}"
           %div.panel-collapse.collapse{:id => "collapse#{index}"}
             .panel-body
               %table.table.table-bordered.table-striped.table-hover{:id=>"mot_table#{index}"}
                 %thead
                   %tr
                     %th 
-                      peptide
+                      Peptide
                       %br
-                      %input{:type => "text", :class => "text_filter", :placeholder => "filter",:size=>5}
+                      %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
                     
                     %th 
-                      dominance 
+                      Dominance 
                       %br
-                      %input{:type => "text", :class => "text_filter", :placeholder => "filter",:size=>5}
+                      %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
                     %th 
                       raw dominance 
                       %br
-                      %input{:type => "text", :class => "text_filter", :placeholder => "filter",:size=>5}
+                      %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
                     %th 
-                      dataset 
+                      Sequencing Dataset 
                       %br
-                      %input{:type => "text", :class => "text_filter", :placeholder => "filter",:size=>5}
+                      %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
                 %tbody
                   - @uniq_pep_per_mots[motif].each do |peptide|
                     - @dom_per_peps[peptide].each do |row|

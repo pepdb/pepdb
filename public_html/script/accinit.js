@@ -45,14 +45,12 @@ $(document).ready(function(){
   // initialzie datatables table
     var pTable = $('.cl_table').dataTable({
     'bPaginate': 'true',
-   // 'sPaginationType': 'full_numbers',
     'bInfo': true,
     'aaSorting': [[2, 'desc']],
     'aoColumnDefs': [
       {'iDataSort': 2 , 'aTargets':[1]},
       {'bVisible': false , 'aTargets':[2]},
     ],
-   // 'bJQueryUI': true,
     'sDom': '<"H"lfrT>t<"F"ip>',
     'oTableTools':{
       'sSwfPath': url+'/copy_csv_xls_pdf.swf',
@@ -66,4 +64,9 @@ $(document).ready(function(){
     });
 
   $.addTableFunctions('.cl_table', pTable);
+/*
+  $('#motpepinfos').affix({
+    offset: {
+      top:300}
+  });*/
 });

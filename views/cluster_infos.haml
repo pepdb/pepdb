@@ -3,7 +3,7 @@
   - index = 0
   - puts @cluster_infos.inspect
   - @cluster_infos.each do |cl|  
-    .row
+    .row.row-separator
       .col-md-3
         .clsearchinfo
           = partial :info_tables, locals: {reads_sum:@reads_sum[index], data_to_display:[cl] , element:[cl][0][:Consensus_sequence]}

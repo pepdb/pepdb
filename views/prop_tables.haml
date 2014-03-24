@@ -1,13 +1,17 @@
-%table{:class => "table table-borderer table-striped table-hover #{table_id}", :data=>{:first_choice => "#{choice}"}}
+%table{:id => table_id, :class => "table table-bordered table-striped table-hover", :data=>{:first_choice => "#{choice}"}}
   %thead
     %tr
       - first_data_to_display.first.each do |column_name|
         %th
           = column_name[0].to_s.tr('_', ' ')
+          %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text(column_name[0])}
+            %span.glyphicon.glyphicon-info-sign
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
       %th
-        similarity quotient 
+        Similarity quotient 
+        %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Similarity_quotient")}
+          %span.glyphicon.glyphicon-info-sign
         %br
         %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
       %th
@@ -27,6 +31,6 @@
           -else
             %td= cell_data[1]
         %td.text-right
-          = format_score(@sim_quots[data_element[:peptide_sequence]])
+          = format_score(@sim_quots[data_element[:Peptide_sequence]])
         %td
           = data_element[:dominance]

@@ -20,9 +20,16 @@ module Sinatra
         "%.5f" % value 
     end
 
+    def get_permission_description(user)
+      if (user.permission_level == -1 || user.site_admin?)
+        "admin"
+      elsif user.permission_level == 1
+        "authenticated user"
+      end
+    end
     
     def is_dominance?(column)
-      column == :dominance || column == :dominance_sum
+      column == :dominance || column == :dominance_sum || column == :Dominance || column == :Dominance_sum
     end
 
     # align numerical values right 

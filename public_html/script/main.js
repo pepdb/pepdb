@@ -174,6 +174,8 @@ $(document).ready(function(){
     $('.clsearch').html('');
     $('#clpepresults').html('');
     $('.clsearchpeps').html('');
+    $('#clprop').html('');
+    $('#clusterlist_pep').html('');
     $.ajax({
       data: $(this).serialize(),
       type: $(this).attr('method'),
@@ -382,20 +384,32 @@ $(document).ready(function(){
     });
     return false;
   });
+
+  if ($('#type').val() === 'complete sequence'){
+    $('#blosum').show();
+    $('#wchelp').hide();
+  } else if ($('#type').val() === 'wildcard sequence'){
+    $('#blosum').hide();
+    $('#blos').val('');
+    $('#wchelp').show();
+  } else {
+    $('#blosum').hide();
+    $('#blos').val('');
+    $('#wchelp').hide();
+  }
       
   $('#type').change(function(){
     if ($(this).val() == 'complete sequence'){
-      $('#blossum').show();
+      $('#blosum').show();
       $('#wchelp').hide();
-      $('#bshelp').show();
     } else if ($(this).val() == 'wildcard sequence'){
-      $('#blossum').hide();
+      $('#blosum').hide();
+      $('#blos').val('');
       $('#wchelp').show();
-      $('#bshelp').hide();
     } else {
-      $('#blossum').hide();
+      $('#blosum').hide();
+      $('#blos').val('');
       $('#wchelp').hide();
-      $('#bshelp').hide();
     }
   });
 
@@ -418,16 +432,6 @@ $(document).ready(function(){
       $('#editusers').html(response);
     });
   });
-/*
-  $('#clusterlist').jstree({
-    'plugins': ['html_data','ui','themes','crrm'],
-    'themes': {'theme':'proton',
-                'dots':true,
-                'icons':false,
-                'url': './themes/proton/style.css'
-              } 
-
-  });*/
 
   /* -----------jsTree configuration------------------- */
   $('#clusterlist').bind('loaded.jstree', function(){

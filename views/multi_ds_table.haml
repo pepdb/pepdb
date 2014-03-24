@@ -9,7 +9,7 @@
         %br
         %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
         %th<>
-          Dataset
+          Sequencing dataset
           %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Dataset_inv")}
             %span.glyphicon.glyphicon-info-sign
           %br
@@ -32,7 +32,7 @@
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
       - params[:ref_ds].each do
         %th<>
-          Dataset
+          Sequencing dataset
           %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Dataset_ref")}
             %span.glyphicon.glyphicon-info-sign
           %br

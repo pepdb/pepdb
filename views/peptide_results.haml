@@ -2,14 +2,14 @@
   = partial :tables, locals: {table_class:"display", table_id: "pep_table", choice:"", first_data_to_display:@peptides, second_data_to_display:@peptides.limit(10)}
 
 - elsif request.path_info == "/comparative-results"
-  %p
-    results
-    - if @common_peptides.count == 0 && @uniq_peptides.count == 0
-      %p no matches found
-    - else
-      = partial :multi_ds_table, locals: {table_class: "display", table_id: "comppep_table", choice:"", maxlen:@maxlength}
+  - if @common_peptides.count == 0 && @uniq_peptides.count == 0
+    .alert.alert-info
+      %strong Info:
+      no matches found
+  - else
+    = partial :multi_ds_table, locals: {table_class: "display", table_id: "comppep_table", choice:"", maxlen:@maxlength}
 - else
-  %p 
+  %h4 
     All clusters containing peptide 
     =h params['pep-seq'].to_s
   = partial :tables, locals: {table_class:"test" , table_id: "select_table", choice:"", first_data_to_display:@cluster, second_data_to_display:@cluster.where(:peptide_sequence => "#{params['pep-seq'].to_s.upcase}", :dataset_name => @datasets)}
