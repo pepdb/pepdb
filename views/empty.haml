@@ -1,8 +1,5 @@
 -if defined? @message
-  .ui-widget
-    %div{:class => "ui-state-highlight ui-corner-all", :id => "highlightbox"}
-      %p
-        %span{:class => "ui-icon ui-icon-info", :id => "highlightspan"}
-          %p
-            = @message
+  .alert.alert-info.alert-dismissable
+    %button.close{:type => "button", "data-dismiss"=>"alert", "aria-hidden" => true} &times;
+    = @message
 

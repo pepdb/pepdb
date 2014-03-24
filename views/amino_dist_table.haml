@@ -1,20 +1,49 @@
-%p.text-justify
-  This table shows the amino acid distribution within the selected sequencing dataset. The columns indicate the position within peptide whereas the rows indicate the amino acids in single-letter code. The values represent the deviation from the expectation value of observing the specific amino acid. A value close to "1" indicates that the expectation value was met. While values "&gt;1" or "&lt;1" represent an over- or underrepresentation.
-%table.table.table-bordered
-  %thead
-    %tr
-      - distribution.each_value do |row|
-        %th 
-        - row.each_key do |position|
-          %th.text-center 
-            = position
-        - break
-  %tbody
-    - distribution.each_pair do |acid, dist|
-      %tr
-        %td 
-          = acid
-        - dist.each_value do |value|
-          %td{:class => "text-right #{get_cell_color(value)}"} 
-            = value
-      
+.row
+  .col-md-6
+    %p.text-justify
+      This table shows the amino acid distribution within the selected sequencing dataset. 
+    %p.text-justify
+      The columns indicate the position within peptide whereas the rows indicate the amino acids in single-letter code. The values represent the deviation from the expectation value of observing the specific amino acid. 
+    %p.text-justify
+      A value close to "1" indicates that the expectation value was met. While values "&gt;1" or "&lt;1" represent an over- or underrepresentation.
+    .col-md-10
+      %table.table
+        %thead
+          %tr
+            %th{:colspan => 2}
+              color legend
+        %tbody
+          %tr
+            %td.darkbluecell
+            %td high overrepresentation (x &gt; 3.0)
+          %tr
+            %td.lightbluecell
+            %td overrepresentation (1.5 &lt; x &le; 3.0)
+          %tr
+            %td.whitecell
+            %td value meets expectation value (0.67 &lt; x &le; 1.5)
+          %tr
+            %td.lightredcell
+            %td underrepresentation (0.33 &lt; x &le; 0.67 )
+          %tr
+            %td.darkredcell
+            %td high underrepresentation (x &le; 0.33)
+  .col-md-6
+    %table.table.table-bordered.table-condensed
+      %thead
+        %tr
+          - distribution.each_value do |row|
+            %th 
+            - row.each_key do |position|
+              %th.text-center 
+                = position
+            - break
+      %tbody
+        - distribution.each_pair do |acid, dist|
+          %tr
+            %td 
+              = acid
+            - dist.each_value do |value|
+              %td{:class => "text-right #{get_cell_color(value)}"} 
+                = value
+          

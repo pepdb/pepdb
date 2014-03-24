@@ -27,6 +27,9 @@ body.no-pad {
   padding-top:0px;
 }
 
+.modal-amino {
+  width:50%;
+}
 .tooltip-inner {
   text-align:left !important;
   font-size:13px;
@@ -78,6 +81,9 @@ legend.search-params {
 }
 
 /*amino acid distribution color definitions */
+.whitecell{
+  border:1px solid;
+}
 .darkbluecell {
   background-color:#0033FF;
   color:white;

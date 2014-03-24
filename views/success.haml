@@ -5,6 +5,7 @@
     = javascript_script_tag("/script/jquery-1.10.2.min.js", "/script/bootstrap.min.js")
     = stylesheet_link_tag("/bootstrap/css/bootstrap.min.css", "/style.css",)
   %body.no-pad
-    .alert.alert-success  
+    .alert.alert-success.alert-dismissable
+      %button.close{:type => "button", "data-dismiss"=>"alert", "aria-hidden" => true} &times;
       %strong Success!
       = @message 

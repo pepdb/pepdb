@@ -49,7 +49,7 @@
     <Rank><![CDATA[<p class="text-justify">The rank reflects the position of the peptide among the peptides of one sequencing dataset. The peptide that was observed in highest abundance has rank 1.</p>]]></Rank>
     <Reads><![CDATA[<p class="text-justify">The number of sequencing reads that encode the peptide within the sequencing dataset.</p>]]></Reads>
     <Dominance><![CDATA[<p class="text-justify">The dominance indicates which fraction of all successful reads within a sequencing dataset encodes the peptide. A dominance of “1E+02” would indicate that 100% of all sequencing reads encode the peptide.</p>]]></Dominance>
-    <Peptide_performance><![CDATA[<p class="text-justify">needs description</p>]]></Peptide_performance>
+    <Peptide_performance><![CDATA[<p class="text-justify">Summary of the known data about the functionality of the peptide in the technical setting (e.g. tissue specificity of a vector using the peptide for targeting)</p>]]></Peptide_performance>
     <Similarity_quotient><![CDATA[<p class="text-justify">Quotient of the blosum scores of the result peptide sequence and the query peptide sequence.</p>]]></Similarity_quotient>
   </peptide>
   <cluster>
