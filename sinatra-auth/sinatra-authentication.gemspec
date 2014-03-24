@@ -49,7 +49,7 @@ Gem::Specification.new do |s|
     "lib/views/show.haml",
     "lib/views/signup.haml",
     "readme.markdown",
-    "sinatra-authentication-0.3.2.gem",
+    #"sinatra-authentication-0.3.2.gem",
     "sinatra-authentication.gemspec",
     "spec/run_all_specs.rb",
     "spec/unit/dm_model_spec.rb",
@@ -114,31 +114,31 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<sinatra>, [">= 0"])
-      s.add_runtime_dependency(%q<dm-core>, [">= 0"])
-      s.add_runtime_dependency(%q<dm-migrations>, [">= 0"])
-      s.add_runtime_dependency(%q<dm-validations>, [">= 0"])
-      s.add_runtime_dependency(%q<dm-timestamps>, [">= 0"])
-      s.add_runtime_dependency(%q<rufus-tokyo>, [">= 0"])
-      s.add_runtime_dependency(%q<sinbook>, [">= 0"])
+      #s.add_runtime_dependency(%q<dm-core>, [">= 0"])
+      #s.add_runtime_dependency(%q<dm-migrations>, [">= 0"])
+      #s.add_runtime_dependency(%q<dm-validations>, [">= 0"])
+      #s.add_runtime_dependency(%q<dm-timestamps>, [">= 0"])
+      #s.add_runtime_dependency(%q<rufus-tokyo>, [">= 0"])
+      #s.add_runtime_dependency(%q<sinbook>, [">= 0"])
       s.add_runtime_dependency(%q<rack-flash3>, [">= 0"])
     else
       s.add_dependency(%q<sinatra>, [">= 0"])
-      s.add_dependency(%q<dm-core>, [">= 0"])
-      s.add_dependency(%q<dm-migrations>, [">= 0"])
-      s.add_dependency(%q<dm-validations>, [">= 0"])
-      s.add_dependency(%q<dm-timestamps>, [">= 0"])
-      s.add_dependency(%q<rufus-tokyo>, [">= 0"])
-      s.add_dependency(%q<sinbook>, [">= 0"])
+      #s.add_dependency(%q<dm-core>, [">= 0"])
+      #s.add_dependency(%q<dm-migrations>, [">= 0"])
+      #s.add_dependency(%q<dm-validations>, [">= 0"])
+      #s.add_dependency(%q<dm-timestamps>, [">= 0"])
+      #s.add_dependency(%q<rufus-tokyo>, [">= 0"])
+      #s.add_dependency(%q<sinbook>, [">= 0"])
       s.add_dependency(%q<rack-flash3>, [">= 0"])
     end
   else
     s.add_dependency(%q<sinatra>, [">= 0"])
-    s.add_dependency(%q<dm-core>, [">= 0"])
-    s.add_dependency(%q<dm-migrations>, [">= 0"])
-    s.add_dependency(%q<dm-validations>, [">= 0"])
-    s.add_dependency(%q<dm-timestamps>, [">= 0"])
-    s.add_dependency(%q<rufus-tokyo>, [">= 0"])
-    s.add_dependency(%q<sinbook>, [">= 0"])
+    #s.add_dependency(%q<dm-core>, [">= 0"])
+    #s.add_dependency(%q<dm-migrations>, [">= 0"])
+    #s.add_dependency(%q<dm-validations>, [">= 0"])
+    #s.add_dependency(%q<dm-timestamps>, [">= 0"])
+    #s.add_dependency(%q<rufus-tokyo>, [">= 0"])
+    #s.add_dependency(%q<sinbook>, [">= 0"])
     s.add_dependency(%q<rack-flash3>, [">= 0"])
   end
 end

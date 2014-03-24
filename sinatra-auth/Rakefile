@@ -14,12 +14,12 @@ begin
     gemspec.author         = "Max Justus Spransy"
     gemspec.email          = "maxjustus@gmail.com"
     gemspec.add_dependency "sinatra"
-    gemspec.add_dependency "dm-core"
-    gemspec.add_dependency "dm-migrations"
-    gemspec.add_dependency "dm-validations"
-    gemspec.add_dependency "dm-timestamps"
-    gemspec.add_dependency "rufus-tokyo"
-    gemspec.add_dependency "sinbook"
+    #gemspec.add_dependency "dm-core"
+    #gemspec.add_dependency "dm-migrations"
+    #gemspec.add_dependency "dm-validations"
+    #gemspec.add_dependency "dm-timestamps"
+    #gemspec.add_dependency "rufus-tokyo"
+    #gemspec.add_dependency "sinbook"
     gemspec.add_dependency "rack-flash3"
   end
   Jeweler::GemcutterTasks.new

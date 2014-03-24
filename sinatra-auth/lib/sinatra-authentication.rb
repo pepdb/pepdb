@@ -116,9 +116,10 @@ module Sinatra
           redirect '/user-management'
         else
           if Rack.const_defined?('Flash')
-            flash[:error] = "Whoops, looks like there were some problems with your updates: #{user.errors}."
+            flash[:error] = "Error while updating: #{user.errors}."
           end
-          redirect "/users/#{user.id}/edit?" + hash_to_query_string(user_attributes)
+          redirect '/user-management'
+          #redirect "/users/#{user.id}/edit?" + hash_to_query_string(user_attributes)
         end
       end
 
@@ -151,7 +152,8 @@ module Sinatra
       if user && user.class != GuestUser
         return true
       else
-        session[:return_to] = request.fullpath
+        #session[:return_to] = request.fullpath
+        session[:return_to] = '/' 
         redirect '/login'
         return false
       end
