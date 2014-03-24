@@ -1,3 +1,6 @@
+-if (@form_type == "dataset" || @form_type == "cluster") 
+  = partial :modal, locals: {id:"infomodal",modal_title:"Library browsing details", modal_category:"add-data", modal_type:"#{@form_type}"}
+
 %form.form-horizontal{:role => "form",:id => "adddata", :action => "#{url '/validate-data'}", :method => "post", :enctype => "multipart/form-data",:target => "notify"}
   %input{:type => "hidden", :value => @form_type, :name => "submittype", :id =>"submittype"}
   %fieldset.search-params
@@ -38,13 +41,18 @@
         - else 
           %label.col-md-3.control-label{:for => key}
             =field[:label]
+
           .col-md-9
             -if field[:type] == "file"
               %input{:type => field[:type], :name => key, :id => key, :required => field[:required]}
             - else
               %input.form-control{:type => field[:type], :name => key, :id => key, :required => field[:required]}
             - if field[:required]  
-              %span.help-block required
+              %span.help-block 
+                required 
+                - if (key == :pepfile ||key == :clfile)
+                  %input.btn-xs.btn-info{:type => "button", "data-toggle"=>"modal", "data-target"=>"#infomodal", :value => "format"} 
+
 
 
     .form-group
