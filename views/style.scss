@@ -23,6 +23,10 @@ iframe#propresults {
   width:100%;
 }
 
+body.no-pad {
+  padding-top:0px;
+}
+
 .tooltip-inner {
   text-align:left !important;
   font-size:13px;
@@ -40,13 +44,21 @@ iframe#propresults {
 
 .check-select {
   border:1px solid #ccc;
-  height:100px;
+  height:150px;
   overflow-y:scroll;
   padding:4px;
   padding-top:0;
   margin-top:2px;
 }
 
+.mot-select {
+  border:1px solid #ccc;
+  height:250px;
+  overflow-y:scroll;
+  padding:4px;
+  padding-top:0;
+  margin-top:2px;
+}
 fieldset.search-params {
   border:1px groove #ddd !important;
   padding:0 1.4em 1.4em 1.4em !important;
@@ -83,6 +95,11 @@ legend.search-params {
   background-color:#FF3300;
   color:white;
 }
+
+.row-separator {
+  border-bottom: 1px solid;
+}
+
 
 /* disable navbar responsiveness*/
 .navbar-header {
