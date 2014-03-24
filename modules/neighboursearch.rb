@@ -14,7 +14,7 @@ module Sinatra
       end
       bs = BlosumSearch.new(seq, number_of_neighbours.to_i, peptides, quot)
       sequences, quotients = bs.get_neighbours
-      raise ArgumentError, "no peptide similarity score matches similarity quotient. Try lowering the quotient." if (sequences.empty? || quotients.empty?)
+      raise ArgumentError, "no peptide similarity score reaches similarity quotient. Try adjusting the search parameters." if (sequences.empty? || quotients.empty?)
       querystring = ""
       querystring << 'peptides_sequencing_datasets.peptide_sequence IN (' if qry.length == 0
       querystring << 'AND peptides_sequencing_datasets.peptide_sequence IN (' if qry.length > 0
@@ -25,7 +25,6 @@ module Sinatra
       querystring << ') '
       qry << querystring
       placeholder.insert(-1, *sequences)
-      puts quotients.inspect
       quotients
     end #find_neigh
   end #module

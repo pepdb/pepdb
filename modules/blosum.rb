@@ -39,9 +39,9 @@ class BlosumSearch
     calc_selfscore
     @references.each do |pep|
       peptide = pep[:peptide_sequence]
-      if peptide == @sequences[0]
-        next
-      end
+     # if peptide == @sequences[0]
+     #   next
+     # end
       compare_length(peptide, @sequences[0])
     end # peptide
     @seq_neighbours[@curr_seq].each do |sequence|
@@ -90,7 +90,7 @@ class BlosumSearch
       curr_val += @blosum_hash["#{a.upcase}#{b.upcase}".to_sym]  
     end #zip
     sim_quot = curr_val / @selfscores[@score_index].to_f
-    if (@seq_neighbours[@curr_seq].size < @num_neighbours && sim_quot > @min_sim)
+    if (@seq_neighbours[@curr_seq].size < @num_neighbours && sim_quot >= @min_sim)
       @seq_neighbours[@curr_seq].insert(-1,[curr_val, peptide, sim_quot])
       if @seq_neighbours[@curr_seq].size == @num_neighbours
         @seq_neighbours[@curr_seq].sort{|x,y| y <=> x}
@@ -98,7 +98,7 @@ class BlosumSearch
       end #if
     # if we find a sequence with a better blosum score than the current worst 
     # score in the result, replace it
-    elsif (curr_val > @curr_min_val && sim_quot > @min_sim )
+    elsif (curr_val > @curr_min_val && sim_quot >= @min_sim )
       @seq_neighbours[@curr_seq].pop
       @seq_neighbours[@curr_seq].unshift([curr_val, peptide, sim_quot])
       @seq_neighbours[@curr_seq].sort!{|x,y| y <=> x}
