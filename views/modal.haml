@@ -1,5 +1,9 @@
+-if id == "aminodist"
+  - modclass = "modal-amino"
+- else 
+  - modclass = ""
 .modal.fade{:id => id,:tabindex=>-1, :role=>"dialog", "aria-labelledby" => "#{id}label", "aria-hidden" => true}
-  .modal-dialog.modal-amino
+  %div{:class => "modal-dialog #{modclass}"}
     .modal-content
       .modal-header
         %button.close{"data-dismiss"=>"modal", "aria-hidden" => true}
