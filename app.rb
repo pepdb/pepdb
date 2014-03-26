@@ -26,6 +26,7 @@ require './model'
 require 'sinatra-authentication'
 require 'rack-flash'
 require 'set'
+require 'pdfkit'
 
 Haml::Options.defaults[:format] = :xhtml
 
@@ -36,6 +37,10 @@ set :default_encoding, "utf-8"
 
 use Rack::Session::Cookie, :expire_after => 3600, :secret => 'Gh6hh91uhMEsmq05h01ec2b4i9BRVj39' 
 use Rack::Flash
+
+configure do 
+  mime_type :pdf, 'application/pdf'
+end
 
 # column to select in later database queries to create less clutter in the routes
 library_columns = [:library_name___Name, :carrier___Carrier, :encoding_scheme___Encoding_scheme, :insert_length___Insert_length]
@@ -1070,4 +1075,17 @@ get '/stats/:ds_name' do
     output_name = filename[:statistic_file].split('/')[-1] << ".txt"
     send_file filename[:statistic_file], :type => :txt 
   end
+end
+
+get '/amino-dist-pdf/:ds_name' do
+  style_path = settings.views + '/style.scss'
+  bootstrap_css = settings.public_folder + '/bootstrap/css/bootstrap.css'
+  haml_template = File.read(File.join(settings.views, 'amino_dist_table_pdf.haml'))
+  html = Haml::Engine.new(haml_template).render(binding, :distribution => get_amino_acid_dist(params[:ds_name]), :dataset => params[:ds_name])
+  kit = PDFKit.new(html)
+  kit.stylesheets << style_path 
+  kit.stylesheets << bootstrap_css
+  
+  content_type :pdf
+  kit.to_pdf
 end

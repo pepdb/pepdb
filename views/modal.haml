@@ -10,7 +10,7 @@
           = modal_title
       .modal-body
         - if modal_category == "amino-acid-dist"
-          = partial :amino_dist_table, locals: {distribution:get_amino_acid_dist(dataset)} 
+          = partial :amino_dist_table, locals: {distribution:get_amino_acid_dist(dataset),:dataset=>dataset} 
         - else
           = get_modal_text(modal_category, modal_type)
       .modal-footer

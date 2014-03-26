@@ -1,0 +1,20 @@
+%h3 
+  = dataset
+%table.table.table-bordered.table-condensed
+  %thead
+    %tr
+      - distribution.each_value do |row|
+        %th 
+        - row.each_key do |position|
+          %th.text-center 
+            = position
+        - break
+  %tbody
+    - distribution.each_pair do |acid, dist|
+      %tr
+        %td.text-center
+          = acid
+        - dist.each_value do |value|
+          %td{:class => "text-right #{get_cell_color(value)}"} 
+            = value
+      

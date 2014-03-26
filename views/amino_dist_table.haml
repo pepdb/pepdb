@@ -46,4 +46,7 @@
             - dist.each_value do |value|
               %td{:class => "text-right #{get_cell_color(value)}"} 
                 = value
-          
+.row
+  .col-md-3.col-md-offset-9
+    %form{:action => "/amino-dist-pdf/#{dataset}", :target => "_blank"}
+      %input.btn.btn-primary{:type => "submit", :value => "show as pdf"}          
