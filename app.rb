@@ -1078,14 +1078,26 @@ get '/stats/:ds_name' do
 end
 
 get '/amino-dist-pdf/:ds_name' do
-  style_path = settings.views + '/style.scss'
-  bootstrap_css = settings.public_folder + '/bootstrap/css/bootstrap.css'
-  haml_template = File.read(File.join(settings.views, 'amino_dist_table_pdf.haml'))
-  html = Haml::Engine.new(haml_template).render(binding, :distribution => get_amino_acid_dist(params[:ds_name]), :dataset => params[:ds_name])
-  kit = PDFKit.new(html)
-  kit.stylesheets << style_path 
-  kit.stylesheets << bootstrap_css
-  
-  content_type :pdf
-  kit.to_pdf
+  login_required
+  allowed = false
+  if (current_user.admin? || can_access?(:sequencing_datasets, params[:ds_name]))
+    allowed = true
+  end
+  if allowed
+    style_path = settings.views + '/style.scss'
+    bootstrap_css = settings.public_folder + '/bootstrap/css/bootstrap.css'
+    haml_template = File.read(File.join(settings.views, 'amino_dist_table_pdf.haml'))
+    begin
+      html = Haml::Engine.new(haml_template).render(binding, :distribution => get_amino_acid_dist(params[:ds_name]), :dataset => params[:ds_name])
+    rescue ArgumentError => e
+      redirect '/'
+    end
+    kit = PDFKit.new(html)
+    kit.stylesheets << style_path 
+    kit.stylesheets << bootstrap_css
+    content_type :pdf
+    kit.to_pdf
+  else 
+    redirect '/'
+  end
 end
