@@ -4,7 +4,8 @@
 .col-md-7
   #motacc
     - if @pep_per_mots.empty?
-      = "No results found."
+      .alert.alert-info.pull-left
+        No results found.
     - else
       - index = 0
       .panel-group#accordion

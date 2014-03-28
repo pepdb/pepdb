@@ -40,12 +40,10 @@
               %label
                 = elem[:list_name]
                 %input{:type => "radio", :name => "checked_motl[]", :id => "#{elem[:list_name]}",:value => "#{elem[:list_name]}"}/
-    .col-md-9#motifs
-  .form-group
-    .col-md-3
-      %fieldset.checklist
+      .col-md-12
         %input.btn.btn-primary{:type => "submit", :id => "msearchb", :value => "search"}
         %input.btn{:type => "button", :id => "clear-button",:value => "clear selection"}
         = image_tag("/images/ajax-loader.gif", :class => "loading", :hidden => true)
+    .col-md-9#motifs
 .row
   #motresults
