@@ -359,13 +359,21 @@ get '/show_sn_table' do
     @eletype = "Selections"
     @id = :show_table
     allowed_sel = get_accessible_elements(:selections)
-    @data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns).where(:Name => allowed_sel)
+    if current_user.admin?
+      @data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns)
+    else 
+      @data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns).where(:Name => allowed_sel)
+    end
   elsif params['ref'] == "Selection" 
     @column = :selection_name
     @eletype = "Sequencing Datasets"
     @id = :show_table
     allowed_ds = get_accessible_elements(:sequencing_datasets)
-    @data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns).where(:Name => allowed_ds)
+    if current_user.admin?
+      @data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns)
+    else 
+      @data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns).where(:Name => allowed_ds)
+    end
   elsif params['ref'] == "Sequencing Dataset" 
     @column = :sequencing_datasets__dataset_name
     @eletype = "Peptides"

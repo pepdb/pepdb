@@ -143,12 +143,14 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
       } else if (path == url+'/cluster-search'){
         $.get(url+'/show-info', {ele_name: selectedID, ref:'Clustersearch', ele_name2: firstChoice}, function(data){
           $('#clusterlist_pep').html(data);
+          $('.ttips').tooltip({});
         });
       } else {
         $.get(url+'/show-info', {ele_name: selectedID, ref:dataType, ele_name2: firstChoice}, function(data){
           $('#datainfo').html(data);
           $.getScript(url+'/script/initbutton.js', function(){
             $('#datainfo').show();
+            $('.ttips').tooltip({});
           });
         });
       }
@@ -172,6 +174,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
         $('#clusterinfos').html(data);
         $.getScript(url+'/script/initproptable.js', function(){
           $('#clusterinfos').show();
+          $('.ttips').tooltip({});
         });
         $('.clsearchpeps').show();
       });
@@ -200,6 +203,7 @@ jQuery.addTableFunctions = function addTableFunctions(objID, tabVar){
         });
       });
     }
+    $('.ttips').tooltip({});
   });
   
 };
