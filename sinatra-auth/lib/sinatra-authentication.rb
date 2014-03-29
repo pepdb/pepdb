@@ -231,7 +231,8 @@ module Sinatra
         end
         case table
         when :libraries
-          requested_rows = DB[:libraries_sequel_users].where(:id => user.id, :library_name => qry).count
+          #requested_rows = DB[:libraries_sequel_users].where(:id => user.id, :library_name => qry).count
+          requested_rows = DB[:libraries].where(:library_name => DB[:selections_sequel_users].select(:library_name).join(:selections, :selection_name => :selection_name).where(:id => user.id, :library_name => qry)).count
         when :selections
           requested_rows = DB[:selections_sequel_users].where(:id => user.id, :selection_name => qry).count
         when :sequencing_datasets
@@ -245,22 +246,26 @@ module Sinatra
       end
     end
 
+    def get_accessible_elements(table)
+      user = current_user
+      elements = []
+      case table
+      when :libraries
+        query = Library.select(:library_name).where(:library_name => DB[:selections_sequel_users].select(:library_name).join(:selections, :selection_name => :selection_name).where(:id => user.id)).all.each{|lib| elements.push(lib[:library_name])}
+      when :selections
+        query = DB[:selections_sequel_users].select(:selection_name).where(:id => user.id).all.each{|sel| elements.push(sel[:selection_name])}
+      when :sequencing_datasets
+        query = SequencingDataset.select(:dataset_name).where(:dataset_name => DB[:selections_sequel_users].select(:dataset_name).join(:sequencing_datasets, :selection_name => :selection_name).where(:id => user.id)).all.each{|ds| elements.push(ds[:dataset_name])}
+      end
+      elements
+    end
+
     def update_access(selections, user)
       sequel_user = SequelUser.where(:id => user.id).first
-      lib = Selection.distinct.select(:library_name).where(:selection_name => selections).all
       sel = Selection.select(:selection_name).where(:selection_name => selections).all
-      ds = SequencingDataset.select(:dataset_name).where(:selection_name => selections).all
       sequel_user.remove_all_selections
-      sequel_user.remove_all_libraries
-      sequel_user.remove_all_sequencing_datasets
-      lib.each do |row|
-        DB[:libraries_sequel_users].insert(:id => user.id, :library_name => row[:library_name])
-      end    
       sel.each do |row|
         sequel_user.add_selection(row)
-      end    
-      ds.each do |row|
-        sequel_user.add_sequencing_dataset(row)
       end    
   
       true

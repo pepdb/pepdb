@@ -39,11 +39,22 @@ module Sinatra
     end
   
     def choose_data(params)
+      user = current_user
       if params['selector'] == "sel"
-        datatype = Selection.select(:selection_name).where(:library_name => params['checkedElem'])
+        if user.admin?
+          datatype = Selection.select(:selection_name).where(:library_name => params['checkedElem'])
+        else
+          allowed_sel = get_accessible_elements(:selections)
+          datatype = Selection.select(:selection_name).where(:library_name => params['checkedElem'], :selection_name => allowed_sel)
+        end
         columnname = :selection_name
       elsif params['selector'] == "ds"
-        datatype = SequencingDataset.select(:dataset_name).where(:selection_name => params['checkedElem'])
+        if user.admin?
+          datatype = SequencingDataset.select(:dataset_name).where(:selection_name => params['checkedElem'])
+        else
+          allowed_ds = get_accessible_elements(:sequencing_datasets)
+          datatype = SequencingDataset.select(:dataset_name).where(:selection_name => params['checkedElem'], :dataset_name => allowed_ds)
+        end 
         columnname = :dataset_name
       end
 
@@ -60,22 +71,6 @@ module Sinatra
       !field.nil? && not_just_nbsp?(field)
     end
   
-    # return all libraries, selecions and sequencing datasets that the current user is allowed
-    # to access
-    def get_allowed_lib_sel_ds(user)
-      allowed_lib = []
-      allowed_sel = []
-      allowed_ds = []
-      DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => user.id).each {|ds| allowed_ds.insert(-1, ds[:dataset_name])}
-      DB[:libraries_sequel_users].select(:library_name).where(:id => user.id).each {|ds| allowed_lib.insert(-1, ds[:library_name])}
-      DB[:selections_sequel_users].select(:selection_name).where(:id => user.id).each {|ds| allowed_sel.insert(-1, ds[:selection_name])}
-      libraries = Library.where(:library_name => allowed_lib)
-      selections = Selection.where(:selection_name => allowed_sel)
-      datasets = SequencingDataset.where(:dataset_name => allowed_ds)
-      
-      return libraries, selections, datasets
-    end
-    
     def calc_gen_spec(spec, ref_specs, cluster_spec, clusters = nil)
       if cluster_spec
         gen_spec = 1

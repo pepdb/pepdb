@@ -42,7 +42,7 @@ module Sinatra
           querystring << 'libraries.library_name = ? ' if querystring.length == 0
           placeholders.insert(-1, params['l'].to_s)
         else
-          allowed_sel = DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).map(:selection_name)
+          allowed_sel = get_accessible_elements(:selections) 
           selections = Selection.select(:selection_name).where(:library_name => params['l'].to_s, :selection_name=> allowed_sel).map(:selection_name)
           querystring << 'AND selections.selection_name IN (' if querystring.length > 0
           querystring << 'selections.selection_name IN (' if querystring.length == 0
@@ -65,7 +65,7 @@ module Sinatra
       
       unless current_user.admin?
         if params['l'].nil? && params['s'].nil? && params['ds'].nil?
-          datasets = DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).map(:dataset_name)
+          datasets = get_accessible_elements(:sequencing_datasets) 
           querystring << 'AND sequencing_datasets.dataset_name IN (' if querystring.length > 0
           querystring << 'sequencing_datasets.dataset_name IN (' if querystring.length == 0
           (0...datasets.size).each do |index|
@@ -182,6 +182,28 @@ module Sinatra
       elsif !params[:selected1].nil?
         querystring << '? = ?'                                                                                         
         placeholders.insert(-1, params[:where1].to_sym, params[:selected1].to_s)
+      elsif !params[:selected2].nil?
+        querystring << '? = ?'                                                                                         
+        placeholders.insert(-1, params[:where2].to_sym, params[:selected2].to_s)
+     end       
+      return querystring, placeholders
+    end
+
+    def build_prop_formdrop_string(params)
+      user = current_user
+      querystring = ''
+      placeholders = Array.new
+      if !params[:selected1].nil? && !params[:selected2].nil?
+        querystring << '? = ? AND ? = ?'                                                                                         
+        placeholders.insert(-1, params[:where1].to_sym, params[:selected1].to_s, params[:where2].to_sym, params[:selected2].to_s)
+      elsif !params[:selected1].nil?
+        querystring << '? = ? AND `selection_name` IN ('                                                                                         
+        allowed_sel = get_accessible_elements(:selections)
+        allowed_sel.each do |sel|
+          querystring << '?,'
+        end
+        querystring.chop! << ')'
+        placeholders.insert(-1, params[:where1].to_sym, params[:selected1].to_s, *allowed_sel)
       elsif !params[:selected2].nil?
         querystring << '? = ?'                                                                                         
         placeholders.insert(-1, params[:where2].to_sym, params[:selected2].to_s)

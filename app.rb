@@ -194,9 +194,8 @@ get '/libraries' do
   if current_user.admin?
     @libraries = Library.select(*library_columns)
   else
-    allowed = []
-    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:library_name])}
-    @libraries = Library.select(*library_columns).where(:library_name => allowed)
+    allowed = get_accessible_elements(:libraries)
+    @libraries = DB[:libraries].select(*library_columns).where(:library_name => allowed)
   end
   if @libraries.empty?
     @message = "No libraries found in database"
@@ -210,15 +209,15 @@ get '/libraries/:lib_name' do
   login_required
   if current_user.admin?
     @libraries = Library.select(*library_columns)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns)
   elsif can_access?(:libraries, params[:lib_name])
-    allowed = []
-    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:library_name])}
-    @libraries = Library.select(*library_columns).where(:library_name => allowed)
+    allowed = get_accessible_elements(:libraries)
+    @libraries = DB[:libraries].select(*library_columns).where(:library_name => allowed)
+    allowed_sel = get_accessible_elements(:selections)
+    @selections = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns).where(:Name => allowed_sel)
   else
     redirect '/libraries'
   end
-  @selections = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns)
-  #@columns = {"Name" => :library_name, "Carrier"}
   @infodata = Library.select(*library_info)
   haml :libraries
 end
@@ -228,8 +227,7 @@ get '/selections' do
   if current_user.admin?
     @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_columns)
   else
-    allowed = []
-    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:selection_name])}
+    allowed = get_accessible_elements(:selections)
     @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_columns).where(:selection_name => allowed)
   end
   if @selections.empty?
@@ -244,14 +242,15 @@ get '/selections/:sel_name' do
   login_required
   if current_user.admin?
     @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_columns)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns)
   elsif can_access?(:selections, params[:sel_name])
-    allowed = []
-    DB[:selections_sequel_users].select(:selection_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:selection_name])}
+    allowed = get_accessible_elements(:selections)
     @selections = Selection.left_join(Target, :target_id=>:target_id).join(Library, :selections__library_name => :libraries__library_name).select(*selection_columns).where(:selection_name => allowed)
+    allowed_ds = get_accessible_elements(:sequencing_datasets)
+    @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns).where(:Name => allowed_ds)
   else
     redirect '/selections'
   end
-  @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns)
   @infodata = Selection.select(*selection_info).left_join(Target, :target_id => :target_id).where(:selection_name => params[:sel_name])
   @eletype = "Selection"
   haml :selections
@@ -262,8 +261,7 @@ get '/datasets' do
   if current_user.admin?
     @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_columns)
   else
-    allowed = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
+    allowed = get_accessible_elements(:sequencing_datasets) 
     @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_columns).where(:dataset_name => allowed)
   end
   if @datasets.empty?
@@ -279,8 +277,7 @@ get '/datasets/:set_name' do
   if current_user.admin?
     @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :libraries__library_name => :sequencing_datasets__library_name).select(*dataset_columns)
   elsif can_access?(:sequencing_datasets, params[:set_name])
-    allowed = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
+    allowed = get_accessible_elements(:sequencing_datasets) 
     @datasets = SequencingDataset.left_join(Target, :target_id=>:target_id).join(Library, :sequencing_datasets__library_name => :libraries__library_name).select(*dataset_columns).where(:dataset_name => allowed)
   else
     redirect '/datasets'
@@ -295,8 +292,7 @@ end
 get '/clusters' do
   login_required
   unless current_user.admin?
-    @datasets = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @datasets = get_accessible_elements(:sequencing_datsets) 
     @clusters = Cluster.where(:dataset_name => @datasets)
   else
     @clusters = Cluster
@@ -310,8 +306,7 @@ get '/clusters/:sel_cluster' do
   if current_user.admin?  
     @clusters = Cluster
   elsif can_access?(:sequencing_datasets, ds[:dataset_name])
-    @datasets = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @datasets = get_accessible_elements(:sequencing_datsets) 
     @clusters = Cluster.where(:dataset_name => @datasets)
   else
     redirect "/clusters"
@@ -327,14 +322,13 @@ get '/clusters/:sel_cluster/:pep_seq' do
   if current_user.admin?  
     @clusters = Cluster
   elsif can_access?(:sequencing_datasets, ds[:dataset_name])
-    @datasets = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| @datasets.insert(-1, ds[:dataset_name])}
+    @datasets = get_accessible_elements(:sequencing_datsets) 
     @clusters = Cluster.where(:dataset_name => @datasets)
   else
     redirect "/clusters"
   end
   @cluster_info = Cluster.select(:consensus_sequence, :dominance_sum, :parameters)
- @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
+  @cluster_pep = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).join(Observation, :peptide_sequence => :peptide_sequence).select(*cluster_peptide_columns)
   @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
   haml :clusters
 end
@@ -364,12 +358,14 @@ get '/show_sn_table' do
     @column = :library_name
     @eletype = "Selections"
     @id = :show_table
-    @data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns)
+    allowed_sel = get_accessible_elements(:selections)
+    @data = Selection.left_join(Target, :target_id=>:target_id).select(*selection_columns).where(:Name => allowed_sel)
   elsif params['ref'] == "Selection" 
     @column = :selection_name
     @eletype = "Sequencing Datasets"
     @id = :show_table
-    @data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns)
+    allowed_ds = get_accessible_elements(:sequencing_datasets)
+    @data = SequencingDataset.left_join(Target, :target_id=>:target_id).select(*dataset_columns).where(:Name => allowed_ds)
   elsif params['ref'] == "Sequencing Dataset" 
     @column = :sequencing_datasets__dataset_name
     @eletype = "Peptides"
@@ -456,15 +452,26 @@ get '/systemic-search' do
     @selections = Selection.all
     @datasets = SequencingDataset.all
   else
-    @libraries, @selections, @datasets = get_allowed_lib_sel_ds(current_user) 
+    allowed_lib = get_accessible_elements(:libraries) 
+    allowed_sel = get_accessible_elements(:selections) 
+    allowed_ds = get_accessible_elements(:sequencing_datasets) 
+    @libraries = Library.where(:library_name =>allowed_lib).all
+    @selections = Selection.where(:selection_name => allowed_sel).all
+    @datasets = SequencingDataset.where(:dataset_name => allowed_ds).all
   end
   haml :sys_search
 end
 
 get '/systemic-results' do
   login_required
-  @peptides = Observation.select(*sys_peptide_columns).where(:Sequencing_dataset => params['sysDS'])
-  haml :peptide_results, :layout => false
+  if params['sysDS'].nil?
+     
+    @errors = {:ds =>"No sequencing datasets selected."}
+    haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
+  else
+    @peptides = Observation.select(*sys_peptide_columns).where(:Sequencing_dataset => params['sysDS'])
+    haml :peptide_results, :layout => false
+  end
 end
 
 #------- Property Search -------------#
@@ -475,7 +482,12 @@ get '/property-search' do
     @datasets = SequencingDataset
     @selections = Selection
   else
-    @libraries, @selections, @datasets = get_allowed_lib_sel_ds(current_user) 
+    allowed_lib = get_accessible_elements(:libraries) 
+    allowed_sel = get_accessible_elements(:selections) 
+    allowed_ds = get_accessible_elements(:sequencing_datasets) 
+    @libraries = Library.where(:library_name =>allowed_lib).all
+    @selections = Selection.where(:selection_name => allowed_sel).all
+    @datasets = SequencingDataset.where(:dataset_name => allowed_ds).all
   end
   @targets = Target
   haml :prop_search
@@ -501,6 +513,9 @@ get '/property-results' do
   rescue ArgumentError => e
     @error = e.message
   end
+  puts "sadfffffffffffffffffff"
+  puts @querystring
+  puts @placeholders.inspect
   haml :prop_results, :layout => false
 end
 
@@ -514,7 +529,12 @@ get '/comparative-search' do
     @datasets = SequencingDataset
     @selections = Selection
   else
-    @libraries, @selections, @datasets = get_allowed_lib_sel_ds(current_user) 
+    allowed_lib = get_accessible_elements(:libraries) 
+    allowed_sel = get_accessible_elements(:selections) 
+    allowed_ds = get_accessible_elements(:sequencing_datasets) 
+    @libraries = Library.where(:library_name =>allowed_lib).all
+    @selections = Selection.where(:selection_name => allowed_sel).all
+    @datasets = SequencingDataset.where(:dataset_name => allowed_ds).all
   end
   @peptides = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name___dataset=>:dataset_name).select(*sys_peptide_columns)
   @peptide_info = Peptide.join(Observation, :peptide_sequence___peptide=>:peptide_sequence___peptide).join(SequencingDataset, :dataset_name=>:dataset_name).left_join(Target, :targets__target_id => :results__target_id).select(*peptide_all_columns)
@@ -554,8 +574,7 @@ get '/motif-search' do
   if current_user.admin?
     @libraries = Library
   else
-    allowed = []
-    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:library_name])}
+    allowed = get_accessible_elements(:libraries) 
     @libraries = Library.where(:library_name => allowed)
   end
   @motiflists = MotifList
@@ -636,6 +655,9 @@ end
 
 post '/checklist' do
   login_required
+  puts params.inspect
+  puts "sdfasdfipasdfopiuhhhhhhhhhhhhhhhhh"
+  puts params[:checkedElem].inspect
   case params[:selector]
   when "sel"
     table = :libraries
@@ -643,7 +665,7 @@ post '/checklist' do
     table = :selections
   end
   if params[:checkedElem].nil?
-  elsif current_user.admin? || can_access?(table, params[:checkedElem])
+  elsif (current_user.admin? || can_access?(table, params[:checkedElem]))
     @data_to_display, @column = choose_data(params)
     @section = params['sec']
     haml :checklist, :layout => false
@@ -676,8 +698,7 @@ get '/cluster-results' do
   if current_user.admin?
     @datasets = SequencingDataset.select(:dataset_name).map(:dataset_name)
   else
-    allowed = []
-    DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:dataset_name])}
+    allowed = get_accessible_elements(:sequencing_datasets) 
     @datasets = SequencingDataset.select(:dataset_name).where(:dataset_name => allowed).map(:dataset_name)
   end
   @cluster = Cluster.join(:clusters_peptides, :cluster_id => :cluster_id).select(*clsearch_results)
@@ -690,8 +711,7 @@ get '/comparative-cluster-search' do
   if current_user.admin?
     @libraries = Library
   else
-    allowed = []
-    DB[:libraries_sequel_users].select(:library_name).where(:id => current_user.id).each {|ds| allowed.insert(-1, ds[:library_name])}
+    allowed = get_accessible_elements(:libraries)
     @libraries = Library.where(:library_name => allowed)
   end
   haml :comparative_cluster_search
@@ -1014,7 +1034,11 @@ end
 
 get '/formdrop' do
   login_required
-  @querystring, @placeholders = build_formdrop_string(params)
+  if (request.referrer.include?("property-search")&& !current_user.admin?)
+    @querystring, @placeholders = build_prop_formdrop_string(params)
+  else
+    @querystring, @placeholders = build_formdrop_string(params)
+  end
   req = !params[:required].nil? ? true : false
   @data = DB[params[:table].to_sym].distinct.select(params[:columnname].to_sym).where(Sequel.lit(@querystring, *@placeholders))
   haml :formdrop, :layout => false, locals:{values:@data, column:params[:columnname].to_sym, para:params['boxID'].to_sym, required:req }
@@ -1064,7 +1088,7 @@ get '/stats/:ds_name' do
   if current_user.admin?
     allowed = 1
   else
-    allowed = DB[:sequel_users_sequencing_datasets].select(:dataset_name).where(:id => current_user.id, :dataset_name => params[:ds_name].to_s).count
+    allowed = get_acccessible_elements(:sequencing_datasets)
   end
  
   filename = SequencingDataset.select(:statistic_file).where(:dataset_name => params[:ds_name].to_s).first

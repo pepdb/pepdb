@@ -123,13 +123,6 @@ DB.create_table?(:motifs_motif_lists) do
   index [:list_name, :motif_sequence]
 end
 
-DB.create_table?(:libraries_sequel_users) do
-  foreign_key :library_name, :libraries, :type => 'varchar(255)',:on_delete => :cascade
-  foreign_key :id, :sequel_users, :on_delete => :cascade
-  primary_key [:id, :library_name]
-  index [:id, :library_name]
-end
-
 DB.create_table?(:selections_sequel_users) do
   foreign_key :selection_name, :selections, :type => 'varchar(255)',:on_delete => :cascade
   foreign_key :id, :sequel_users, :on_delete => :cascade
@@ -137,9 +130,3 @@ DB.create_table?(:selections_sequel_users) do
   index [:id, :selection_name]
 end
 
-DB.create_table?(:sequel_users_sequencing_datasets) do
-  foreign_key :dataset_name, :sequencing_datasets, :type => 'varchar(255)',:on_delete => :cascade
-  foreign_key :id, :sequel_users, :on_delete => :cascade
-  primary_key [:id, :dataset_name]
-  index [:id, :dataset_name]
-end
