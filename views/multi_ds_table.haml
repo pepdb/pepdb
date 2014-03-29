@@ -30,7 +30,7 @@
             %span.glyphicon.glyphicon-info-sign
           %br
           %input{:type => "text", :class => "text_filter", :placeholder => "filter"}
-      - params[:ref_ds].each do
+      - 1.upto(@maxlength) do
         %th<>
           Sequencing dataset
           %a.ttips{"data-toggle"=> "tooltip", "data-html" => "true",:title => get_tooltip_text("Dataset_ref")}
@@ -87,7 +87,7 @@
           = format_dominance(@first_ds[row[:peptide_sequence]][0])
         %td.text-right<>
           1.00000
-        - params[:ref_ds].each do |ds|
+        - 1.upto(@maxlength) do |ds|
           %td<>
           %td<>
           %td<>

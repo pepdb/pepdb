@@ -513,9 +513,6 @@ get '/property-results' do
   rescue ArgumentError => e
     @error = e.message
   end
-  puts "sadfffffffffffffffffff"
-  puts @querystring
-  puts @placeholders.inspect
   haml :prop_results, :layout => false
 end
 
@@ -560,6 +557,8 @@ get '/comparative-results' do
     @first_ds = Observation.select(:dataset_name, :peptide_sequence, :dominance).where(:dataset_name => params[:radio_ds], :peptide_sequence => peptides).to_hash_groups(:peptide_sequence, :dominance)
     @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @common_peptides.map(:peptide_sequence)).all
     @specs = DB[:peptides_sequencing_datasets].select(:peptide_sequence, :dominance).where(:peptide_sequence => @common_peptides.map(:peptide_sequence), :dataset_name => params[:ref_ds]).to_hash_groups(:peptide_sequence, :dominance)
+    @maxlength = 0 if @common_peptides.count == 0
+    puts @common_peptides.count
     haml :peptide_results, :layout => false
   else
     haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
