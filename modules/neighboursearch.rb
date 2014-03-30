@@ -1,5 +1,5 @@
 require 'sinatra/base'
-require './modules/blosum'
+require settings.root + '/modules/blosum'
 # this module implements the neighbour search thats offered by 
 # the peptide property search
 module Sinatra

@@ -1,5 +1,5 @@
 require 'sinatra/base'
-require './modules/blosum'
+require settings.root + '/modules/blosum'
 module BlosumHelpers
   def get_neighbours
     read_blosum_file

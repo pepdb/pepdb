@@ -4,7 +4,8 @@ require 'xmlsimple'
 
 module Sinatra
   module Tooltips
-    Tips = XmlSimple.xml_in('./modules/tooltips.xml', :ForceArray=> false)
+    xml_file = File.expand_path('../tooltips.xml', __FILE__)
+    Tips = XmlSimple.xml_in(xml_file ,:ForceArray=> false)
     def get_element_type
       case request.path
       when /libraries/

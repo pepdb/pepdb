@@ -1,7 +1,7 @@
 require 'sinatra/base'
-require './modules/wcsearch'
-require './modules/utilities'
-require './modules/neighboursearch'
+require settings.root + '/modules/wcsearch'
+require settings.root + '/modules/utilities'
+require settings.root + '/modules/neighboursearch'
 # this module builds larger sql queries that can't be directly projected by sequel
 # so we use raw sql queries via sequel instead
 # these queries are mainly used when using the peptide property search

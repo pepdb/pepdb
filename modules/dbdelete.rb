@@ -26,8 +26,10 @@ module Sinatra
           @id_column = :library_name
         when :selections
           @id_column = :selection_name
+          #TODO add library distinct peptide update
         when :sequencing_datasets
           @id_column = :dataset_name
+          #TODO add library distinct peptide update
         when :results
           @id_column = :result_id
         when :targets

@@ -1,7 +1,7 @@
 require 'sinatra/base'
 require 'sqlite3'
 require 'csv'
-require './modules/columnfinder'
+require settings.root + '/modules/columnfinder'
 # this module is used to insert and update database data
 module Sinatra
   module DBInserter 
