@@ -12,7 +12,8 @@ module Sinatra
         unique_peptides = Observation.select(:peptide_sequence, :dataset_name, :dominance).where(:dataset_name => comp_set).where(Sequel.lit(@ds_qry, *@ds_placeh)).exclude(:peptide_sequence => ref_data)
         ds_data = Observation.select(:peptide_sequence).where(:dataset_name => comp_set).where(Sequel.lit(@ds_qry, *@ds_placeh))
         # get all peptides that occure in every dataset selected
-        common_peptides = Observation.select(:peptide_sequence).where(:dataset_name => reference_sets, :peptide_sequence => ds_data).where(Sequel.lit(@ref_qry, *@ref_placeh)).group_and_count(:peptide_sequence).having(:count => reference_sets.size)
+        #common_peptides = Observation.select(:peptide_sequence).where(:dataset_name => reference_sets, :peptide_sequence => ds_data).where(Sequel.lit(@ref_qry, *@ref_placeh)).group_and_count(:peptide_sequence).having(:count => reference_sets.size)
+        common_peptides = Observation.select(:peptide_sequence).where(:dataset_name => reference_sets, :peptide_sequence => ds_data).where(Sequel.lit(@ref_qry, *@ref_placeh)).group_and_count(:peptide_sequence)
 
     return unique_peptides, common_peptides 
     

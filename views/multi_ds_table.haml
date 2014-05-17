@@ -66,7 +66,9 @@
           = format_dominance(@first_ds[row[:peptide_sequence]][0])
         %td.text-right<>
           = format_score(calc_gen_spec(@first_ds[row[:peptide_sequence]][0], @specs[row[:peptide_sequence]], false))
-        - Observation.where(:dataset_name => params[:ref_ds], :peptide_sequence => row[:peptide_sequence] ).all.each do |cell|
+        -# TODO: performance optimization possible
+        - ds_specs = Observation.where(:dataset_name => params[:ref_ds], :peptide_sequence => row[:peptide_sequence] ).all
+        - ds_specs.each do |cell| 
           %td<>
             = cell[:dataset_name]
           %td.text-right<>
@@ -75,6 +77,12 @@
             = format_dominance(cell[:dominance])
           %td.text-right<>
             = format_score(calc_spec_score(@first_ds[row[:peptide_sequence]][0],cell[:dominance]))
+        - if ds_specs.size != @maxlength
+          - ds_specs.size.upto(@maxlength-1) do |ds| 
+            %td<>
+            %td<>
+            %td<>
+            %td<>
     - @uniq_peptides.all.each do |row| 
       %tr
         %td<>

@@ -2,6 +2,9 @@
 # loads all additional gems/modules, sets some options and 
 # contains all routes served by this application
 # pepdb.rb
+
+ENV['RACK_ENV'] = 'test'
+
 require 'sinatra'
 require 'sinatra/partial'
 require 'sinatra/static_assets'
