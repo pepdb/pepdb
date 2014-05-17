@@ -34,9 +34,14 @@ set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 set :public_folder, Proc.new {File.join(root, "public_html")}
 set :default_encoding, "utf-8" 
+#set :environment, :development
 
 use Rack::Session::Cookie, :expire_after => 3600, :secret => 'Gh6hh91uhMEsmq05h01ec2b4i9BRVj39' 
 use Rack::Flash
+
+PDFKit.configure do |config|
+  config.wkhtmltopdf = settings.root + '/bin/wkhtmltopdf'
+end
 
 configure do 
   mime_type :pdf, 'application/pdf'
