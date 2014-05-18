@@ -24,6 +24,16 @@ jQuery.baseDir =  function baseDir(){
 };
 
 
+  // Save the search result table when leaving the page.
+ /* $(window).unload(function () {
+      if (('localStorage' in window) && window['localStorage'] !== null && document.location.pathname === '/comparative-search') {
+          var form = $("#comppepresults").html();
+          localStorage.setItem('comppepresults', form);
+      }
+  });
+*/
+
+
 /* get url parameter 'name' or return '' if does not exist */
 function urlParam(name){
   'use strict';
@@ -40,12 +50,19 @@ $(document).ready(function(){
   var species = ['#ss', '#ts'];
   var tissue = ['#st', '#tt'];
   var cell = ['#sc', '#tc'];
+
 /*
-  $('.optbut').button();
-  $('#navigation').menu();
-  $('.editlink').button();
-  $('.deletelink').button();
+  if (('localStorage' in window) && window['localStorage'] !== null) {
+      if ('comppepresults' in localStorage){ //&& window.location.hash) {
+          $("#comppepresults").html(localStorage.getItem('comppepresults'));
+          $("#comppepresults").show();
+          $('#comppep_table').DataTable().draw(false);
+          
+        
+      }
+  }
 */
+
   $('#clear-button').click(function(){
     $('body').load(window.location.pathname);
   });
