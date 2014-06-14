@@ -7,7 +7,7 @@ unless DB.table_exists? :sequel_users
     String :salt
     DateTime :created_at
     Integer :permission_level, :default => 1
-
+    Integer :auto_selections, :default => 0
     #check{{char_length(email)=>5..40}}
   end
 end

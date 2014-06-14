@@ -2,10 +2,11 @@ require 'sinatra/base'
 require 'sqlite3'
 require 'csv'
 require settings.root + '/modules/columnfinder'
+require 'sinatra-authentication'
 # this module is used to insert and update database data
 module Sinatra
   module DBInserter 
-    
+    include SinatraAuthentication
     # this class reads possible datafiles, for further format informations
     # see the bachelor thesis
     class FileReader
@@ -180,6 +181,7 @@ module Sinatra
 
     class InsertData   
       include Utilities
+      include SinatraAuthentication
       # sqlite can't handle more than ~500 statements at once
       MAX_SQLITE_STATEMENTS = 450
       include Rack::Utils
@@ -553,10 +555,7 @@ module Sinatra
       end
       
       def up_motlist
-        puts "motsssssssssssssssssssssss"
         @table = :motifs_motif_lists
-        @row_id.to_s
-        puts @row_id
         DB[:motifs_motif_lists].select(:motif_sequence).where(:list_name => @row_id).all.each_with_index do |motif, index|
           where_hash = {:list_name => @row_id, :motif_sequence => motif[:motif_sequence].to_s}
           upd_hash = {:target => "#{es @values["mt#{index}"].to_s}", :receptor => "#{es @values["mr#{index}"].to_s}", :source => "#{es @values["ms#{index}"].to_s}" }
@@ -595,6 +594,10 @@ module Sinatra
     def insert_data(values)
       d = InsertData.new(values)  
       errors = d.try_insert
+      if errors.empty? && values[:submittype] == "selection"
+        apply_auto_selections(values[:selname])
+      end
+      errors
     end #insert
 
   end

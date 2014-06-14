@@ -28,10 +28,19 @@
           Admin
         %option{:value => 1, :selected => @user.permission_level == 1}
           Authenticated user
+      .checkbox#auto-opt
+        - puts @auto_selections.inspect
+        %label{:for => 'auto_sel'} 
+          grant access to all new selections 
+          %input{:type => "checkbox", :id => 'auto_sel', :name => 'user[auto_selections]', :checked => @auto_selections}
   - unless @user.admin?
     %fieldset.search-params
       %legend.search-params accessible selections
       .check-select
+        .checkbox
+          %label{:for => "all_sell"}
+            all selections
+            %input{:type => "checkbox", :id => "all_sell", :name => "all_sell"}
         - @selections.each do |sel|
           .checkbox
             %label

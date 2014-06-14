@@ -13,5 +13,4 @@ test.rb
 *.bak
 *.log
 *.db
-sinatra-auth/
 *_old

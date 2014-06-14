@@ -15,6 +15,7 @@ module Sinatra
         app.set :template_engine, :haml
       end
 
+
       #convenience for ajax but maybe entirely stupid and unnecesary
       app.get '/logged_in' do
         if session[:user]
@@ -63,16 +64,7 @@ module Sinatra
         return_to = ( session[:return_to] ? session[:return_to] : '/' )
         redirect return_to
       end
-=begin
-  only admins should be able to create new users
-      app.get '/signup/?' do
-        if session[:user]
-          redirect '/'
-        else
-          send settings.template_engine, get_view_as_string("signup.#{settings.template_engine}"), :layout => use_layout?
-        end
-      end
-=end
+
       app.post '/add-user/?' do
         @user = User.set(params[:user])
         if @user.valid && @user.id && update_access(params[:selections], @user)
@@ -92,6 +84,7 @@ module Sinatra
         login_required
         redirect "/" unless current_user.admin? 
         @user = User.get(:id => params[:id])
+        @auto_selections = @user.auto_selections == 1 ? true : false
         @access_selections = []        
         DB[:selections_sequel_users].select(:selection_name).where(:id => params[:id].to_i).each{|sel| @access_selections.insert(-1, sel[:selection_name])}
         @selections = Selection.select(:selection_name).all
@@ -103,6 +96,11 @@ module Sinatra
         redirect "/" unless current_user.admin? 
         user = User.get(:id => params[:id])
         user_attributes = params[:user]
+        unless params[:user][:auto_selections].nil?
+          params[:user][:auto_selections] = 1
+        else
+          params[:user][:auto_selections] = 0
+        end
         if params[:user][:password] == ""
             user_attributes.delete("password")
             user_attributes.delete("password_confirmation")
@@ -119,7 +117,6 @@ module Sinatra
             flash[:error] = "Error while updating: #{user.errors}."
           end
           redirect '/user-management'
-          #redirect "/users/#{user.id}/edit?" + hash_to_query_string(user_attributes)
         end
       end
 
@@ -146,12 +143,20 @@ module Sinatra
       hash.collect {|k,v| "#{k}=#{v}"}.join('&')
     end
 
+    def apply_auto_selections(selection)
+      sequel_users = SequelUser.where(:auto_selections => 1).all
+      sequel_users.each do |user|
+        user.add_selection(selection) 
+      end
+    end
+
     def login_required
       #not as efficient as checking the session. but this inits the fb_user if they are logged in
       user = current_user
       if user && user.class != GuestUser
         return true
       else
+        #TODO: correct redirect after auto logout?
         #session[:return_to] = request.fullpath
         session[:return_to] = '/' 
         redirect '/login'
@@ -231,12 +236,12 @@ module Sinatra
         end
         case table
         when :libraries
-          #requested_rows = DB[:libraries_sequel_users].where(:id => user.id, :library_name => qry).count
           requested_rows = DB[:libraries].where(:library_name => DB[:selections_sequel_users].select(:library_name).join(:selections, :selection_name => :selection_name).where(:id => user.id, :library_name => qry)).count
         when :selections
           requested_rows = DB[:selections_sequel_users].where(:id => user.id, :selection_name => qry).count
         when :sequencing_datasets
-          requested_rows = DB[:sequel_users_sequencing_datasets].where(:id => user.id, :dataset_name => qry).count
+          #requested_rows = DB[:sequel_users_sequencing_datasets].where(:id => user.id, :dataset_name => qry).count
+          requested_rows = DB[:sequencing_datasets].where(:dataset_name => DB[:selections_sequel_users].select(:dataset_name).join(:sequencing_datasets, :selection_name => :selection_name ).where(:id => user.id, :dataset_name => qry)).count
         end
         if requested_rows == qry_size
           true
@@ -260,6 +265,7 @@ module Sinatra
       elements
     end
 
+    #TODO false case
     def update_access(selections, user)
       sequel_user = SequelUser.where(:id => user.id).first
       sel = Selection.select(:selection_name).where(:selection_name => selections).all
@@ -271,6 +277,7 @@ module Sinatra
       true
     end
 
+    
   end
 
   register SinatraAuthentication

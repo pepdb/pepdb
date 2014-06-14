@@ -67,8 +67,11 @@ $(document).ready(function(){
     $('body').load(window.location.pathname);
   });
    
+  /* highlight selected navbar group */
   var navbarSec = $('#navbarsec').val();
   $('#'+navbarSec).addClass('active');
+
+  /* when (un)marking "all" in checkboxlist (de)select all list entries  */
   $.each(formAll, function(index, value){
     $(value).click(function(){
       var marked = this.checked;
@@ -447,6 +450,7 @@ $(document).ready(function(){
     var link = $(this).attr('href');
     $.get(link, function(response){
       $('#editusers').html(response);
+      $.getScript(url+'/script/checkbox.js');
     });
   });
 
