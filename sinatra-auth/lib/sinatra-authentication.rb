@@ -260,7 +260,7 @@ module Sinatra
       when :selections
         query = DB[:selections_sequel_users].select(:selection_name).where(:id => user.id).all.each{|sel| elements.push(sel[:selection_name])}
       when :sequencing_datasets
-        query = SequencingDataset.select(:dataset_name).where(:dataset_name => DB[:selections_sequel_users].select(:dataset_name).join(:sequencing_datasets, :selection_name => :selection_name).where(:id => user.id)).all.each{|ds| elements.push(ds[:dataset_name])}
+        query = SequencingDataset.select(:dataset_name).where(:selection_name => DB[:selections_sequel_users].select(:selection_name).where(:id => user.id)).all.each{|ds| elements.push(ds[:dataset_name])}
       end
       elements
     end

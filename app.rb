@@ -2,9 +2,7 @@
 # loads all additional gems/modules, sets some options and 
 # contains all routes served by this application
 # pepdb.rb
-
-ENV['RACK_ENV'] = 'test'
-
+#ENV['RACK_ENV'] = 'test'
 require 'sinatra'
 require 'sinatra/partial'
 require 'sinatra/static_assets'
@@ -300,7 +298,7 @@ end
 get '/clusters' do
   login_required
   unless current_user.admin?
-    @datasets = get_accessible_elements(:sequencing_datsets) 
+    @datasets = get_accessible_elements(:sequencing_datasets) 
     @clusters = Cluster.where(:dataset_name => @datasets)
   else
     @clusters = Cluster
