@@ -1,5 +1,6 @@
 class BlosumSearch
-  def initialize(sequence, neighbours, peptides, sim_quot)
+  def initialize(sequence, neighbours, peptides, sim_quot, public_folder)
+    @full_path = public_folder
     @references = peptides
     @sequences = [*sequence].map{|s| s.to_s}
     @curr_seq = @sequences[0]
@@ -16,7 +17,7 @@ class BlosumSearch
 
   def read_blosum_file
     toplinematch = []
-    bf = File.new("./public_html/BLOSUM62")
+    bf = File.new(@full_path + "/BLOSUM62")
     lines = bf.readlines
     lines.each do |line|
       if line[0].match(/[#\*]/)
