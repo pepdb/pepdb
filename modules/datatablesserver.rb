@@ -19,7 +19,8 @@ module Sinatra
         @table = :peptides_sequencing_datasets
 
         unless @referer.include?("property-search")
-          @dataset = params['selElem'].split(",")
+          @dataset = params['selElem']
+          @dataset = params['selElem'].split(",") if @dataset.class == String
           @placeholder_args.insert(-1, *@columns, @table, *@dataset)
           @select = build_select_string
           @total_rec = Observation.where(:dataset_name => @dataset).count
