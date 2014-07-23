@@ -1,4 +1,4 @@
-
+require 'securerandom'
 
 task :default do
 
@@ -13,8 +13,10 @@ task :install do
   sh 'cp sqlite-regexp-master/regexp.o  .'
   sh 'cp sqlite-regexp-master/regexp.sqlext  .'
   
-  #build sqlite regex module
-  #get wkhtmlbinary
+  desc "setting up session cookie"
+
+  sh %Q/echo "use Rack::Session::Cookie, :expire_after => 3600, :secret => '#{SecureRandom.hex(32)}'" >> session_cookie.rb/
+
 end
 
 task :test do
