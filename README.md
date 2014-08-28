@@ -2,9 +2,9 @@
 
 This is the code behind http://pepdb.zbh.uni-hamburg.de
 
-### (Overview)[#overview] 
+### Overview 
 
-You can use pepDB to store and analyse NGS peptide datasets. You'll have access to various browsing and search functions like 
+You can use pepDB to store and analyse NGS peptide datasets. Additionally you'll have access to various browsing and search functions.
 
 
 In order to get this running on your own linux system you'll need:
@@ -13,7 +13,7 @@ In order to get this running on your own linux system you'll need:
 * SQLite
 * Bundler
 
-To setup everything needed to get pepDB running, type
+To setup everything needed to get pepDB running, type (not yet working 100%)
 
 ```
 % bundle install && bundle exec rake install
