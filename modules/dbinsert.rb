@@ -324,6 +324,7 @@ module Sinatra
             clusters, cluster_data =  fr.read_file(@values[:paras], selection, library)
             DB[:clusters].import([:dataset_name, :selection_name, :library_name, :consensus_sequence, :reads_sum, :dominance_sum, :parameters], clusters)
             Cluster.all.each do |cl|
+              #TODO intention?
             end
             DB[:clusters_peptides].import([:cluster_id, :peptide_sequence], cluster_data)
           rescue Sequel::Error => e
