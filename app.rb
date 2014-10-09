@@ -3,6 +3,8 @@
 # contains all routes served by this application
 # pepdb.rb
 #ENV['RACK_ENV'] = 'test'
+require 'bundler/setup'
+Bundler.setup
 require 'sinatra'
 require 'sinatra/partial'
 require 'sinatra/static_assets'
