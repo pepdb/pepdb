@@ -15,8 +15,7 @@ task :install do
   
   desc "setting up session cookie"
 
-  sh %Q/echo "use Rack::Session::Cookie, :expire_after => 3600, :secret => '#{SecureRandom.hex(32)}'" >> session_cookie.rb/
-
+  sh %Q/echo "use Rack::Session::Cookie, :expire_after => 3600, :secret => '#{SecureRandom.hex(32)}'" > session_cookie.rb/
 end
 
 task :test do
