@@ -5,7 +5,7 @@ Feature: Login
 
   Scenario: Unauthenticated user tries to open data browsing
     Given The user is not logged in
-    When The user opens 'libraries'
+    When The user opens "libraries"
     Then The login page should show up
   
   Scenario: Unauthenticated user submit correct credentials

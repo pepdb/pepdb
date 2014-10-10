@@ -50,3 +50,11 @@ Then(/^The text "(.*?)" should not show up$/) do |arg1|
   page.has_no_content?(arg1)
 end
 
+Then(/^The welcome page should show up$/) do
+  page.has_content?("Welcome to pepDB!")
+end
+
+Then(/^The message "(.*?)" should show up$/) do |arg1|
+  page.has_content?(arg1)
+end
+

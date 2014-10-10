@@ -27,6 +27,7 @@ Given(/^The user selects cluster "(.*?)" in library "(.*?)", selection "(.*?)" a
   click_link(arg1)
 end
 ### Actions
+
 When(/^The user finally selects library "(.*?)"$/) do |arg1|
   find('#select_table').find('td', :text => arg1).click
 end
