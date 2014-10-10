@@ -680,9 +680,6 @@ end
 
 post '/checklist' do
   login_required
-  puts params.inspect
-  puts "sdfasdfipasdfopiuhhhhhhhhhhhhhhhhh"
-  puts params[:checkedElem].inspect
   case params[:selector]
   when "sel"
     table = :libraries

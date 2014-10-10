@@ -4,7 +4,7 @@ require 'logger'
 # this file realizes the ORM part of sequel
 # all database tables can be accessed via the corresponding ruby classes
 # after this file has been loaded
-
+#ENV['RACK_ENV'] = 'test'
 # create db connection and load the regexp module
 if ENV['RACK_ENV'] == 'test'
   db_path = settings.root + '/test/testdata/test.db'
@@ -13,7 +13,7 @@ else
 end
 
 # Use this line to create a DB log file called update.log in the current directory
-#DB = Sequel.sqlite('pep.db', :synchronous => "off", :loggers => Logger.new('update.log'),:after_connect => (proc do |db|
+#DB = Sequel.sqlite(db_path, :synchronous => "off", :loggers => Logger.new('update.log'),:after_connect => (proc do |db|
 DB = Sequel.sqlite(db_path, :synchronous => "off", :after_connect => (proc do |db|
   db.enable_load_extension(1) 
   db.execute("SELECT load_extension('#{settings.root}/regexp.sqlext')")
