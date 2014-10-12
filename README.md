@@ -13,16 +13,20 @@ In order to get this running on your own linux system you'll need:
 * SQLite
 * Bundler
 
-To setup everything needed to get pepDB running, type (not yet working 100%)
+To setup everything needed to use pepDB, type 
 
 ```
 % bundle install && bundle exec rake install
 % ruby app.rb
 ```
 
-If everything was successfull you can reach the site via http://localhost:4567 and log in with `user: admin pw: admin`
+If everything was successful you can reach the site via http://localhost:4567 and log in with<br> 
+`user: admin pw: adminpw`
+
+If you want to use pepDB with some example data, run:
+
+```
+% rake example
+```
 
 To serve pepDB via apache have a look at the [passenger documentation](https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html#_deploying_a_rack_based_ruby_application_including_rails_gt_3).
-
-
-

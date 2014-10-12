@@ -50,7 +50,8 @@ if SequelUser.all.empty?
   #TODO throws an error on very first login, restarting the application eliminates this error
   salt = User.random_string(10)
   name = "admin"
-  DB[:sequel_users].insert(:username => name, :hashed_password => User.encrypt(name,salt),:salt => salt)
+  pw = "adminpw"
+  DB[:sequel_users].insert(:username => name, :hashed_password => User.encrypt(pw,salt),:salt => salt)
 end
 
 PDFKit.configure do |config|
