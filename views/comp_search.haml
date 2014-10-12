@@ -30,11 +30,10 @@
     .col-md-3
       %fieldset.search-params
         %legend.search-params dominance
-        %label.control-label{:for => "ds_dom_max"} max.
-        %input{:type => "text", :size => 5, :name => "ds_dom_max",:id => "ds_dom_max"}
-        %label.control-label{:for => "ds_dom_min"} min.
-        %input{:type => "text", :size => 5, :name => "ds_dom_min", :id => "ds_dom_min", :value => 0.0001}
-
+        %label.control-label{:for => "ref_dom_max"} max.
+        %input.form-control{:type => "text", :size => 5,:name => "ref_dom_max", :id => "ref_dom_max"}
+        %label.control-label{:for => "ref_dom_min"} min.
+        %input.form-control{:type => "text", :size => 5,:name => "ref_dom_min", :id => "ref_dom_min", :value => 0.000001}
   .form-group
     %h4 references
     .col-md-3 Library
@@ -59,9 +58,9 @@
       %fieldset.search-params
         %legend.search-params dominance
         %label.control-label{:for => "ref_dom_max"} max.
-        %input{:type => "text", :size => 5,:name => "ref_dom_max", :id => "ref_dom_max"}
+        %input.form-control{:type => "text", :size => 5,:name => "ref_dom_max", :id => "ref_dom_max"}
         %label.control-label{:for => "ref_dom_min"} min.
-        %input{:type => "text", :size => 5,:name => "ref_dom_min", :id => "ref_dom_min", :value => 0.000001}
+        %input.form-control{:type => "text", :size => 5,:name => "ref_dom_min", :id => "ref_dom_min", :value => 0.000001}
   .form-group 
     %input.btn.btn-primary{:type => "submit", :id => "compare", :value => "compare selected"}
     %input.btn{:type => "button", :id => "clear-button",:value => "clear selection"}
