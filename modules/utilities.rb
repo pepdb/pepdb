@@ -91,17 +91,13 @@ module Sinatra
     def get_max_row_length(cluster_per_match, results)
       length =  0
       cluster_per_match.each_value do |row|
-        puts row.inspect
         uniq_cl = row.dup.to_set
         cl_sum = 0
         uniq_cl.each do |cluster|
-          puts results[cluster].inspect
-          puts results[cluster].size
           cl_sum += results[cluster].size
         end
         length = cl_sum if cl_sum > length
       end
-      puts length
       length
     end
 
@@ -140,7 +136,6 @@ module Sinatra
       if value.nil?
         ""
       else
-        puts value.inspect
         value[0][column]
       end
     end

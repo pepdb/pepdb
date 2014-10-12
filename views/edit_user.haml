@@ -29,7 +29,6 @@
         %option{:value => 1, :selected => @user.permission_level == 1}
           Authenticated user
       .checkbox#auto-opt
-        - puts @auto_selections.inspect
         %label{:for => 'auto_sel'} 
           grant access to all new selections 
           %input{:type => "checkbox", :id => 'auto_sel', :name => 'user[auto_selections]', :checked => @auto_selections}

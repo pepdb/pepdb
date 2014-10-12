@@ -46,7 +46,6 @@ set :default_encoding, "utf-8"
 use Rack::Flash
 
 
-
 if SequelUser.all.empty?
   #TODO throws an error on very first login, restarting the application eliminates this error
   salt = User.random_string(10)
@@ -586,7 +585,6 @@ get '/comparative-results' do
     @results = Peptide.select(:peptide_sequence).where(:peptide_sequence => @common_peptides.map(:peptide_sequence)).all
     @specs = DB[:peptides_sequencing_datasets].select(:peptide_sequence, :dominance).where(:peptide_sequence => @common_peptides.map(:peptide_sequence), :dataset_name => params[:ref_ds]).to_hash_groups(:peptide_sequence, :dominance)
     @maxlength = 0 if @common_peptides.count == 0
-    puts @common_peptides.count
     haml :peptide_results, :layout => false
   else
     haml :validation_errors_wo_header, :layout => false, locals:{errors:@errors}
@@ -662,8 +660,6 @@ get '/peptide-infos' do
   @eletype = "Peptide"
   
   if request.referrer.include?('comparative-search')
-    puts request.referrer
-    puts params[:refDS].inspect
     @eletype = "Peptide Comparative"
     @peptides_info = []
     @peptides_dna = []
@@ -1016,7 +1012,6 @@ get '/editdrop' do
   login_required
   redirect "/" unless current_user.admin?
   @column = find_id_column(params[:table].to_s) 
-  puts params[:table]
   if params[:table] == "targets"
     @data = DB[params[:table].to_sym].select(:target_id, :species, :tissue, :cell).order(:species, :tissue, :cell).all
   else

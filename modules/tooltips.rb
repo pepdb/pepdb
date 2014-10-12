@@ -46,20 +46,11 @@ module Sinatra
     end
     
     def get_modal_text(category,type)
-     # puts Tips.inspect
-     # puts category
-     # puts type 
-     # puts Tips[category][type]
       Tips[category][type]
     end
 
     def get_tooltip_text(column_name)
       type = get_element_type
-     # puts "type: #{type}"
-     # puts request.url
-     # puts request.path
-     # puts "column: #{column_name}"
-      #puts Tips.inspect
       Tips[type][column_name.to_s]
     end
 

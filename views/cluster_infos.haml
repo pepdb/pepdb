@@ -1,7 +1,6 @@
 %input{:type => "hidden", :id => "refelem1", :value=> params[:selCl].to_s}
 - if request.referrer.include?("comparative-cluster")
   - index = 0
-  - puts @cluster_infos.inspect
   - @cluster_infos.each do |cl|  
     .row.row-separator
       .col-md-3
