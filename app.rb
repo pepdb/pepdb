@@ -27,8 +27,10 @@ require 'haml'
 require 'json'
 require 'rack-flash'
 require 'set'
-require 'pdfkit'  
 require 'logger'
+require 'pdfkit'
+require settings.root + '/session_cookie'
+
 
 Haml::Options.defaults[:format] = :xhtml
 
@@ -39,8 +41,16 @@ set :default_encoding, "utf-8"
 set :log_dir, settings.root + '/logs'
 #set :environment, :development
 
-use Rack::Session::Cookie, :expire_after => 3600, :secret => 'Gh6hh91uhMEsmq05h01ec2b4i9BRVj39' 
 use Rack::Flash
+
+
+
+if SequelUser.all.empty?
+  #TODO throws an error on very first login, restarting the application eliminates this error
+  salt = User.random_string(10)
+  name = "admin"
+  DB[:sequel_users].insert(:username => name, :hashed_password => User.encrypt(name,salt),:salt => salt)
+end
 
 PDFKit.configure do |config|
   config.wkhtmltopdf = settings.root + '/bin/wkhtmltopdf'
