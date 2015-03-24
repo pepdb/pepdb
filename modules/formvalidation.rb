@@ -147,7 +147,10 @@ module Sinatra
 
       def valid_date_format?(date)
         begin
-          Date.iso8601(date)
+          if date.count('-') != 2
+            return false
+          end
+          @params[:date] = Date.iso8601(date).to_s
           true
         rescue
           false
