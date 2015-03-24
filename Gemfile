@@ -8,10 +8,10 @@ gem 'sequel'
 gem 'sinatra-partial'
 gem 'json'
 gem 'pdfkit'
+gem 'xml-simple'
 gem 'sinatra-static-assets' # https://gemcutter.org, seems to be merged with rubygems
 
-gem 'sinatra-authentication', :git => 'https://github.com/ccasar/sinatra-authentication.git'
-
+gem 'sinatra-authentication', :git => 'https://github.com/ccasar/sinatra-authentication.git', :branch => 'master'
 
 group :apache do
   gem 'passenger'

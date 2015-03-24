@@ -16,7 +16,6 @@ module Sinatra
             if line.match(/^\s+1/)
               line_found = true
               positions = line.scan(/[0-9]/)
-              puts positions.inspect
             end  
           else
             acid_values = {}

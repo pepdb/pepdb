@@ -1,5 +1,6 @@
 session_cookie.rb
 *.swp
+session_cookie.rb
 pep.db-journal
 .sass-cache
 regexp.o
@@ -36,6 +37,6 @@ test.rb
 .zshrc
 pepdb.dump.gz
 public_html/old_index.html
-statisticfiles/
 wkhtmltox/
-
+.bundle/
+*.lock

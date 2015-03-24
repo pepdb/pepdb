@@ -1,0 +1,16 @@
+{
+  "undef": true,
+  "unused": true,
+  "bitwise": true,
+  "camelcase": true,
+  "curly": true,
+  "latedef": true,
+  "noempty": true,
+  "nonbsp": true,
+  "quotmark": "single",
+  "strict": true,
+  "trailing": true,
+  "jquery":true,  
+  "indent":2,
+  "globals": {"document":false, "pepdb":false}
+}

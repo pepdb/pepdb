@@ -5,9 +5,12 @@
   %h2 
     comparative cluster search 
     %button.btn-xs.btn-info{"data-toggle"=>"modal", "data-target"=>"#infomodal"} details 
-%h4 investigated sequencing dataset
 %form.form-horizontal{:id => "compclsub", :action => "#{url '/comparative-cluster-results'}", :method => 'get'}
   .form-group
+    %h4 investigated sequencing dataset
+    .col-md-3 Library
+    .col-md-3 Selection
+    .col-md-offset-3 Sequencing Dataset
     .col-md-3.check-select#comp-library
       %fieldset
         .checkbox
@@ -32,6 +35,9 @@
 
   .form-group
     %h4 references 
+    .col-md-3 Library
+    .col-md-3 Selection
+    .col-md-offset-3 Sequencing Dataset
     .col-md-3.check-select#ref-library
       %fieldset.checklist
         .checkbox

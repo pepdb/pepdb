@@ -7,6 +7,9 @@
 
 %form.form-horizontal{:id => "libform", :action => "#{url '/sys-search'}", :method => 'get', :role => "form"}
   .form-group
+    .col-md-4 Library
+    .col-md-4 Selection
+    .col-md-4 Sequencing Dataset
     .col-md-4.check-select#ref-library
       %fieldset.checklist
         .checkbox
@@ -20,7 +23,6 @@
               %input{:type => "checkbox", :name => "checked_lib[]", :id => "#{elem[:library_name]}",:value => "#{elem[:library_name]}"}/
               = elem[:library_name]
               %br
-
     .check-select.col-md-4#ref-selection
 
     .check-select.col-md-4#ref-dataset

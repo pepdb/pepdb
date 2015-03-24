@@ -35,7 +35,6 @@ module Sinatra
             end # [
           end # bracket_open
         end # char
-        puts @regexp
         @regexp
       end # end buid_string
 
@@ -70,7 +69,6 @@ module Sinatra
             raise ArgumentError, "invalid amino acid #{h char} given!"
           end
         end #char
-        puts @wildcard
         wc = WildcardSearch.new(@wildcard)
         @regexp = wc.build_string
       end #build_string

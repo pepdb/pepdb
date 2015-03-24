@@ -8,6 +8,9 @@
 %h4 sequencing datasets
 %form.form-horizontal{:id => "motsearch", :action => "#{url '/motif-search-results'}", :method => 'get'}
   .form-group
+    .col-md-3 Library
+    .col-md-3 Selection 
+    .col-md-offset-3 Sequencing Dataset
     .col-md-3.check-select#ref-library
       %fieldset.checklist
         .checkbox
