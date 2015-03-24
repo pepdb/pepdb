@@ -1,7 +1,6 @@
 # require gems needed to run pepdb, see Gemfile
-require 'bundler'
-Bundler.require
-require 'sinatra'
+require 'bundler/setup'
+Bundler.setup(:default)
 
 # run pepdb
 require File.expand_path '../app.rb', __FILE__
