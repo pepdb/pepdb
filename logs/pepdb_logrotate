@@ -1,0 +1,13 @@
+/home/other/pepdb/logs/access.log
+/home/other/pepdb/logs/error.log
+{
+        compress
+        maxage 7
+        size +4096k
+        rotate 5
+        missingok
+        postrotate
+                touch /home/other/pepdb/tmp/restart.txt
+        endscript
+}
+

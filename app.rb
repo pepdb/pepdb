@@ -27,7 +27,8 @@ require 'haml'
 require 'json'
 require 'rack-flash'
 require 'set'
-require 'pdfkit'
+require 'pdfkit'  
+require 'logger'
 
 Haml::Options.defaults[:format] = :xhtml
 
@@ -35,6 +36,7 @@ set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
 set :public_folder, Proc.new {File.join(root, "public_html")}
 set :default_encoding, "utf-8" 
+set :log_dir, settings.root + '/logs'
 #set :environment, :development
 
 use Rack::Session::Cookie, :expire_after => 3600, :secret => 'Gh6hh91uhMEsmq05h01ec2b4i9BRVj39' 
@@ -47,6 +49,30 @@ end
 configure do 
   mime_type :pdf, 'application/pdf'
 end
+
+if settings.environment == :production
+  ::Logger.class_eval { alias :write :'<<' }
+  access_log = File.join(settings.log_dir, 'access.log')
+  access_logger = ::Logger.new(access_log)
+  error_logger = ::File.new(::File.join(settings.log_dir, 'error.log'),'a+')
+  error_logger.sync = true
+
+  Thread.new do
+    loop do
+      %x[logrotate --state #{File.join(settings.log_dir, '.status')} #{File.join(settings.log_dir, 'pepdb_logrotate')}]
+      sleep 86400
+    end
+  end
+
+  configure do
+    use ::Rack::CommonLogger, access_logger
+  end
+
+  before {
+    env["rack.errors"] =  error_logger
+  } 
+end
+
 
 # column to select in later database queries to create less clutter in the routes
 library_columns = [:library_name___Name, :carrier___Carrier, :encoding_scheme___Encoding_scheme, :insert_length___Insert_length]
