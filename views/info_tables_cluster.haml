@@ -94,7 +94,7 @@
                 %td.text-right= column[1]
               -else
                 %td= column[1]
-- if defined? dna_data 
+- unless !defined? dna_data or dna_data.nil?
   - if dna_data.size != 0
     .col-md-5
       %table.table.table-bordered

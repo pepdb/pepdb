@@ -40,7 +40,7 @@ module Sinatra
       investigate = Cluster.select(:consensus_sequence).where(:dataset_name => investigate_ds.to_s).where("dominance_sum > ?", min_dom_inv.to_f).map(:consensus_sequence)
       #references = Cluster.select(:consensus_sequence).where(:dataset_name => references.to_a.map{|s| s.to_s}).where("dominance_sum > ?", min_dom_ref.to_f).all.map{|s| s[:consensus_sequence].upcase }
       references = Cluster.select(:consensus_sequence).where(:dataset_name => references.to_a.map{|s| s.to_s}).where("dominance_sum > ?", min_dom_ref.to_f).map(:consensus_sequence)
-      bs = BlosumSearch.new(investigate, Float::INFINITY,references, sim_quot.to_f)
+      bs = BlosumSearch.new(investigate, Float::INFINITY,references, sim_quot.to_f, settings.public_folder)
       bs.extend(BlosumHelpers)
       bs.get_neighbours
     end #comp_cluster_search
