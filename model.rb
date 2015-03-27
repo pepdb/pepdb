@@ -13,8 +13,8 @@ else
 end
 
 # Use this line to create a DB log file called update.log in the current directory
-#DB = Sequel.sqlite(db_path, :synchronous => "off", :loggers => Logger.new('update.log'),:after_connect => (proc do |db|
-DB = Sequel.sqlite(db_path, :synchronous => "off", :after_connect => (proc do |db|
+#DB = Sequel.sqlite(db_path, :synchronous => "normal", :loggers => Logger.new('update.log'),:after_connect => (proc do |db|
+DB = Sequel.sqlite(db_path, :synchronous => "normal", :after_connect => (proc do |db|
   db.enable_load_extension(1) 
   db.execute("SELECT load_extension('#{settings.root}/regexp.sqlext')")
   db.enable_load_extension(0) 

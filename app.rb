@@ -10,6 +10,7 @@ require 'sequel'
 require settings.root + '/model'
 require 'sinatra-authentication'
 require 'xmlsimple'
+require settings.root + '/core_ext/object'
 require settings.root + '/modules/querystringbuilder'
 require settings.root + '/modules/formvalidation'
 require settings.root + '/modules/utilities'
@@ -594,9 +595,10 @@ end
 get '/comparative-results' do
   login_required
   @errors = {}
+  puts params.inspect
   if params[:radio_ds].nil? || params[:ref_ds].nil?
     @errors[:ds] = "at least one dataset selection per section needed!"
-  elsif (params[:ref_dom_max].empty? && params[:ref_dom_min].empty?) || (params[:ds_dom_max].empty? && params[:ds_dom_min].empty?)
+  elsif (params[:ref_dom_max].blank? && params[:ref_dom_min].blank?) || (params[:ds_dom_max].blank? && params[:ds_dom_min].blank?)
     @errors[:dom] = "at least one dominance limit needs to be selected per section!"
   end
   if @errors.empty?
