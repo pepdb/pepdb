@@ -3,6 +3,8 @@
 # contains all routes served by this application
 # pepdb.rb
 #ENV['RACK_ENV'] = 'test'
+  require 'bundler/setup'
+  Bundler.setup(:default)
 require 'sinatra'
 require 'sinatra/partial'
 require 'sinatra/static_assets'
@@ -1051,15 +1053,8 @@ post '/validate-data' do
   login_required
   redirect "/" unless current_user.admin?
   @errors = validate(params)
+  @dberrors = {}
   @values = params
-  unless params[:statfile].nil?
-    if params[:tab].nil?
-      @values[:overwrite] = false
-    else
-      @values[:overwrite] = true 
-    end
-    @errors = save_statfile(@values)
-  end
   if @errors.empty?
     if params[:tab].nil?
       @dberrors = insert_data(@values)
@@ -1068,11 +1063,19 @@ post '/validate-data' do
       @dberrors = update_data(@values)
       @message = "Update successful!"
     end
-    if @dberrors.empty?
-      haml :success, :layout => false
+  end
+  if !params[:statfile].nil? && @errors.empty? && @dberrors.empty?
+    if params[:tab].nil?
+      @values[:overwrite] = false
     else
-      haml :validation_errors, :layout => false, locals:{errors: @dberrors}
+      @values[:overwrite] = true 
     end
+    @errors = save_statfile(@values)
+  end
+  if @dberrors.empty? && @errors.empty?
+    haml :success, :layout => false
+  elsif @errors.empty?
+    haml :validation_errors, :layout => false, locals:{errors: @dberrors}
   else
     haml :validation_errors, :layout => false, locals:{errors: @errors}
   end

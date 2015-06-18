@@ -3,6 +3,7 @@ require 'sqlite3'
 require 'csv'
 require settings.root + '/modules/columnfinder'
 require 'sinatra-authentication'
+require 'benchmark'
 # this module is used to insert and update database data
 module Sinatra
   module DBInserter 
@@ -188,7 +189,12 @@ module Sinatra
         @values = values
         @errors ={}
         @datatype = values[:submittype]
-      end # init
+      end # snit
+      
+      def current_time
+        Time.now.strftime "%H:%M:%S"
+      end
+
       
       def try_insert
           if @datatype == "library"
@@ -249,15 +255,6 @@ module Sinatra
               target = nil
             end  
             DB[:sequencing_datasets].insert(:dataset_name => "#{es @values[:dsname].to_s}", :read_type => "#{es @values[:rt].to_s}", :date =>"#{es @values[:date]}", :target_id => target, :library_name => library, :selection_name => "#{es @values[:dselname].to_s}", :used_indices => "#{es @values[:ui].to_s}", :origin => "#{es @values[:or].to_s}", :produced_by => "#{es @values[:prod].to_s}", :sequencer => "#{es @values[:seq].to_s}", :selection_round => "#{es @values[:selr].to_i}", :sequence_length => "#{es @values[:seql]}", :statistic_file => @values[:statpath])
-          rescue Sequel::Error => e
-            if e.message.include? "unique"
-              @errors[:ds] = "Given name not unique"
-            else
-              @errors[:ds] = e.message 
-            end
-            raise Sequel::Rollback 
-          end
-          begin 
             fr = FileReader.new(@values[:submittype], @values[:pepfile][:tempfile], @values[:dsname])
             dataset_type = fr.ds_type
             if dataset_type == :ngs 
@@ -265,32 +262,35 @@ module Sinatra
             else
               peps, pep_ds =  fr.read_file 
             end
-          dnas_qry, dnas_placeholder_args = build_compound_select_string(dnas, :dna_sequences, :dna_sequence) if dataset_type == :ngs
-          peps_qry, peps_placeholder_args = build_compound_select_string(peps, :peptides, :peptide_sequence)
+            dnas_qry, dnas_placeholder_args = build_compound_select_string(dnas, :dna_sequences, :dna_sequence) if dataset_type == :ngs
+            peps_qry, peps_placeholder_args = build_compound_select_string(peps, :peptides, :peptide_sequence)
 
             if dataset_type == :ngs
               dnas_qry.zip(dnas_placeholder_args).each do |qry, args|
                 new_data= DB[qry, *args]
                 new_data.insert
-
               end #qry,args
             end #ngs
- 
+            peps_qry.zip(peps_placeholder_args).each do |qry, args|
+              new_data= DB[qry, *args]
+              new_data.insert
+            end #qry,args
+        DB[:dna_sequences_peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :dna_sequence,:reads], dna_pep) if dataset_type == :ngs
+            DB[:peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :reads, :dominance, :rank], pep_ds)
           rescue Sequel::Error => e 
             @errors[:insert] = e.message #"Inserting data failed. Changes rolled back"
             raise Sequel::Rollback 
           rescue ArgumentError => e
             @errors[:ds] = e.message
             raise Sequel::Rollback
-          end # resc
-        
-        DB[:dna_sequences_peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :dna_sequence,:reads], dna_pep) if dataset_type == :ngs
-        DB[:peptides_sequencing_datasets].import([:dataset_name, :peptide_sequence, :reads, :dominance, :rank], pep_ds)
-        #end # trans
-      end
-      # fter inserting a new sequencing dataset update the distinct peptides field of the corresponding library 
-      update_distinct_peptides = DB["UPDATE libraries SET distinct_peptides = (SELECT COUNT (DISTINCT peptide_sequence) FROM peptides_sequencing_datasets AS pep_seq INNER JOIN sequencing_datasets AS ds ON pep_seq.dataset_name = ds.dataset_name  WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)) WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)", @values[:dsname].to_s, @values[:dsname].to_s]
-      update_distinct_peptides.update
+          end
+        end
+        update_distinct_peptides = ''
+
+        # after inserting a new sequencing dataset update the distinct peptides field of the corresponding library 
+        update_distinct_peptides = DB["UPDATE libraries SET distinct_peptides = (SELECT COUNT (DISTINCT peptide_sequence) FROM peptides_sequencing_datasets AS pep_seq INNER JOIN sequencing_datasets AS ds ON pep_seq.dataset_name = ds.dataset_name  WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)) WHERE library_name = (SELECT library_name FROM sequencing_datasets WHERE dataset_name = ?)", @values[:dsname].to_s, @values[:dsname].to_s]
+
+        update_distinct_peptides.update
       end #dataset
        
       def into_cluster
